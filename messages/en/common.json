@@ -7,7 +7,9 @@
     "tagline": "A headless data-grid toolkit for TypeScript.",
     "githubHeading": "Repository",
     "packagesHeading": "Packages",
-    "copyright": "© {year} GridKit."
+    "copyright": "© {year} GridKit.",
+    "credit": "Built by <name>Blagoja Blazhevski</name>",
+    "githubProfileLabel": "Blagoja Blazhevski on GitHub"
   },
   "liveExample": "Live example",
   "install": "Install"

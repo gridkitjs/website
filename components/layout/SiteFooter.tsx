@@ -52,9 +52,32 @@ export async function SiteFooter() {
           </ul>
         </div>
       </Container>
-      <Container className="border-site-line border-t py-6">
+      <Container className="border-site-line flex flex-wrap items-center justify-between gap-2 border-t py-6">
         <p className="text-site-ink-muted text-xs">
           {t("copyright", { year })}
+        </p>
+        <p className="text-site-ink-muted flex items-center gap-1.5 text-xs">
+          {t.rich("credit", {
+            name: (chunks) => (
+              <a
+                href={siteConfig.author.portfolio}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-site-ink hover:text-site-accent underline underline-offset-2 transition-colors"
+              >
+                {chunks}
+              </a>
+            ),
+          })}
+          <a
+            href={siteConfig.author.github}
+            target="_blank"
+            rel="noreferrer noopener"
+            aria-label={t("githubProfileLabel")}
+            className="text-site-ink-muted hover:text-site-ink transition-colors"
+          >
+            <GitHubIcon className="size-3.5" />
+          </a>
         </p>
       </Container>
     </footer>

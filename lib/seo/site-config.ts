@@ -7,4 +7,9 @@ export const siteConfig = {
     react: "https://www.npmjs.com/package/@gridkitjs/react",
     themeTailwind: "https://www.npmjs.com/package/@gridkitjs/theme-tailwind",
   },
+  author: {
+    name: "Blagoja Blazhevski",
+    github: "https://github.com/blagojablazhevski",
+    portfolio: "https://blazhevski.com",
+  },
 } as const;
