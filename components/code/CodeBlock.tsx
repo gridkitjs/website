@@ -28,7 +28,7 @@ export async function CodeBlock({
     >
       <CopyButton code={trimmed} />
       <div
-        className="overflow-x-auto [&_pre]:p-4 [&_pre]:leading-relaxed [&_pre]:bg-transparent!"
+        className="overflow-x-auto [&_pre]:bg-transparent! [&_pre]:p-4 [&_pre]:leading-relaxed"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
