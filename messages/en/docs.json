@@ -11,6 +11,10 @@
       "overview": "Overview",
       "columnDefinitions": "Column definitions",
       "sizingAndOrdering": "Sizing & ordering"
+    },
+    "theme": {
+      "section": "Theme",
+      "overview": "Overview"
     }
   },
   "index": {
@@ -24,6 +28,10 @@
     "coreCard": {
       "title": "@gridkitjs/core",
       "description": "Framework-agnostic column inference, ordering, and resizing."
+    },
+    "themeCard": {
+      "title": "@gridkitjs/theme-tailwind",
+      "description": "Palette tokens, dark mode, and the grid's styles."
     }
   },
   "react": {
@@ -36,9 +44,10 @@
     "dataGrid": {
       "title": "DataGridComponent",
       "description": "The grid component: columns, data, borders, resizing, and reordering.",
-      "intro": "DataGridComponent takes a set of columns and a data source and renders a grid. Resizing and reordering are opt-in — enable them per grid with resizableColumns and reorderableColumns.",
+      "intro": "DataGridComponent takes a set of columns and a data source and renders a grid. Resizing and reordering are opt-in — enable them per grid with resizableColumns and reorderableColumns, or per column via each column's own resizable and reorderable fields.",
       "propsHeading": "Props",
-      "exampleHeading": "Resizable, reorderable columns"
+      "exampleHeading": "Resizable, reorderable columns",
+      "interactionsHeading": "Keyboard & pointer interactions"
     },
     "columnTemplates": {
       "title": "Column templates",
@@ -58,13 +67,26 @@
       "title": "Column definitions",
       "description": "Inferring columns from row data with defineColumnsFromRows.",
       "intro": "defineColumnsFromRows inspects your row data and infers a type and alignment per field, one level into nested objects. Use it as a starting point, then override or extend individual columns.",
-      "exampleHeading": "Inferred columns"
+      "exampleHeading": "Inferred columns",
+      "shapeHeading": "Column definition shape"
     },
     "sizingAndOrdering": {
       "title": "Sizing & ordering",
       "description": "The resizing and reordering logic underneath resizableColumns and reorderableColumns.",
       "intro": "resolveColumnWidths, fitColumnsToWidth, applyColumnOrder, and moveColumnBefore are the functions DataGridComponent calls internally when resizableColumns or reorderableColumns is enabled. Reach for them directly if you're building a custom grid adapter.",
       "exampleHeading": "The same logic, in the React grid"
+    }
+  },
+  "theme": {
+    "overview": {
+      "title": "@gridkitjs/theme-tailwind",
+      "description": "Palette tokens, dark mode, and the grid's styles.",
+      "intro": "@gridkitjs/react renders semantic class names — gridkit-data-grid, header-cell, grid-row — and this stylesheet targets them directly. Nothing needs to scan component source, and every colour is a CSS custom property, so overriding one is plain CSS.",
+      "installHeading": "Install",
+      "classesHeading": "Semantic classes",
+      "tokensHeading": "Theme tokens",
+      "darkModeHeading": "Dark mode",
+      "darkModeIntro": "The dark: variant is bound to a .dark class rather than the OS preference, so you drive the theme yourself:"
     }
   }
 }

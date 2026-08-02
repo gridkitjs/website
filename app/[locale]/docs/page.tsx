@@ -39,6 +39,11 @@ export default async function DocsIndexPage({
       title: t("coreCard.title"),
       description: t("coreCard.description"),
     },
+    {
+      href: "/docs/theme-tailwind",
+      title: t("themeCard.title"),
+      description: t("themeCard.description"),
+    },
   ];
 
   return (
@@ -47,7 +52,7 @@ export default async function DocsIndexPage({
         {t("title")}
       </h1>
       <p className="text-site-ink-muted mt-3 max-w-2xl text-lg">{t("intro")}</p>
-      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
           <Link
             key={card.href}

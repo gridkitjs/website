@@ -150,6 +150,22 @@ export default async function DataGridDocPage({
       <CodeBlock code={exampleSource} className="mt-4" />
       <h2>{t("propsHeading")}</h2>
       <PropsTable rows={propRows} />
+      <h2>{t("interactionsHeading")}</h2>
+      <ul className="text-site-ink-muted list-disc space-y-2 pl-5 leading-relaxed">
+        <li>
+          Drag a header&apos;s trailing edge to resize; double-click it to size
+          the column to its content.
+        </li>
+        <li>
+          With the resize handle focused, arrow keys nudge the width; Escape
+          cancels an in-progress resize.
+        </li>
+        <li>Drag a header to reorder columns.</li>
+        <li>
+          With a header focused, Ctrl+ArrowLeft / Ctrl+ArrowRight reorders it
+          via keyboard; Escape cancels an in-progress drag.
+        </li>
+      </ul>
     </DocPage>
   );
 }

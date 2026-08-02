@@ -43,11 +43,15 @@ export default async function ReactOverviewPage({
         <Link href="/docs/react/data-grid" className="text-site-accent">
           DataGridComponent
         </Link>{" "}
-        for the component itself, or{" "}
+        for the component itself,{" "}
         <Link href="/docs/react/column-templates" className="text-site-accent">
           column templates
         </Link>{" "}
-        for custom header and cell rendering.
+        for custom header and cell rendering, or{" "}
+        <Link href="/docs/theme-tailwind" className="text-site-accent">
+          theming
+        </Link>{" "}
+        for palette tokens and dark mode.
       </p>
     </DocPage>
   );

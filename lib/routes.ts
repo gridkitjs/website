@@ -47,6 +47,11 @@ export const docsNav: DocSectionRoute[] = [
       },
     ],
   },
+  {
+    path: "theme-tailwind",
+    navLabelKey: "nav.theme.section",
+    pages: [{ path: "theme-tailwind", navLabelKey: "nav.theme.overview" }],
+  },
 ];
 
 /** Every docs page path, flattened, e.g. "react/data-grid". */
