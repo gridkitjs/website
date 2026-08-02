@@ -1,9 +1,10 @@
 import { codeToHtml } from "shiki";
 import { cn } from "@/components/ui/cn";
+import { CopyButton } from "./CopyButton";
 
 interface CodeBlockProps {
   code: string;
-  lang?: "tsx" | "ts";
+  lang?: "tsx" | "ts" | "css";
   className?: string;
 }
 
@@ -12,7 +13,8 @@ export async function CodeBlock({
   lang = "tsx",
   className,
 }: CodeBlockProps) {
-  const html = await codeToHtml(code.trim(), {
+  const trimmed = code.trim();
+  const html = await codeToHtml(trimmed, {
     lang,
     theme: "github-light",
   });
@@ -20,10 +22,15 @@ export async function CodeBlock({
   return (
     <div
       className={cn(
-        "border-site-line bg-site-surface overflow-x-auto rounded-xl border text-sm [&_pre]:p-4 [&_pre]:leading-relaxed",
+        "border-site-line bg-site-surface relative overflow-hidden rounded-xl border text-sm",
         className,
       )}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    >
+      <CopyButton code={trimmed} />
+      <div
+        className="overflow-x-auto [&_pre]:p-4 [&_pre]:leading-relaxed [&_pre]:bg-transparent!"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
   );
 }
