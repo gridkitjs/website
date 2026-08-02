@@ -1,0 +1,46 @@
+{
+  "hero": {
+    "title": "Grid logic that stays out of your way.",
+    "subtitle": "GridKit separates grid logic from rendering. Sorting, filtering, and paging live in framework-agnostic TypeScript; React just renders the result — so you're never fighting a component to get the behavior your data needs.",
+    "primaryCta": "Read the docs",
+    "secondaryCta": "View on GitHub"
+  },
+  "features": {
+    "title": "Built to be read, not just used",
+    "subtitle": "Three packages, one clean split between logic and rendering.",
+    "items": [
+      {
+        "title": "Framework-agnostic core",
+        "description": "Column inference, ordering, and resizing live in plain TypeScript — testable without a DOM, and ready for adapters beyond React."
+      },
+      {
+        "title": "Semantic React components",
+        "description": "DataGridComponent renders semantic class names and carries no styles of its own, so your theme decides how it looks."
+      },
+      {
+        "title": "A theme you can swap",
+        "description": "@gridkitjs/theme-tailwind ships the grid's palette as OKLCH tokens with a built-in dark mode — or bring your own stylesheet."
+      }
+    ]
+  },
+  "packages": {
+    "title": "Three packages, one grid",
+    "core": {
+      "name": "@gridkitjs/core",
+      "description": "Column inference, ordering, and resizing logic."
+    },
+    "react": {
+      "name": "@gridkitjs/react",
+      "description": "The DataGridComponent and its supporting hooks, built on core."
+    },
+    "themeTailwind": {
+      "name": "@gridkitjs/theme-tailwind",
+      "description": "The grid's stylesheet — palette tokens, dark mode, grid styles."
+    }
+  },
+  "cta": {
+    "title": "Start with the docs",
+    "description": "Every example on the docs site runs the real, published packages — nothing simplified for the demo.",
+    "button": "Explore the docs"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "nav": {
+    "react": {
+      "section": "React",
+      "overview": "Overview",
+      "dataGrid": "DataGridComponent",
+      "columnTemplates": "Column templates"
+    },
+    "core": {
+      "section": "Core",
+      "overview": "Overview",
+      "columnDefinitions": "Column definitions",
+      "sizingAndOrdering": "Sizing & ordering"
+    }
+  },
+  "index": {
+    "title": "Docs",
+    "description": "Reference and live examples for @gridkitjs/react and @gridkitjs/core.",
+    "intro": "GridKit is early: the API is still moving and may break between minor versions. These docs cover what's shipped today and run against the real, published packages.",
+    "reactCard": {
+      "title": "@gridkitjs/react",
+      "description": "The DataGridComponent — semantic, unstyled, and built on core."
+    },
+    "coreCard": {
+      "title": "@gridkitjs/core",
+      "description": "Framework-agnostic column inference, ordering, and resizing."
+    }
+  },
+  "react": {
+    "overview": {
+      "title": "@gridkitjs/react",
+      "description": "React components for GridKit, built on @gridkitjs/core.",
+      "intro": "@gridkitjs/react renders semantic class names — gridkit-data-grid, header-cell, grid-row — and carries no styles of its own. Pair it with @gridkitjs/theme-tailwind, or target the same class names with your own stylesheet.",
+      "installHeading": "Install"
+    },
+    "dataGrid": {
+      "title": "DataGridComponent",
+      "description": "The grid component: columns, data, borders, resizing, and reordering.",
+      "intro": "DataGridComponent takes a set of columns and a data source and renders a grid. Resizing and reordering are opt-in — enable them per grid with resizableColumns and reorderableColumns.",
+      "propsHeading": "Props",
+      "exampleHeading": "Resizable, reorderable columns"
+    },
+    "columnTemplates": {
+      "title": "Column templates",
+      "description": "Custom header and cell rendering with headerTemplate and cellTemplate.",
+      "intro": "Start from defineColumnsFromRows for the columns you don't need to customize, then declare the ones you do. headerTemplate and cellTemplate accept any React node, so formatting and conditional styling are plain component code.",
+      "exampleHeading": "Formatted currency column"
+    }
+  },
+  "core": {
+    "overview": {
+      "title": "@gridkitjs/core",
+      "description": "Framework-agnostic grid logic: column inference, ordering, and resizing.",
+      "intro": "@gridkitjs/core is plain TypeScript — so it's testable without a DOM and reusable from other framework adapters. Today it covers column inference, ordering, and resizing; sorting, filtering, and paging are not implemented yet.",
+      "installHeading": "Install"
+    },
+    "columnDefinitions": {
+      "title": "Column definitions",
+      "description": "Inferring columns from row data with defineColumnsFromRows.",
+      "intro": "defineColumnsFromRows inspects your row data and infers a type and alignment per field, one level into nested objects. Use it as a starting point, then override or extend individual columns.",
+      "exampleHeading": "Inferred columns"
+    },
+    "sizingAndOrdering": {
+      "title": "Sizing & ordering",
+      "description": "The resizing and reordering logic underneath resizableColumns and reorderableColumns.",
+      "intro": "resolveColumnWidths, fitColumnsToWidth, applyColumnOrder, and moveColumnBefore are the functions DataGridComponent calls internally when resizableColumns or reorderableColumns is enabled. Reach for them directly if you're building a custom grid adapter.",
+      "exampleHeading": "The same logic, in the React grid"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "home": "Home",
+    "docs": "Docs"
+  },
+  "footer": {
+    "tagline": "A headless data-grid toolkit for TypeScript.",
+    "githubHeading": "Repository",
+    "packagesHeading": "Packages",
+    "copyright": "© {year} GridKit."
+  },
+  "liveExample": "Live example",
+  "install": "Install"
+}
