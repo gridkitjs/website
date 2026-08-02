@@ -10,6 +10,17 @@ export async function Hero() {
 
   return (
     <Section variant="inverted" className="overflow-hidden">
+      <div className="mx-auto mt-14 max-w-md">
+        <Image
+          src="/brand/gridkit-header.svg"
+          alt="GridKit"
+          width={1920}
+          height={950}
+          priority
+          sizes="(min-width: 896px) 896px, 100vw"
+          className="h-auto w-full"
+        />
+      </div>
       <Container className="relative pt-14 pb-20 text-center sm:pt-18 sm:pb-28">
         <h1 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
           {t("title")}
@@ -26,17 +37,6 @@ export async function Hero() {
           >
             {t("secondaryCta")}
           </Button>
-        </div>
-        <div className="mx-auto mt-14 max-w-4xl">
-          <Image
-            src="/brand/gridkit-header.svg"
-            alt="GridKit"
-            width={1920}
-            height={950}
-            priority
-            sizes="(min-width: 896px) 896px, 100vw"
-            className="h-auto w-full opacity-90"
-          />
         </div>
       </Container>
     </Section>
