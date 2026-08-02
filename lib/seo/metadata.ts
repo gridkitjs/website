@@ -28,6 +28,12 @@ export function buildMetadata({
       localizedUrl(candidate, path),
     ]),
   );
+  const ogImage = {
+    url: "/brand/repository-open-graph-template.png",
+    width: 1280,
+    height: 640,
+    alt: siteConfig.name,
+  };
 
   return {
     title,
@@ -43,11 +49,13 @@ export function buildMetadata({
       siteName: siteConfig.name,
       locale,
       type: "website",
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [ogImage.url],
     },
   };
 }
