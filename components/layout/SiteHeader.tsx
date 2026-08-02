@@ -1,6 +1,6 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { HomeIcon } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
 
 export async function SiteHeader() {
@@ -13,9 +13,19 @@ export async function SiteHeader() {
           <Link
             href="/"
             aria-label={t("home")}
-            className="text-site-ink flex items-center gap-2 transition-opacity hover:opacity-70"
+            className="flex items-center gap-2 transition-opacity hover:opacity-70"
           >
-            <HomeIcon className="size-5" />
+            <Image
+              src="/brand/grid-kit-logo.svg"
+              alt=""
+              width={24}
+              height={24}
+              className="size-6"
+              priority
+            />
+            <span className="text-site-accent text-sm font-semibold">
+              GridKit
+            </span>
           </Link>
           <Link
             href="/docs"
