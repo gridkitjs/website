@@ -39,8 +39,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  // "max" is the recommended stale-while-revalidate profile: stale docs
-  // content keeps serving instantly while the next request refetches it.
-  revalidateTag(DOCS_CACHE_TAG, "max");
+  // This is a webhook from an external system (gridkit's Action), so it needs
+  // immediate expiration rather than "max"'s stale-while-revalidate profile —
+  // otherwise docs stay stale until a second visitor happens to hit the page.
+  revalidateTag(DOCS_CACHE_TAG, { expire: 0 });
   return NextResponse.json({ revalidated: true, tag: DOCS_CACHE_TAG });
 }
