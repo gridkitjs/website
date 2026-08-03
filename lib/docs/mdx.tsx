@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import { Link } from "@/i18n/navigation";
 import { CodeBlock } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
+import { Kbd, KbdGroup } from "@/components/ui/Kbd";
 import { DataGridBasicExample } from "@/components/live-examples/DataGridBasicExample";
 import { DataGridResizeReorderExample } from "@/components/live-examples/DataGridResizeReorderExample";
 import { ColumnTemplatesExample } from "@/components/live-examples/ColumnTemplatesExample";
@@ -66,7 +67,7 @@ function Th(props: ComponentProps<"th">) {
 function Td({ children, ...props }: ComponentProps<"td">) {
   return (
     <td
-      className="border-site-line text-site-ink-muted not-last:font-mono border-b px-4 py-3 align-top text-xs last:text-sm"
+      className="border-site-line text-site-ink-muted border-b px-4 py-3 align-top text-xs not-last:font-mono last:text-sm"
       {...props}
     >
       {children === "" ? "—" : children}
@@ -86,6 +87,8 @@ const mdxComponents = {
   th: Th,
   td: Td,
   tr: Tr,
+  Kbd,
+  KbdGroup,
   LiveExampleFrame,
   DataGridBasicExample,
   DataGridResizeReorderExample,
