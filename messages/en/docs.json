@@ -2,6 +2,7 @@
   "index": {
     "title": "Docs",
     "description": "Reference and live examples for @gridkitjs/core, @gridkitjs/react, and @gridkitjs/theme-tailwind.",
-    "intro": "GridKit is early: the API is still moving and may break between minor versions. These docs cover what's shipped today and run against the real, published packages."
+    "intro": "GridKit is early: the API is still moving and may break between minor versions. These docs cover what's shipped today and run against the real, published packages.",
+    "changelogCta": "See what's changed"
   }
 }

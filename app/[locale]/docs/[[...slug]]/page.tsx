@@ -88,6 +88,11 @@ export default async function DocsSlugPage({
             </Link>
           ))}
         </div>
+        <p className="mt-10 text-sm">
+          <Link href="/changelog" className="text-site-accent">
+            {t("changelogCta")}
+          </Link>
+        </p>
       </div>
     );
   }
@@ -128,8 +133,8 @@ export default async function DocsSlugPage({
         description={page.description}
         lastUpdated={lastUpdated}
         editUrl={getEditUrl(page.repoPath)}
-        prev={prev ? { slug: prev.slug, title: prev.title } : undefined}
-        next={next ? { slug: next.slug, title: next.title } : undefined}
+        prev={prev ? { href: `/docs/${prev.slug}`, title: prev.title } : undefined}
+        next={next ? { href: `/docs/${next.slug}`, title: next.title } : undefined}
       >
         <DocContent source={page.content} />
       </DocPage>

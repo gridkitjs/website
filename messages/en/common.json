@@ -1,6 +1,7 @@
 {
   "nav": {
     "home": "Home",
+    "changelog": "Changelog",
     "docs": "Docs"
   },
   "footer": {

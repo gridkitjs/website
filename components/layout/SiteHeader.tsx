@@ -27,12 +27,20 @@ export async function SiteHeader() {
               GridKit
             </span>
           </Link>
-          <Link
-            href="/docs"
-            className="text-site-ink text-sm font-medium transition-opacity hover:opacity-70"
-          >
-            {t("docs")}
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/changelog"
+              className="text-site-ink text-sm font-medium transition-opacity hover:opacity-70"
+            >
+              {t("changelog")}
+            </Link>
+            <Link
+              href="/docs"
+              className="text-site-ink text-sm font-medium transition-opacity hover:opacity-70"
+            >
+              {t("docs")}
+            </Link>
+          </div>
         </nav>
       </Container>
     </header>

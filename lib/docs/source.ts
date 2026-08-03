@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import matter from "gray-matter";
 import { fetchRawFile, fetchRepoTree, type GithubTreeEntry } from "./github";
+import { PACKAGES as PACKAGE_REGISTRY } from "@/lib/packages";
 
 export interface DocPageNode {
   /** Flat, locale-less path used in the site's URLs, e.g. "react/column-templates". */
@@ -43,13 +44,10 @@ interface PackageConfig {
   docsPath: string;
 }
 
-// Which packages contribute docs, and in what order they appear in the nav —
-// a website concern, not something contributors editing docs content control.
-const PACKAGES: PackageConfig[] = [
-  { slug: "react", docsPath: "packages/react/docs" },
-  { slug: "core", docsPath: "packages/core/docs" },
-  { slug: "theme-tailwind", docsPath: "packages/theme-tailwind/docs" },
-];
+const PACKAGES: PackageConfig[] = PACKAGE_REGISTRY.map(({ slug }) => ({
+  slug,
+  docsPath: `packages/${slug}/docs`,
+}));
 
 interface MetaJson {
   title?: string;
