@@ -46,3 +46,32 @@ export function breadcrumbListJsonLd(locale: string, items: BreadcrumbEntry[]) {
     })),
   };
 }
+
+export function techArticleJsonLd({
+  locale,
+  path,
+  title,
+  description,
+  dateModified,
+}: {
+  locale: string;
+  path: string;
+  title: string;
+  description: string;
+  dateModified: Date | null;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: title,
+    description,
+    url: `${siteConfig.baseUrl}/${locale}${path ? `/${path}` : ""}`,
+    inLanguage: locale,
+    ...(dateModified ? { dateModified: dateModified.toISOString() } : {}),
+    author: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: siteConfig.baseUrl,
+    },
+  };
+}

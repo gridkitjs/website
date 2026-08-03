@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { getDocsTree } from "@/lib/docs/source";
 import { fetchLastCommitDate, getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { JsonLd, techArticleJsonLd } from "@/lib/json-ld";
 
 interface PageParams {
   locale: string;
@@ -111,16 +112,27 @@ export default async function DocsSlugPage({
   ];
 
   return (
-    <DocPage
-      crumbs={crumbs}
-      title={page.title}
-      description={page.description}
-      lastUpdated={lastUpdated}
-      editUrl={getEditUrl(page.repoPath)}
-      prev={prev ? { slug: prev.slug, title: prev.title } : undefined}
-      next={next ? { slug: next.slug, title: next.title } : undefined}
-    >
-      <DocContent source={page.content} />
-    </DocPage>
+    <>
+      <JsonLd
+        data={techArticleJsonLd({
+          locale,
+          path: `docs/${path}`,
+          title: page.title,
+          description: page.description,
+          dateModified: lastUpdated,
+        })}
+      />
+      <DocPage
+        crumbs={crumbs}
+        title={page.title}
+        description={page.description}
+        lastUpdated={lastUpdated}
+        editUrl={getEditUrl(page.repoPath)}
+        prev={prev ? { slug: prev.slug, title: prev.title } : undefined}
+        next={next ? { slug: next.slug, title: next.title } : undefined}
+      >
+        <DocContent source={page.content} />
+      </DocPage>
+    </>
   );
 }
