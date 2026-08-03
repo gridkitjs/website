@@ -9,7 +9,7 @@ export async function Hero() {
   const t = await getTranslations("home.hero");
 
   return (
-    <Section variant="inverted" className="overflow-hidden">
+    <Section variant="gradient" className="overflow-hidden">
       <div className="mx-auto mt-14 max-w-md">
         <Image
           src="/brand/gridkit-header.svg"
@@ -22,7 +22,7 @@ export async function Hero() {
         />
       </div>
       <Container className="relative pt-14 pb-20 text-center sm:pt-18 sm:pb-28">
-        <h1 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
+        <h1 className="mx-auto max-w-3xl bg-[linear-gradient(to_bottom,#fff,#cbd5e1)] bg-clip-text text-4xl font-semibold tracking-tight text-balance text-transparent sm:text-6xl">
           {t("title")}
         </h1>
         <p className="text-site-ink-muted-inverted mx-auto mt-6 max-w-2xl text-lg text-balance">
