@@ -38,6 +38,16 @@
       "description": "The grid's stylesheet — palette tokens, dark mode, grid styles."
     }
   },
+  "story": {
+    "title": "Why another grid?",
+    "lede": "TL;DR: I got tired of fighting my tools.",
+    "paragraphs": {
+      "p1": "I've spent <b>2+ years</b> building grids and tables inside SaaS ERP products — the kind where a single view needs sorting, filtering, inline editing, and a few thousand rows to not fall over. Along the way I've reached for more than one big commercial grid library (won't name names), and the pattern was always the same: the library wasn't actually built for React, it was <b>ported</b> to it.",
+      "p2": "That shows up in specific ways. Conditional rendering or a prop change in the wrong order would <b>crash the whole grid</b>. Instability that only appeared under React's StrictMode or concurrent rendering. Internals reaching into the DOM with brittle selectors and zero guard rails, so a version bump could silently break your app. And TypeScript support that felt bolted on after the fact (if even) — types that lied about what the API actually accepted, instead of types that <b>were</b> the API.",
+      "p3": "<accent>GridKit</accent> is my attempt at doing it the other way around: write the grid <b>for</b> the framework, not around it. The core logic is framework-agnostic TypeScript so it's testable and predictable on its own, but the React package is a first-class citizen built with React's rendering model in mind from day one — not a jQuery-era widget wearing a component wrapper.",
+      "p4": "Long term, I want this to be the grid people reach for <b>without bracing for a fight</b> — something that gets out of your way, doesn't need a support contract to debug, and actually gets the max potential out of the framework it's built on. Everything I learned about what a robust grid needs to do in production ERP software is going into <accent>GridKit</accent>."
+    }
+  },
   "cta": {
     "title": "Start with the docs",
     "description": "Every example on the docs site runs the real, published packages — nothing simplified for the demo.",
