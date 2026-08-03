@@ -22,12 +22,13 @@ export function buildMetadata({
   locale,
 }: BuildMetadataOptions): Metadata {
   const url = localizedUrl(locale, path);
-  const languages = Object.fromEntries(
-    routing.locales.map((candidate) => [
+  const languages = Object.fromEntries([
+    ...routing.locales.map((candidate) => [
       candidate,
       localizedUrl(candidate, path),
     ]),
-  );
+    ["x-default", localizedUrl(routing.defaultLocale, path)],
+  ]);
   const ogImage = {
     url: "/brand/repository-open-graph-template.png",
     width: 1280,

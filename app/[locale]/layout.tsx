@@ -40,12 +40,13 @@ export async function generateMetadata({
     description:
       "GridKit is a headless, framework-agnostic data-grid toolkit for TypeScript and React.",
     alternates: {
-      languages: Object.fromEntries(
-        routing.locales.map((candidate) => [
+      languages: Object.fromEntries([
+        ...routing.locales.map((candidate) => [
           candidate,
           `${siteConfig.baseUrl}/${candidate}`,
         ]),
-      ),
+        ["x-default", `${siteConfig.baseUrl}/${routing.defaultLocale}`],
+      ]),
     },
     openGraph: {
       locale,
