@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
-import { siteRoutes } from "@/lib/routes";
+import { getDocsTree } from "@/lib/docs/source";
 import { siteConfig } from "@/lib/seo/site-config";
 
 function urlFor(locale: string, path: string): string {
@@ -8,8 +8,11 @@ function urlFor(locale: string, path: string): string {
   return `${siteConfig.baseUrl}/${locale}${suffix}`;
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return siteRoutes.map((path) => ({
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const tree = await getDocsTree();
+  const routes = ["", "docs", ...tree.flat.map((page) => `docs/${page.slug}`)];
+
+  return routes.map((path) => ({
     url: urlFor(routing.defaultLocale, path),
     alternates: {
       languages: Object.fromEntries(

@@ -13,5 +13,7 @@
   },
   "liveExample": "Live example",
   "install": "Install",
-  "lastUpdated": "Last updated {date}"
+  "lastUpdated": "Last updated {date}",
+  "prevPage": "Previous",
+  "nextPage": "Next"
 }

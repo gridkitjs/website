@@ -1,27 +1,32 @@
 import type { ReactNode } from "react";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { DocsBreadcrumbs } from "./DocsBreadcrumbs";
+import { DocsBreadcrumbs, type Crumb } from "./DocsBreadcrumbs";
+import { PrevNextNav, type PrevNextEntry } from "./PrevNextNav";
 import { Prose } from "@/components/ui/Prose";
-import { getDocPageLastUpdated } from "@/lib/docs/last-updated";
 
 export async function DocPage({
-  path,
+  crumbs,
   title,
   description,
+  lastUpdated,
+  prev,
+  next,
   children,
 }: {
-  path: string;
+  crumbs: Crumb[];
   title: string;
   description: string;
+  lastUpdated: Date | null;
+  prev?: PrevNextEntry;
+  next?: PrevNextEntry;
   children: ReactNode;
 }) {
   const t = await getTranslations("common");
   const format = await getFormatter();
-  const lastUpdated = getDocPageLastUpdated(path);
 
   return (
     <article>
-      <DocsBreadcrumbs path={path} />
+      <DocsBreadcrumbs crumbs={crumbs} />
       <h1 className="text-site-ink text-3xl font-semibold tracking-tight">
         {title}
       </h1>
@@ -38,6 +43,7 @@ export async function DocPage({
         </p>
       )}
       <Prose className="mt-8">{children}</Prose>
+      <PrevNextNav prev={prev} next={next} />
     </article>
   );
 }

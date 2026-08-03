@@ -1,19 +1,17 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { usePathname, Link } from "@/i18n/navigation";
-import { docsNav } from "@/lib/routes";
+import type { DocSectionNode } from "@/lib/docs/source";
 import { cn } from "@/components/ui/cn";
 
-export function DocsSidebar() {
-  const t = useTranslations("docs");
+export function DocsSidebar({ sections }: { sections: DocSectionNode[] }) {
   const pathname = usePathname();
 
-  function pageLink(page: { path: string; navLabelKey: string }) {
-    const href = `/docs/${page.path}`;
+  function pageLink(page: { slug: string; title: string }) {
+    const href = `/docs/${page.slug}`;
     const active = pathname === href;
     return (
-      <li key={page.path}>
+      <li key={page.slug}>
         <Link
           href={href}
           aria-current={active ? "page" : undefined}
@@ -24,7 +22,7 @@ export function DocsSidebar() {
               : "text-site-ink-muted hover:text-site-ink",
           )}
         >
-          {t(page.navLabelKey)}
+          {page.title}
         </Link>
       </li>
     );
@@ -32,18 +30,18 @@ export function DocsSidebar() {
 
   return (
     <nav aria-label="Docs" className="space-y-8">
-      {docsNav.map((section) => (
-        <div key={section.path}>
+      {sections.map((section) => (
+        <div key={section.slug}>
           <p className="text-site-ink-muted text-xs font-semibold tracking-wide uppercase">
-            {t(section.navLabelKey)}
+            {section.title}
           </p>
           <ul className="mt-3 space-y-1">
             {section.pages.map((page) => pageLink(page))}
           </ul>
-          {section.groups?.map((group) => (
-            <div key={group.navLabelKey} className="mt-4 pl-3">
+          {section.groups.map((group) => (
+            <div key={group.key} className="mt-4 pl-3">
               <p className="text-site-ink-muted/80 text-xs font-medium">
-                {t(group.navLabelKey)}
+                {group.title}
               </p>
               <ul className="mt-2 space-y-1">
                 {group.pages.map((page) => pageLink(page))}

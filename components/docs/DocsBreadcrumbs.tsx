@@ -1,68 +1,44 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { findDocPage } from "@/lib/routes";
 import { JsonLd, breadcrumbListJsonLd } from "@/lib/json-ld";
 
-export async function DocsBreadcrumbs({ path }: { path: string }) {
-  const locale = await getLocale();
-  const t = await getTranslations("docs");
-  const tCommon = await getTranslations("common");
-  const found = findDocPage(path);
+export interface Crumb {
+  name: string;
+  path: string;
+}
 
-  // The group ("Columns", "Rows", "Cells") is a sidebar heading with no page
-  // of its own, so it is shown between the section and the page crumbs but
-  // left out of the JSON-LD list, whose every entry needs a resolvable URL.
-  const crumbs = [
-    { name: tCommon("nav.docs"), path: "docs" },
-    ...(found
-      ? [
-          {
-            name: t(found.section.navLabelKey),
-            path: `docs/${found.section.path}`,
-          },
-        ]
-      : []),
-    ...(found && found.page.path !== found.section.path
-      ? [{ name: t(found.page.navLabelKey), path: `docs/${found.page.path}` }]
-      : []),
-  ];
+/** `crumbs` holds only the section/page entries; the "Docs" root crumb is added here. */
+export async function DocsBreadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
+  const locale = await getLocale();
+  const tCommon = await getTranslations("common");
+  const docsRoot: Crumb = { name: tCommon("nav.docs"), path: "docs" };
 
   return (
     <nav aria-label="Breadcrumb" className="text-site-ink-muted mb-6 text-sm">
-      <JsonLd data={breadcrumbListJsonLd(locale, crumbs)} />
+      <JsonLd data={breadcrumbListJsonLd(locale, [docsRoot, ...crumbs])} />
       <ol className="flex flex-wrap items-center gap-1.5">
         <li>
           <Link href="/docs" className="hover:text-site-ink">
-            {tCommon("nav.docs")}
+            {docsRoot.name}
           </Link>
         </li>
-        {found && (
-          <>
-            <li aria-hidden="true">/</li>
-            <li>
-              <Link
-                href={`/docs/${found.section.path}`}
-                className="hover:text-site-ink"
-              >
-                {t(found.section.navLabelKey)}
-              </Link>
+        {crumbs.map((crumb, index) => {
+          const isLast = index === crumbs.length - 1;
+          return (
+            <li key={crumb.path} className="flex items-center gap-1.5">
+              <span aria-hidden="true">/</span>
+              {isLast ? (
+                <span className="text-site-ink" aria-current="page">
+                  {crumb.name}
+                </span>
+              ) : (
+                <Link href={`/${crumb.path}`} className="hover:text-site-ink">
+                  {crumb.name}
+                </Link>
+              )}
             </li>
-            {found.group && (
-              <>
-                <li aria-hidden="true">/</li>
-                <li>{t(found.group.navLabelKey)}</li>
-              </>
-            )}
-            {found.page.path !== found.section.path && (
-              <>
-                <li aria-hidden="true">/</li>
-                <li className="text-site-ink" aria-current="page">
-                  {t(found.page.navLabelKey)}
-                </li>
-              </>
-            )}
-          </>
-        )}
+          );
+        })}
       </ol>
     </nav>
   );
