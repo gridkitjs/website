@@ -183,7 +183,7 @@ async function buildSection(
   const overview = pages.find((page) => page.slug === pkg.slug);
   return {
     slug: pkg.slug,
-    title: overview?.title ?? titleCase(pkg.slug),
+    title: titleCase(pkg.slug),
     description: overview?.description ?? "",
     pages,
     groups,
