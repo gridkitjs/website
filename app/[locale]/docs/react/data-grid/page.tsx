@@ -4,6 +4,7 @@ import { DocPage } from "@/components/docs/DocPage";
 import { CodeBlock } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
 import { PropsTable, type PropRow } from "@/components/docs/PropsTable";
+import { Link } from "@/i18n/navigation";
 import { DataGridResizeReorderExample } from "@/components/live-examples/DataGridResizeReorderExample";
 import { buildMetadata } from "@/lib/seo/metadata";
 
@@ -18,6 +19,25 @@ const propRows: PropRow[] = [
     name: "dataSource",
     type: "readonly Row[]",
     description: "The rows to render.",
+  },
+  {
+    name: "getRowId",
+    type: "(row: Row, index: number) => string",
+    default: "row position",
+    description:
+      "A row's stable identity, for state keyed by it. Give one for data that sorts, filters, or pages.",
+  },
+  {
+    name: "label",
+    type: "string",
+    description:
+      'The grid\'s accessible name, announced when it takes focus — without one a screen reader announces only "grid".',
+  },
+  {
+    name: "labelledBy",
+    type: "string",
+    description:
+      "The id of an element naming the grid, for a heading already on the page. Takes precedence over label.",
   },
   {
     name: "borders",
@@ -74,6 +94,23 @@ const propRows: PropRow[] = [
     name: "onColumnOrderChange",
     type: "(event: ColumnOrderEvent) => void",
     description: "Called once when the user drops a column somewhere new.",
+  },
+  {
+    name: "selectable",
+    type: "{ rows?, columns?, cells? }",
+    default: "all off",
+    description:
+      "Which parts of the grid the user may select, and how many of each. Off by default: selection claims the click.",
+  },
+  {
+    name: "defaultRowSelection / defaultColumnSelection",
+    type: "SelectionState",
+    description: "Row / column ids selected to start with. Uncontrolled.",
+  },
+  {
+    name: "defaultCellSelection",
+    type: "CellSelectionState",
+    description: "The cell selected to start with. Uncontrolled.",
   },
 ];
 
@@ -157,13 +194,61 @@ export default async function DataGridDocPage({
           the column to its content.
         </li>
         <li>
-          With the resize handle focused, arrow keys nudge the width; Escape
-          cancels an in-progress resize.
+          With the trailing edge focused, <code>Alt+ArrowLeft</code> /{" "}
+          <code>Alt+ArrowRight</code> nudge the width; Escape cancels an
+          in-progress resize.
         </li>
         <li>Drag a header to reorder columns.</li>
         <li>
-          With a header focused, Ctrl+ArrowLeft / Ctrl+ArrowRight reorders it
-          via keyboard; Escape cancels an in-progress drag.
+          With a header focused, <code>Ctrl+ArrowLeft</code> /{" "}
+          <code>Ctrl+ArrowRight</code> reorders it via keyboard; Escape cancels
+          an in-progress drag.
+        </li>
+        <li>
+          Click a row, column, or cell to select it; Ctrl+click toggles,
+          Shift+click takes a range.
+        </li>
+        <li>
+          <code>Ctrl+A</code> selects every row; Escape clears every selection.
+        </li>
+      </ul>
+      <h2>{t("seeAlsoHeading")}</h2>
+      <ul className="text-site-ink-muted list-disc space-y-2 pl-5 leading-relaxed">
+        <li>
+          <Link href="/docs/react/column-resizing" className="text-site-accent">
+            Column resizing
+          </Link>{" "}
+          and{" "}
+          <Link
+            href="/docs/react/column-reordering"
+            className="text-site-accent"
+          >
+            column reordering
+          </Link>
+          , in depth.
+        </li>
+        <li>
+          <Link href="/docs/react/row-selection" className="text-site-accent">
+            Row
+          </Link>
+          ,{" "}
+          <Link
+            href="/docs/react/column-selection"
+            className="text-site-accent"
+          >
+            column
+          </Link>
+          , and{" "}
+          <Link href="/docs/react/cell-selection" className="text-site-accent">
+            cell
+          </Link>{" "}
+          selection, each on its own page.
+        </li>
+        <li>
+          <Link href="/docs/react/events" className="text-site-accent">
+            Events
+          </Link>{" "}
+          for every callback prop, firing live.
         </li>
       </ul>
     </DocPage>

@@ -38,6 +38,18 @@ const classRows: PropRow[] = [
     type: "element",
     description: "The draggable resize grip on a header cell's trailing edge.",
   },
+  {
+    name: ".selectable-rows / .selectable-columns / .selectable-cells",
+    type: "<table>",
+    description:
+      "Present on the grid while the matching selectable member is enabled — what turns on the pointer cursor and text-selection guard.",
+  },
+  {
+    name: ".is-selected",
+    type: "<tr> | <th> | <td>",
+    description:
+      "A selected row, header cell, or cell. A selected cell wins over its row and column.",
+  },
 ];
 
 const tokenRows: PropRow[] = [
@@ -75,6 +87,16 @@ const tokenRows: PropRow[] = [
     name: "--gridkit-accent",
     type: "color",
     description: "Accent — resize and reorder indicator lines.",
+  },
+  {
+    name: "--gridkit-selected",
+    type: "color",
+    description: "A selected row, column, or cell.",
+  },
+  {
+    name: "--gridkit-selected-strong",
+    type: "color",
+    description: "A selected row or cell also hovered.",
   },
 ];
 

@@ -12,5 +12,6 @@
     "githubProfileLabel": "Blagoja Blazhevski on GitHub"
   },
   "liveExample": "Live example",
-  "install": "Install"
+  "install": "Install",
+  "lastUpdated": "Last updated {date}"
 }

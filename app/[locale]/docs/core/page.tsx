@@ -40,14 +40,19 @@ export default async function CoreOverviewPage({
         <Link href="/docs/core/column-definitions" className="text-site-accent">
           column definitions
         </Link>{" "}
-        for column inference, or{" "}
-        <Link
-          href="/docs/core/sizing-and-ordering"
-          className="text-site-accent"
-        >
-          sizing &amp; ordering
+        for column inference,{" "}
+        <Link href="/docs/core/resizing" className="text-site-accent">
+          resizing
         </Link>{" "}
-        for the resizing and reordering logic.
+        and{" "}
+        <Link href="/docs/core/ordering" className="text-site-accent">
+          ordering
+        </Link>{" "}
+        for the logic underneath resizableColumns and reorderableColumns, or{" "}
+        <Link href="/docs/core/selection" className="text-site-accent">
+          selection
+        </Link>{" "}
+        for the primitives underneath selectable.
       </p>
     </DocPage>
   );

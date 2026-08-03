@@ -47,7 +47,23 @@ export default async function ReactOverviewPage({
         <Link href="/docs/react/column-templates" className="text-site-accent">
           column templates
         </Link>{" "}
-        for custom header and cell rendering, or{" "}
+        for custom header and cell rendering,{" "}
+        <Link href="/docs/react/column-resizing" className="text-site-accent">
+          resizing
+        </Link>
+        ,{" "}
+        <Link href="/docs/react/column-reordering" className="text-site-accent">
+          reordering
+        </Link>
+        , row/column/cell{" "}
+        <Link href="/docs/react/row-selection" className="text-site-accent">
+          selection
+        </Link>
+        , or{" "}
+        <Link href="/docs/react/events" className="text-site-accent">
+          events
+        </Link>{" "}
+        for every callback prop. See{" "}
         <Link href="/docs/theme-tailwind" className="text-site-accent">
           theming
         </Link>{" "}
