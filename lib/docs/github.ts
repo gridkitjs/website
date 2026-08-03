@@ -59,6 +59,11 @@ export async function fetchRawFile(repoPath: string): Promise<string> {
   return res.text();
 }
 
+/** The GitHub URL for editing `repoPath` directly, e.g. via github.dev's web editor. */
+export function getEditUrl(repoPath: string): string {
+  return `https://github.com/${OWNER}/${REPO}/edit/${BRANCH}/${repoPath}`;
+}
+
 /** The commit date of the last change to `repoPath`, or `null` if it has no history (e.g. a new file not yet pushed). */
 export async function fetchLastCommitDate(
   repoPath: string,

@@ -5,7 +5,7 @@ import { DocPage } from "@/components/docs/DocPage";
 import { DocContent } from "@/lib/docs/mdx";
 import { Link } from "@/i18n/navigation";
 import { getDocsTree } from "@/lib/docs/source";
-import { fetchLastCommitDate } from "@/lib/docs/github";
+import { fetchLastCommitDate, getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 interface PageParams {
@@ -116,6 +116,7 @@ export default async function DocsSlugPage({
       title={page.title}
       description={page.description}
       lastUpdated={lastUpdated}
+      editUrl={getEditUrl(page.repoPath)}
       prev={prev ? { slug: prev.slug, title: prev.title } : undefined}
       next={next ? { slug: next.slug, title: next.title } : undefined}
     >
