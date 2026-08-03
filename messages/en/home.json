@@ -1,41 +1,56 @@
 {
   "hero": {
     "title": "Grid logic that stays out of your way.",
-    "subtitle": "GridKit separates grid logic from rendering. Sorting, filtering, and paging live in framework-agnostic TypeScript; React just renders the result — so you're never fighting a component to get the behavior your data needs.",
+    "subtitle": "GridKit separates grid logic from rendering. Column resolution, resizing, reordering, and selection live in framework-agnostic TypeScript — React binds it to real components today, with more framework adapters planned — so you're never fighting a component to get the behavior your data needs.",
     "primaryCta": "Read the docs",
     "secondaryCta": "View on GitHub"
   },
   "features": {
-    "title": "Built to be read, not just used",
-    "subtitle": "Three packages, one clean split between logic and rendering.",
+    "title": "Everything the grid does today",
+    "subtitle": "Six real capabilities, built on a framework-agnostic core — React is the first adapter, with more on the way.",
     "items": [
       {
-        "title": "Framework-agnostic core",
-        "description": "Column inference, ordering, and resizing live in plain TypeScript — testable without a DOM, and ready for adapters beyond React."
+        "title": "Columns that infer themselves",
+        "description": "Infer columns and their types straight from your data, or declare them by hand — custom header and cell templates take over whenever you need more control.",
+        "docsSlug": "core/column-definitions"
       },
       {
-        "title": "Semantic React components",
-        "description": "DataGridComponent renders semantic class names and carries no styles of its own, so your theme decides how it looks."
+        "title": "Resize, your way",
+        "description": "Drag a column's edge to resize it, double-click to auto-fit its content, or drive the whole thing from the keyboard.",
+        "docsSlug": "react/column-resizing"
+      },
+      {
+        "title": "Reorder without fighting state",
+        "description": "Drag a header into place or reorder with the keyboard — GridKit computes the new order and tells you once, on drop.",
+        "docsSlug": "react/column-reordering"
+      },
+      {
+        "title": "Selection for rows, columns, and cells",
+        "description": "Select any combination of rows, columns, and cells, single or multiple, fully controlled or left to sensible defaults.",
+        "docsSlug": "core/selection"
+      },
+      {
+        "title": "Keyboard-first and accessible",
+        "description": "A single roving tab stop, full arrow-key navigation, and ARIA roles with live announcements — built in, not bolted on.",
+        "docsSlug": "react/data-grid"
       },
       {
         "title": "A theme you can swap",
-        "description": "@gridkitjs/theme-tailwind ships the grid's palette as OKLCH tokens with a built-in dark mode — or bring your own stylesheet."
+        "description": "@gridkitjs/react renders semantic class names and carries no styles of its own. @gridkitjs/theme-tailwind ships a ready-made palette with dark mode, or bring your own stylesheet.",
+        "docsSlug": "theme-tailwind"
       }
     ]
   },
   "packages": {
     "title": "Three packages, one grid",
     "core": {
-      "name": "@gridkitjs/core",
-      "description": "Column inference, ordering, and resizing logic."
+      "name": "@gridkitjs/core"
     },
     "react": {
-      "name": "@gridkitjs/react",
-      "description": "The DataGridComponent and its supporting hooks, built on core."
+      "name": "@gridkitjs/react"
     },
     "themeTailwind": {
-      "name": "@gridkitjs/theme-tailwind",
-      "description": "The grid's stylesheet — palette tokens, dark mode, grid styles."
+      "name": "@gridkitjs/theme-tailwind"
     }
   },
   "story": {
