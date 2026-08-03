@@ -1,9 +1,9 @@
 import type { ComponentProps, ReactElement } from "react";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
 import { Link } from "@/i18n/navigation";
 import { CodeBlock } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
-import { PropsTable } from "@/components/docs/PropsTable";
 import { DataGridBasicExample } from "@/components/live-examples/DataGridBasicExample";
 import { DataGridResizeReorderExample } from "@/components/live-examples/DataGridResizeReorderExample";
 import { ColumnTemplatesExample } from "@/components/live-examples/ColumnTemplatesExample";
@@ -39,10 +39,53 @@ function A({ href = "", ...props }: ComponentProps<"a">) {
   return <a href={href} target="_blank" rel="noreferrer noopener" {...props} />;
 }
 
+// GFM tables (e.g. props reference tables) styled to match the site's
+// rounded, bordered look: a tinted header row and code-styled cells for
+// every column but the last, which holds prose description text.
+function Table(props: ComponentProps<"table">) {
+  return (
+    <div className="border-site-line mt-6 w-full overflow-x-auto rounded-xl border">
+      <table className="w-full border-collapse text-sm" {...props} />
+    </div>
+  );
+}
+
+function Thead(props: ComponentProps<"thead">) {
+  return <thead className="bg-site-surface" {...props} />;
+}
+
+function Th(props: ComponentProps<"th">) {
+  return (
+    <th
+      className="border-site-line text-site-ink border-b px-4 py-3 text-left text-xs font-semibold first:rounded-tl-xl last:rounded-tr-xl"
+      {...props}
+    />
+  );
+}
+
+function Td({ children, ...props }: ComponentProps<"td">) {
+  return (
+    <td
+      className="border-site-line text-site-ink-muted not-last:font-mono border-b px-4 py-3 align-top text-xs last:text-sm"
+      {...props}
+    >
+      {children === "" ? "—" : children}
+    </td>
+  );
+}
+
+function Tr(props: ComponentProps<"tr">) {
+  return <tr className="last:[&>td]:border-b-0" {...props} />;
+}
+
 const mdxComponents = {
   pre: Pre,
   a: A,
-  PropsTable,
+  table: Table,
+  thead: Thead,
+  th: Th,
+  td: Td,
+  tr: Tr,
   LiveExampleFrame,
   DataGridBasicExample,
   DataGridResizeReorderExample,
@@ -58,5 +101,11 @@ const mdxComponents = {
 
 /** Renders a doc page's MDX body (frontmatter already stripped by `gray-matter` in `lib/docs/source.ts`). */
 export function DocContent({ source }: { source: string }) {
-  return <MDXRemote source={source} components={mdxComponents} />;
+  return (
+    <MDXRemote
+      source={source}
+      components={mdxComponents}
+      options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+    />
+  );
 }
