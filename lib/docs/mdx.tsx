@@ -1,6 +1,8 @@
 import type { ComponentProps, ReactElement } from "react";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { Link } from "@/i18n/navigation";
 import { CodeBlock } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
@@ -108,7 +110,22 @@ export function DocContent({ source }: { source: string }) {
     <MDXRemote
       source={source}
       components={mdxComponents}
-      options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+      options={{
+        mdxOptions: {
+          remarkPlugins: [remarkGfm],
+          rehypePlugins: [
+            rehypeSlug,
+            [
+              rehypeAutolinkHeadings,
+              {
+                behavior: "append",
+                properties: { className: ["anchor-link"], ariaLabel: "Link to this section" },
+                content: { type: "text", value: "#" },
+              },
+            ],
+          ],
+        },
+      }}
     />
   );
 }
