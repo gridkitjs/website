@@ -12,6 +12,7 @@ import { DataGridResizeReorderExample } from "@/components/live-examples/DataGri
 import { ColumnTemplatesExample } from "@/components/live-examples/ColumnTemplatesExample";
 import { ColumnResizingExample } from "@/components/live-examples/ColumnResizingExample";
 import { ColumnReorderingExample } from "@/components/live-examples/ColumnReorderingExample";
+import { ColumnSortingExample } from "@/components/live-examples/ColumnSortingExample";
 import { ColumnSelectionExample } from "@/components/live-examples/ColumnSelectionExample";
 import { RowSelectionExample } from "@/components/live-examples/RowSelectionExample";
 import { CellSelectionExample } from "@/components/live-examples/CellSelectionExample";
@@ -97,6 +98,7 @@ const mdxComponents = {
   ColumnTemplatesExample,
   ColumnResizingExample,
   ColumnReorderingExample,
+  ColumnSortingExample,
   ColumnSelectionExample,
   RowSelectionExample,
   CellSelectionExample,
