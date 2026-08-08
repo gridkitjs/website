@@ -7,7 +7,7 @@ export async function CtaSection() {
   const t = await getTranslations("home.cta");
 
   return (
-    <Section variant="inverted">
+    <Section variant="gradient">
       <Container className="flex flex-col items-center gap-6 py-24 text-center">
         <h2 className="text-site-ink-inverted text-3xl font-semibold tracking-tight">
           {t("title")}
