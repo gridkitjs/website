@@ -43,14 +43,18 @@
   },
   "packages": {
     "title": "Three packages, one grid",
+    "subtitle": "Install just the layer you need — the core has no framework or styling dependency.",
     "core": {
-      "name": "@gridkitjs/core"
+      "name": "@gridkitjs/core",
+      "description": "Framework-agnostic grid logic: column resolution, resizing, reordering, and selection, fully tested on its own."
     },
     "react": {
-      "name": "@gridkitjs/react"
+      "name": "@gridkitjs/react",
+      "description": "Binds the core to real React components — hooks and a DataGridComponent, no virtual-DOM fighting."
     },
     "themeTailwind": {
-      "name": "@gridkitjs/theme-tailwind"
+      "name": "@gridkitjs/theme-tailwind",
+      "description": "A ready-made palette with dark mode support, or use it as a reference for your own stylesheet."
     }
   },
   "story": {

@@ -19,7 +19,7 @@ export async function StorySection() {
 
   return (
     <Section variant="default">
-      <Container className="border-site-line border-t py-24">
+      <Container className="py-24">
         <div className="max-w-2xl">
           <h2 className="text-site-ink text-3xl font-semibold tracking-tight">
             {t("title")}
