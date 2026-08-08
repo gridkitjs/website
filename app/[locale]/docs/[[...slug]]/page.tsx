@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DocPage } from "@/components/docs/DocPage";
+import { OnThisPage } from "@/components/docs/OnThisPage";
 import { DocContent } from "@/lib/docs/mdx";
+import { extractToc } from "@/lib/docs/toc";
 import { Link } from "@/i18n/navigation";
 import { getDocsTree } from "@/lib/docs/source";
 import { fetchLastCommitDate, getEditUrl } from "@/lib/docs/github";
@@ -108,6 +110,8 @@ export default async function DocsSlugPage({
       ? tree.flat[index + 1]
       : undefined;
   const lastUpdated = await fetchLastCommitDate(page.repoPath);
+  const toc = extractToc(page.content);
+  const t = await getTranslations("common");
 
   const crumbs = [
     { name: section.title, path: `docs/${section.slug}` },
@@ -127,17 +131,24 @@ export default async function DocsSlugPage({
           dateModified: lastUpdated,
         })}
       />
-      <DocPage
-        crumbs={crumbs}
-        title={page.title}
-        description={page.description}
-        lastUpdated={lastUpdated}
-        editUrl={getEditUrl(page.repoPath)}
-        prev={prev ? { href: `/docs/${prev.slug}`, title: prev.title } : undefined}
-        next={next ? { href: `/docs/${next.slug}`, title: next.title } : undefined}
-      >
-        <DocContent source={page.content} />
-      </DocPage>
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_200px] xl:items-start xl:gap-12">
+        <DocPage
+          crumbs={crumbs}
+          title={page.title}
+          description={page.description}
+          lastUpdated={lastUpdated}
+          editUrl={getEditUrl(page.repoPath)}
+          prev={
+            prev ? { href: `/docs/${prev.slug}`, title: prev.title } : undefined
+          }
+          next={
+            next ? { href: `/docs/${next.slug}`, title: next.title } : undefined
+          }
+        >
+          <DocContent source={page.content} />
+        </DocPage>
+        <OnThisPage toc={toc} label={t("onThisPage")} />
+      </div>
     </>
   );
 }

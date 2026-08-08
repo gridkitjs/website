@@ -2,9 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ChangelogPage } from "@/components/changelog/ChangelogPage";
+import { OnThisPage } from "@/components/docs/OnThisPage";
 import { DocContent } from "@/lib/docs/mdx";
+import { extractToc } from "@/lib/docs/toc";
 import { Link } from "@/i18n/navigation";
-import { getChangelogTree, type ChangelogSection } from "@/lib/changelog/source";
+import {
+  getChangelogTree,
+  type ChangelogSection,
+} from "@/lib/changelog/source";
 import { fetchLastCommitDate, getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { JsonLd, techArticleJsonLd } from "@/lib/json-ld";
@@ -34,7 +39,10 @@ export async function generateStaticParams() {
   return [{ slug: [] }, ...packageParams, ...versionParams];
 }
 
-function resolveVersion(tree: Awaited<ReturnType<typeof getChangelogTree>>, slug: string[]) {
+function resolveVersion(
+  tree: Awaited<ReturnType<typeof getChangelogTree>>,
+  slug: string[],
+) {
   const [pkgSlug, versionParam] = slug;
   const section = tree.sections.find((candidate) => candidate.slug === pkgSlug);
   if (!section) return undefined;
@@ -142,18 +150,32 @@ export default async function ChangelogSlugPage({
   const isLatest = index === 0;
   const prevVersion = index > 0 ? section.versions[index - 1] : undefined;
   const nextVersion =
-    index < section.versions.length - 1 ? section.versions[index + 1] : undefined;
-  const lastUpdated = isLatest ? await fetchLastCommitDate(section.repoPath) : null;
+    index < section.versions.length - 1
+      ? section.versions[index + 1]
+      : undefined;
+  const lastUpdated = isLatest
+    ? await fetchLastCommitDate(section.repoPath)
+    : null;
+  const toc = extractToc(version.content);
 
   const crumbs = [
     { name: section.title, path: `changelog/${section.slug}` },
     ...(isLatest
       ? []
-      : [{ name: `v${version.version}`, path: `changelog/${section.slug}/${version.version}` }]),
+      : [
+          {
+            name: `v${version.version}`,
+            path: `changelog/${section.slug}/${version.version}`,
+          },
+        ]),
   ];
 
   const t = await getTranslations("changelog.page");
-  const title = t("title", { package: section.title, version: version.version });
+  const tCommon = await getTranslations("common");
+  const title = t("title", {
+    package: section.title,
+    version: version.version,
+  });
   const description = t("description", {
     package: section.title,
     version: version.version,
@@ -170,32 +192,35 @@ export default async function ChangelogSlugPage({
           dateModified: lastUpdated,
         })}
       />
-      <ChangelogPage
-        crumbs={crumbs}
-        packageTitle={section.title}
-        version={version.version}
-        lastUpdated={lastUpdated}
-        editUrl={getEditUrl(section.repoPath)}
-        docsHref={`/docs/${section.slug}`}
-        prev={
-          prevVersion
-            ? {
-                href: `/${versionPath(section, index - 1)}`,
-                title: `v${prevVersion.version}`,
-              }
-            : undefined
-        }
-        next={
-          nextVersion
-            ? {
-                href: `/${versionPath(section, index + 1)}`,
-                title: `v${nextVersion.version}`,
-              }
-            : undefined
-        }
-      >
-        <DocContent source={version.content} />
-      </ChangelogPage>
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_200px] xl:items-start xl:gap-12">
+        <ChangelogPage
+          crumbs={crumbs}
+          packageTitle={section.title}
+          version={version.version}
+          lastUpdated={lastUpdated}
+          editUrl={getEditUrl(section.repoPath)}
+          docsHref={`/docs/${section.slug}`}
+          prev={
+            prevVersion
+              ? {
+                  href: `/${versionPath(section, index - 1)}`,
+                  title: `v${prevVersion.version}`,
+                }
+              : undefined
+          }
+          next={
+            nextVersion
+              ? {
+                  href: `/${versionPath(section, index + 1)}`,
+                  title: `v${nextVersion.version}`,
+                }
+              : undefined
+          }
+        >
+          <DocContent source={version.content} />
+        </ChangelogPage>
+        <OnThisPage toc={toc} label={tCommon("onThisPage")} />
+      </div>
     </>
   );
 }
