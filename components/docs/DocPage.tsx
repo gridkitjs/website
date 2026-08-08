@@ -28,8 +28,11 @@ export async function DocPage({
   const format = await getFormatter();
 
   return (
-    <article>
-      <Breadcrumbs root={{ name: t("nav.docs"), path: "docs" }} crumbs={crumbs} />
+    <article className="min-w-0">
+      <Breadcrumbs
+        root={{ name: t("nav.docs"), path: "docs" }}
+        crumbs={crumbs}
+      />
       <h1 className="text-site-ink text-3xl font-semibold tracking-tight">
         {title}
       </h1>

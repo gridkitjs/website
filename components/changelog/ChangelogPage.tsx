@@ -33,7 +33,7 @@ export async function ChangelogPage({
   const format = await getFormatter();
 
   return (
-    <article>
+    <article className="min-w-0">
       <Breadcrumbs
         root={{ name: t("nav.changelog"), path: "changelog" }}
         crumbs={crumbs}
