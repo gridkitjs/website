@@ -1,4 +1,12 @@
 @import "tailwindcss";
+/*
+ * theme-tailwind stops registering its own `@custom-variant dark` once this
+ * site is on >=0.4.0 (gridkit's `feat/dark-mode-config`) — until that bump
+ * lands, the installed 0.3.x still declares the identical line itself, and
+ * Tailwind dedupes the exact duplicate. This is what the docs' live dark
+ * mode demo (DarkModeExample, toggled via `.dark` on `<html>`) depends on.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
 @import "@gridkitjs/theme-tailwind/styles.css";
 
 :root {

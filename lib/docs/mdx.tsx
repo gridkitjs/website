@@ -18,6 +18,7 @@ import { RowSelectionExample } from "@/components/live-examples/RowSelectionExam
 import { CellSelectionExample } from "@/components/live-examples/CellSelectionExample";
 import { CombinedSelectionExample } from "@/components/live-examples/CombinedSelectionExample";
 import { EventsShowcaseExample } from "@/components/live-examples/EventsShowcaseExample";
+import { DarkModeExample } from "@/components/live-examples/DarkModeExample";
 
 type CodeLang = "tsx" | "ts" | "css";
 
@@ -104,6 +105,7 @@ const mdxComponents = {
   CellSelectionExample,
   CombinedSelectionExample,
   EventsShowcaseExample,
+  DarkModeExample,
 };
 
 /** Renders a doc page's MDX body (frontmatter already stripped by `gray-matter` in `lib/docs/source.ts`). */
@@ -121,7 +123,10 @@ export function DocContent({ source }: { source: string }) {
               rehypeAutolinkHeadings,
               {
                 behavior: "append",
-                properties: { className: ["anchor-link"], ariaLabel: "Link to this section" },
+                properties: {
+                  className: ["anchor-link"],
+                  ariaLabel: "Link to this section",
+                },
                 content: { type: "text", value: "#" },
               },
             ],
