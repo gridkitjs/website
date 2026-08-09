@@ -8,12 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "update-gridkit": "npm i @gridkitjs/core@latest @gridkitjs/react@latest @gridkitjs/theme-tailwind@latest"
   },
   "dependencies": {
-    "@gridkitjs/core": "^0.7.0",
-    "@gridkitjs/react": "^0.6.0",
-    "@gridkitjs/theme-tailwind": "^0.4.0",
+    "@gridkitjs/core": "^0.8.0",
+    "@gridkitjs/react": "^0.7.0",
+    "@gridkitjs/theme-tailwind": "^0.5.0",
     "clsx": "^2.1.1",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
