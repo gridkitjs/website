@@ -8,16 +8,10 @@ import { CodeBlock } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
 import { DataGridBasicExample } from "@/components/live-examples/DataGridBasicExample";
-import { GridExample } from "@/components/live-examples/GridExample";
+import { StackblitzExample } from "@/components/live-examples/StackblitzExample";
 import { DataGridResizeReorderExample } from "@/components/live-examples/DataGridResizeReorderExample";
 import { ColumnTemplatesExample } from "@/components/live-examples/ColumnTemplatesExample";
 import { ColumnResizingExample } from "@/components/live-examples/ColumnResizingExample";
-import { ColumnReorderingExample } from "@/components/live-examples/ColumnReorderingExample";
-import { ColumnSortingExample } from "@/components/live-examples/ColumnSortingExample";
-import { ColumnSelectionExample } from "@/components/live-examples/ColumnSelectionExample";
-import { RowSelectionExample } from "@/components/live-examples/RowSelectionExample";
-import { CellSelectionExample } from "@/components/live-examples/CellSelectionExample";
-import { CombinedSelectionExample } from "@/components/live-examples/CombinedSelectionExample";
 import { EventsShowcaseExample } from "@/components/live-examples/EventsShowcaseExample";
 import { DarkModeExample } from "@/components/live-examples/DarkModeExample";
 
@@ -95,17 +89,11 @@ const mdxComponents = {
   Kbd,
   KbdGroup,
   LiveExampleFrame,
-  GridExample,
+  StackblitzExample,
   DataGridBasicExample,
   DataGridResizeReorderExample,
   ColumnTemplatesExample,
   ColumnResizingExample,
-  ColumnReorderingExample,
-  ColumnSortingExample,
-  ColumnSelectionExample,
-  RowSelectionExample,
-  CellSelectionExample,
-  CombinedSelectionExample,
   EventsShowcaseExample,
   DarkModeExample,
 };
