@@ -14,6 +14,7 @@ import { ColumnTemplatesExample } from "@/components/live-examples/ColumnTemplat
 import { ColumnResizingExample } from "@/components/live-examples/ColumnResizingExample";
 import { EventsShowcaseExample } from "@/components/live-examples/EventsShowcaseExample";
 import { DarkModeExample } from "@/components/live-examples/DarkModeExample";
+import { CombinedSelectionExample } from "@/components/live-examples/CombinedSelectionExample";
 
 type CodeLang = "tsx" | "ts" | "css";
 
@@ -96,6 +97,7 @@ const mdxComponents = {
   ColumnResizingExample,
   EventsShowcaseExample,
   DarkModeExample,
+  CombinedSelectionExample,
 };
 
 /** Renders a doc page's MDX body (frontmatter already stripped by `gray-matter` in `lib/docs/source.ts`). */
