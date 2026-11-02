@@ -10,5 +10,6 @@ export interface PackageInfo {
 export const PACKAGES: PackageInfo[] = [
   { slug: "react" },
   { slug: "core" },
+  { slug: "dom" },
   { slug: "theme-tailwind" },
 ];
