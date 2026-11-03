@@ -42,11 +42,13 @@ function A({ href = "", ...props }: ComponentProps<"a">) {
 
 // GFM tables (e.g. props reference tables) styled to match the site's
 // rounded, bordered look: a tinted header row and code-styled cells for
-// every column but the last, which holds prose description text.
+// every column but the last, which holds prose description text. Code cells
+// may break mid-token so a wide props table shrinks to the content column
+// instead of clipping its Description; narrower than that, it scrolls.
 function Table(props: ComponentProps<"table">) {
   return (
     <div className="border-site-line my-6 w-full overflow-x-auto rounded-xl border">
-      <table className="w-full border-collapse text-sm" {...props} />
+      <table className="w-full min-w-160 border-collapse text-sm" {...props} />
     </div>
   );
 }
@@ -67,7 +69,7 @@ function Th(props: ComponentProps<"th">) {
 function Td({ children, ...props }: ComponentProps<"td">) {
   return (
     <td
-      className="border-site-line text-site-ink-muted border-b px-4 py-3 align-top text-xs not-last:font-mono last:text-sm"
+      className="border-site-line text-site-ink-muted border-b px-4 py-3 align-top text-xs not-last:font-mono not-last:wrap-anywhere last:w-2/5 last:text-sm"
       {...props}
     >
       {children === "" ? "—" : children}
