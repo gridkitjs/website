@@ -66,7 +66,7 @@ function Thead(props: ComponentProps<"thead">) {
 function Th(props: ComponentProps<"th">) {
   return (
     <th
-      className="border-site-line text-site-ink border-b px-4 py-3 text-left text-xs font-semibold first:rounded-tl-xl last:rounded-tr-xl"
+      className="border-site-line text-site-ink border-b px-3 py-3 text-left text-xs font-semibold first:rounded-tl-xl last:rounded-tr-xl"
       {...props}
     />
   );
@@ -107,7 +107,7 @@ function breakCellText(node: ReactNode): ReactNode {
 function Td({ children, ...props }: ComponentProps<"td">) {
   return (
     <td
-      className="border-site-line text-site-ink-muted border-b px-4 py-3 align-top text-xs not-last:font-mono last:w-2/5 last:text-sm"
+      className="border-site-line text-site-ink-muted border-b px-3 py-3 align-top text-xs not-last:font-mono last:text-sm"
       {...props}
     >
       {children === "" ? "—" : breakCellText(children)}
