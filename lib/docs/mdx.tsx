@@ -1,4 +1,11 @@
-import type { ComponentProps, ReactElement } from "react";
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
@@ -42,11 +49,12 @@ function A({ href = "", ...props }: ComponentProps<"a">) {
 
 // GFM tables (e.g. props reference tables) styled to match the site's
 // rounded, bordered look: a tinted header row and code-styled cells for
-// every column but the last, which holds prose description text.
+// every column but the last, which holds prose description text. Narrower
+// than min-w-160 the table scrolls inside its wrapper.
 function Table(props: ComponentProps<"table">) {
   return (
-    <div className="border-site-line mt-6 w-full overflow-x-auto rounded-xl border">
-      <table className="w-full border-collapse text-sm" {...props} />
+    <div className="border-site-line my-6 w-full overflow-x-auto rounded-xl border">
+      <table className="w-full min-w-160 border-collapse text-sm" {...props} />
     </div>
   );
 }
@@ -58,19 +66,73 @@ function Thead(props: ComponentProps<"thead">) {
 function Th(props: ComponentProps<"th">) {
   return (
     <th
-      className="border-site-line text-site-ink border-b px-4 py-3 text-left text-xs font-semibold first:rounded-tl-xl last:rounded-tr-xl"
+      className="border-site-line text-site-ink border-b px-3 py-3 text-left text-xs font-semibold first:rounded-tl-xl last:rounded-tr-xl"
       {...props}
     />
   );
 }
 
+// Split points for type signatures: after `|`, `,` and `(`, before a run of
+// `)`, and around a generic's `<…>` (only after an identifier, so a tag like
+// `<table>` stays whole and `=>` is never split), so a long type wraps at its
+// punctuation instead of mid-identifier.
+const TYPE_BREAK = /(?<=[|,(])|(?<=\w<)|(?<![>)])(?=\))|(?<=\w<[^<>]*\w)(?=>)/;
+// In prose, only call-like tokens such as `defineColumnsFromRows(dataSource)`
+// get a break, right after the opening parenthesis.
+const CALL_BREAK = /(?<=\w\()/;
+
+// Code also splits after whitespace and before a `.` in a selector or member
+// chain, so each segment can be kept whole: a hyphenated class name such as
+// `.gridkit-data-grid-viewport` must not break at its hyphens.
+const CODE_BREAK = new RegExp(
+  `${TYPE_BREAK.source}|(?<=\\s)|(?<=\\w)(?=\\.\\w)`,
+);
+
+function withBreaks(text: string, at: RegExp): ReactNode {
+  const parts = text.split(at);
+  return parts.length === 1
+    ? text
+    : parts.flatMap((part, i) => (i === 0 ? [part] : [<wbr key={i} />, part]));
+}
+
+function withCodeBreaks(text: string): ReactNode {
+  if (!text.includes("-")) return withBreaks(text, TYPE_BREAK);
+  return text.split(CODE_BREAK).flatMap((part, i) => {
+    const segment = part.includes("-") ? (
+      <span key={i} className="whitespace-nowrap">
+        {part}
+      </span>
+    ) : (
+      part
+    );
+    return i === 0 ? [segment] : [<wbr key={`wbr-${i}`} />, segment];
+  });
+}
+
+// Table cells get <wbr> break opportunities so long types and calls wrap at
+// their punctuation instead of widening the table or splitting an identifier.
+// <wbr> adds no characters, so the copied/textContent value is unchanged.
+function breakCellText(node: ReactNode): ReactNode {
+  return Children.map(node, (child) => {
+    if (typeof child === "string") return withBreaks(child, CALL_BREAK);
+    if (!isValidElement<{ children?: ReactNode }>(child)) return child;
+    const inner = child.props.children;
+    if (child.type === "code" && typeof inner === "string") {
+      return cloneElement(child, undefined, withCodeBreaks(inner));
+    }
+    return inner === undefined
+      ? child
+      : cloneElement(child, undefined, breakCellText(inner));
+  });
+}
+
 function Td({ children, ...props }: ComponentProps<"td">) {
   return (
     <td
-      className="border-site-line text-site-ink-muted border-b px-4 py-3 align-top text-xs not-last:font-mono last:text-sm"
+      className="border-site-line text-site-ink-muted border-b px-3 py-3 align-top text-xs not-last:font-mono last:text-sm"
       {...props}
     >
-      {children === "" ? "—" : children}
+      {children === "" ? "—" : breakCellText(children)}
     </td>
   );
 }
