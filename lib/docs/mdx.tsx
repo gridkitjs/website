@@ -1,4 +1,11 @@
-import type { ComponentProps, ReactElement } from "react";
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
@@ -42,9 +49,8 @@ function A({ href = "", ...props }: ComponentProps<"a">) {
 
 // GFM tables (e.g. props reference tables) styled to match the site's
 // rounded, bordered look: a tinted header row and code-styled cells for
-// every column but the last, which holds prose description text. Code cells
-// may break mid-token so a wide props table shrinks to the content column
-// instead of clipping its Description; narrower than that, it scrolls.
+// every column but the last, which holds prose description text. Narrower
+// than min-w-160 the table scrolls inside its wrapper.
 function Table(props: ComponentProps<"table">) {
   return (
     <div className="border-site-line my-6 w-full overflow-x-auto rounded-xl border">
@@ -66,13 +72,45 @@ function Th(props: ComponentProps<"th">) {
   );
 }
 
+// Split points for type signatures: after `|`, `,`, `(` and `<`, and before a
+// run of `>` / `)` (but never inside `=>`), so a long type wraps at its
+// punctuation instead of mid-identifier.
+const TYPE_BREAK = /(?<=[|,(<])|(?<![>)=])(?=[>)])/;
+// In prose, only call-like tokens such as `defineColumnsFromRows(dataSource)`
+// get a break, right after the opening parenthesis.
+const CALL_BREAK = /(?<=\w\()/;
+
+function withBreaks(text: string, at: RegExp): ReactNode {
+  const parts = text.split(at);
+  return parts.length === 1
+    ? text
+    : parts.flatMap((part, i) => (i === 0 ? [part] : [<wbr key={i} />, part]));
+}
+
+// Table cells get <wbr> break opportunities so long types and calls wrap at
+// their punctuation instead of widening the table or splitting an identifier.
+// <wbr> adds no characters, so the copied/textContent value is unchanged.
+function breakCellText(node: ReactNode): ReactNode {
+  return Children.map(node, (child) => {
+    if (typeof child === "string") return withBreaks(child, CALL_BREAK);
+    if (!isValidElement<{ children?: ReactNode }>(child)) return child;
+    const inner = child.props.children;
+    if (child.type === "code" && typeof inner === "string") {
+      return cloneElement(child, undefined, withBreaks(inner, TYPE_BREAK));
+    }
+    return inner === undefined
+      ? child
+      : cloneElement(child, undefined, breakCellText(inner));
+  });
+}
+
 function Td({ children, ...props }: ComponentProps<"td">) {
   return (
     <td
-      className="border-site-line text-site-ink-muted border-b px-4 py-3 align-top text-xs not-last:font-mono not-last:wrap-anywhere last:w-2/5 last:text-sm"
+      className="border-site-line text-site-ink-muted border-b px-4 py-3 align-top text-xs not-last:font-mono last:w-2/5 last:text-sm"
       {...props}
     >
-      {children === "" ? "—" : children}
+      {children === "" ? "—" : breakCellText(children)}
     </td>
   );
 }
