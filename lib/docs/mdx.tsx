@@ -72,19 +72,41 @@ function Th(props: ComponentProps<"th">) {
   );
 }
 
-// Split points for type signatures: after `|`, `,`, `(` and `<`, and before a
-// run of `>` / `)` (but never inside `=>`), so a long type wraps at its
+// Split points for type signatures: after `|`, `,` and `(`, before a run of
+// `)`, and around a generic's `<…>` (only after an identifier, so a tag like
+// `<table>` stays whole and `=>` is never split), so a long type wraps at its
 // punctuation instead of mid-identifier.
-const TYPE_BREAK = /(?<=[|,(<])|(?<![>)=])(?=[>)])/;
+const TYPE_BREAK = /(?<=[|,(])|(?<=\w<)|(?<![>)])(?=\))|(?<=\w<[^<>]*\w)(?=>)/;
 // In prose, only call-like tokens such as `defineColumnsFromRows(dataSource)`
 // get a break, right after the opening parenthesis.
 const CALL_BREAK = /(?<=\w\()/;
+
+// Code also splits after whitespace and before a `.` in a selector or member
+// chain, so each segment can be kept whole: a hyphenated class name such as
+// `.gridkit-data-grid-viewport` must not break at its hyphens.
+const CODE_BREAK = new RegExp(
+  `${TYPE_BREAK.source}|(?<=\\s)|(?<=\\w)(?=\\.\\w)`,
+);
 
 function withBreaks(text: string, at: RegExp): ReactNode {
   const parts = text.split(at);
   return parts.length === 1
     ? text
     : parts.flatMap((part, i) => (i === 0 ? [part] : [<wbr key={i} />, part]));
+}
+
+function withCodeBreaks(text: string): ReactNode {
+  if (!text.includes("-")) return withBreaks(text, TYPE_BREAK);
+  return text.split(CODE_BREAK).flatMap((part, i) => {
+    const segment = part.includes("-") ? (
+      <span key={i} className="whitespace-nowrap">
+        {part}
+      </span>
+    ) : (
+      part
+    );
+    return i === 0 ? [segment] : [<wbr key={`wbr-${i}`} />, segment];
+  });
 }
 
 // Table cells get <wbr> break opportunities so long types and calls wrap at
@@ -96,7 +118,7 @@ function breakCellText(node: ReactNode): ReactNode {
     if (!isValidElement<{ children?: ReactNode }>(child)) return child;
     const inner = child.props.children;
     if (child.type === "code" && typeof inner === "string") {
-      return cloneElement(child, undefined, withBreaks(inner, TYPE_BREAK));
+      return cloneElement(child, undefined, withCodeBreaks(inner));
     }
     return inner === undefined
       ? child
