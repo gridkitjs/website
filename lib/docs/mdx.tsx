@@ -45,7 +45,7 @@ function A({ href = "", ...props }: ComponentProps<"a">) {
 // every column but the last, which holds prose description text.
 function Table(props: ComponentProps<"table">) {
   return (
-    <div className="border-site-line mt-6 w-full overflow-x-auto rounded-xl border">
+    <div className="border-site-line my-6 w-full overflow-x-auto rounded-xl border">
       <table className="w-full border-collapse text-sm" {...props} />
     </div>
   );
