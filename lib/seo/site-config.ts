@@ -6,6 +6,7 @@ export const siteConfig = {
     core: "https://www.npmjs.com/package/@gridkitjs/core",
     react: "https://www.npmjs.com/package/@gridkitjs/react",
     themeTailwind: "https://www.npmjs.com/package/@gridkitjs/theme-tailwind",
+    exportXlsx: "https://www.npmjs.com/package/@gridkitjs/export-xlsx",
   },
   author: {
     name: "Blagoja Blazhevski",

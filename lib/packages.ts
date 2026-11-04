@@ -5,6 +5,8 @@
  */
 export interface PackageInfo {
   slug: string;
+  /** Docs nav title; defaults to the slug title-cased ("theme-tailwind" → "Theme Tailwind"). */
+  title?: string;
 }
 
 export const PACKAGES: PackageInfo[] = [
@@ -12,4 +14,5 @@ export const PACKAGES: PackageInfo[] = [
   { slug: "core" },
   { slug: "dom" },
   { slug: "theme-tailwind" },
+  { slug: "export-xlsx", title: "Export XLSX" },
 ];

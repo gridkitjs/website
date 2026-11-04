@@ -41,11 +41,13 @@ export interface DocsTree {
 
 interface PackageConfig {
   slug: string;
+  title: string | undefined;
   docsPath: string;
 }
 
-const PACKAGES: PackageConfig[] = PACKAGE_REGISTRY.map(({ slug }) => ({
+const PACKAGES: PackageConfig[] = PACKAGE_REGISTRY.map(({ slug, title }) => ({
   slug,
+  title,
   docsPath: `packages/${slug}/docs`,
 }));
 
@@ -181,7 +183,7 @@ async function buildSection(
   const overview = pages.find((page) => page.slug === pkg.slug);
   return {
     slug: pkg.slug,
-    title: titleCase(pkg.slug),
+    title: pkg.title ?? titleCase(pkg.slug),
     description: overview?.description ?? "",
     pages,
     groups,
