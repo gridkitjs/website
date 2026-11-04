@@ -5,7 +5,7 @@ import { DocPage } from "@/components/docs/DocPage";
 import { OnThisPage } from "@/components/docs/OnThisPage";
 import { DocContent } from "@/lib/docs/mdx";
 import { extractToc } from "@/lib/docs/toc";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { getDocsTree } from "@/lib/docs/source";
 import { fetchLastCommitDate, getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -100,7 +100,15 @@ export default async function DocsSlugPage({
   }
 
   const entry = tree.bySlug.get(path);
-  if (!entry) notFound();
+  if (!entry) {
+    // A package's overview.mdx is served at the section root, but docs link
+    // to it by file name too, e.g. /docs/export-xlsx/overview.
+    const overviewOf = /^([^/]+)\/overview$/.exec(path)?.[1];
+    if (overviewOf && tree.bySlug.has(overviewOf)) {
+      redirect({ href: `/docs/${overviewOf}`, locale });
+    }
+    notFound();
+  }
 
   const { page, section } = entry;
   const index = tree.flat.findIndex((candidate) => candidate.slug === path);
