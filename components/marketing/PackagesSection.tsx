@@ -23,6 +23,11 @@ export async function PackagesSection() {
       description: t("themeTailwind.description"),
       href: siteConfig.npm.themeTailwind,
     },
+    {
+      name: t("exportXlsx.name"),
+      description: t("exportXlsx.description"),
+      href: siteConfig.npm.exportXlsx,
+    },
   ];
 
   return (
@@ -34,7 +39,7 @@ export async function PackagesSection() {
           </h2>
           <p className="text-site-ink-muted mt-3 text-lg">{t("subtitle")}</p>
         </div>
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {packages.map((pkg) => (
             <a
               key={pkg.name}

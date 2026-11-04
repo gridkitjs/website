@@ -42,7 +42,7 @@
     ]
   },
   "packages": {
-    "title": "Three packages, one grid",
+    "title": "Four packages, one grid",
     "subtitle": "Install just the layer you need — the core has no framework or styling dependency.",
     "core": {
       "name": "@gridkitjs/core",
@@ -55,6 +55,10 @@
     "themeTailwind": {
       "name": "@gridkitjs/theme-tailwind",
       "description": "A ready-made palette with dark mode support, or use it as a reference for your own stylesheet."
+    },
+    "exportXlsx": {
+      "name": "@gridkitjs/export-xlsx",
+      "description": "Excel export writer for GridKit."
     }
   },
   "story": {
