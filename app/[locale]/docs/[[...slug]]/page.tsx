@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DocPage } from "@/components/docs/DocPage";
-import { OnThisPage } from "@/components/docs/OnThisPage";
+import { OnThisPage, OnThisPageDisclosure } from "@/components/docs/OnThisPage";
 import { DocContent } from "@/lib/docs/mdx";
 import { extractToc } from "@/lib/docs/toc";
 import { Link, redirect } from "@/i18n/navigation";
@@ -151,6 +151,7 @@ export default async function DocsSlugPage({
           next={
             next ? { href: `/docs/${next.slug}`, title: next.title } : undefined
           }
+          toc={<OnThisPageDisclosure toc={toc} label={t("onThisPage")} />}
         >
           <DocContent source={page.content} />
         </DocPage>
