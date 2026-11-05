@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import { visit } from "unist-util-visit";
 import { toString } from "mdast-util-to-string";
 import GithubSlugger from "github-slugger";
-import type { Heading } from "mdast";
+import type { Heading, Root } from "mdast";
 
 export interface TocEntry {
   id: string;
@@ -12,25 +12,43 @@ export interface TocEntry {
   children: TocEntry[];
 }
 
-const headingParser = unified().use(remarkParse).use(remarkGfm);
+const markdownParser = unified().use(remarkParse).use(remarkGfm);
 
 /**
- * Extracts h2/h3 headings from MDX source into a nested list, slugging
- * titles the same way `rehype-slug` does at render time (both use
- * `github-slugger`) so generated ids match the ones on the rendered
- * heading elements.
+ * Parses MDX source as plain Markdown with GFM. JSX isn't understood: a tag
+ * like `<Kbd>` comes back as an `html` node, its children as siblings.
+ * That's enough for reading headings and prose, and far cheaper than
+ * compiling the MDX.
  */
-export function extractToc(markdown: string): TocEntry[] {
-  const tree = headingParser.parse(markdown);
+export function parseMarkdown(markdown: string): Root {
+  return markdownParser.parse(markdown);
+}
+
+/**
+ * The id of every heading in `tree`, slugged the way `rehype-slug` does at
+ * render time (both use `github-slugger`, over every heading level in
+ * document order) so they match the ids on the rendered heading elements.
+ */
+export function slugHeadings(tree: Root): Map<Heading, string> {
   const slugger = new GithubSlugger();
+  const ids = new Map<Heading, string>();
+  visit(tree, "heading", (node: Heading) => {
+    ids.set(node, slugger.slug(toString(node)));
+  });
+  return ids;
+}
+
+/** Extracts h2/h3 headings from MDX source into a nested list. */
+export function extractToc(markdown: string): TocEntry[] {
+  const tree = parseMarkdown(markdown);
+  const ids = slugHeadings(tree);
   const entries: TocEntry[] = [];
   let currentH2: TocEntry | undefined;
 
-  visit(tree, "heading", (node: Heading) => {
-    if (node.depth !== 2 && node.depth !== 3) return;
+  for (const [node, id] of ids) {
+    if (node.depth !== 2 && node.depth !== 3) continue;
 
-    const title = toString(node);
-    const entry: TocEntry = { id: slugger.slug(title), title, children: [] };
+    const entry: TocEntry = { id, title: toString(node), children: [] };
 
     if (node.depth === 2) {
       currentH2 = entry;
@@ -40,7 +58,7 @@ export function extractToc(markdown: string): TocEntry[] {
     } else {
       entries.push(entry);
     }
-  });
+  }
 
   return entries;
 }
