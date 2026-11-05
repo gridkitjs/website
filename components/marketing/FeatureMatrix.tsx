@@ -44,31 +44,38 @@ export async function FeatureMatrix() {
           </p>
         </div>
 
-        {/* The lattice draws its top and left edges, each column its right
-            and bottom, so a short last row ends cleanly. */}
-        <div className="border-site-line mt-10 grid grid-cols-1 border-t border-l sm:grid-cols-2 lg:grid-cols-5">
-          {FEATURE_GROUPS.map((group) => (
-            <div key={group.key} className="border-site-line border-r border-b">
-              <h3 className="border-site-line bg-site-surface text-site-ink-muted border-b px-4 py-2 text-xs font-semibold tracking-wide uppercase">
-                {t(`groups.${group.key}`)}
-              </h3>
-              <ul>
-                {group.features.map((feature) => (
-                  <li
-                    key={feature.key}
-                    className="border-site-line border-b last:border-b-0"
-                  >
-                    <Link
-                      href={`/docs/${feature.slug}`}
-                      className="text-site-ink hover:bg-site-surface hover:text-site-accent block px-4 py-2.5 text-sm transition-colors"
+        {/* The rounded frame draws the lattice's outer edge. Each column
+            draws its right and bottom, so a short last row ends cleanly; the
+            grid overhangs the frame by 1px on those sides, so the outermost
+            column and row borders are clipped under the frame's own. */}
+        <div className="border-site-line rounded-site mt-10 overflow-hidden border">
+          <div className="-mr-px -mb-px grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+            {FEATURE_GROUPS.map((group) => (
+              <div
+                key={group.key}
+                className="border-site-line border-r border-b"
+              >
+                <h3 className="border-site-line bg-site-surface text-site-ink-muted border-b px-4 py-2 text-xs font-semibold tracking-wide uppercase">
+                  {t(`groups.${group.key}`)}
+                </h3>
+                <ul>
+                  {group.features.map((feature) => (
+                    <li
+                      key={feature.key}
+                      className="border-site-line border-b last:border-b-0"
                     >
-                      {t(`items.${feature.key}`)}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+                      <Link
+                        href={`/docs/${feature.slug}`}
+                        className="text-site-ink hover:bg-site-surface hover:text-site-accent block px-4 py-2.5 text-sm transition-colors"
+                      >
+                        {t(`items.${feature.key}`)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </Container>
     </Section>

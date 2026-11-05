@@ -12,8 +12,9 @@ import { HeroGrid } from "./HeroGrid";
 
 const INSTALL_PACKAGES = "@gridkitjs/react @gridkitjs/theme-tailwind";
 
-// The list draws the lattice's top and left edges, each cell its right and
-// bottom, so a short last row ends cleanly.
+// A rounded frame draws the lattice's outer edge and each cell its right and
+// bottom, so a short last row ends cleanly. The list overhangs the frame by
+// 1px on those sides, so the outermost cell borders sit under the frame's.
 const statClassName =
   "border-site-line flex flex-col gap-0.5 border-r border-b px-4 py-3";
 const statLabelClassName = "text-site-ink-muted font-mono text-xs";
@@ -51,32 +52,34 @@ export async function Hero() {
       </Container>
 
       <Container className="pb-12 lg:pb-16">
-        <dl className="border-site-line grid grid-cols-2 border-t border-l text-sm sm:grid-cols-4 lg:grid-cols-7">
-          {PACKAGES.map(({ slug }) => {
-            const release = releases[slug];
-            return (
-              <div key={slug} className={statClassName}>
-                <dt className={statLabelClassName}>{slug}</dt>
-                <dd>
-                  <Link
-                    href={`/changelog/${slug}`}
-                    className="text-site-ink hover:text-site-accent font-mono tabular-nums transition-colors"
-                  >
-                    {release ? `v${release.version}` : t("changelog")}
-                  </Link>
-                </dd>
-              </div>
-            );
-          })}
-          <div className={statClassName}>
-            <dt className={statLabelClassName}>{t("licenseLabel")}</dt>
-            <dd className="text-site-ink font-mono">MIT</dd>
-          </div>
-          <div className={statClassName}>
-            <dt className={statLabelClassName}>{t("languageLabel")}</dt>
-            <dd className="text-site-ink font-mono">TypeScript</dd>
-          </div>
-        </dl>
+        <div className="border-site-line rounded-site overflow-hidden border">
+          <dl className="-mr-px -mb-px grid grid-cols-2 text-sm sm:grid-cols-4 lg:grid-cols-7">
+            {PACKAGES.map(({ slug }) => {
+              const release = releases[slug];
+              return (
+                <div key={slug} className={statClassName}>
+                  <dt className={statLabelClassName}>{slug}</dt>
+                  <dd>
+                    <Link
+                      href={`/changelog/${slug}`}
+                      className="text-site-ink hover:text-site-accent font-mono tabular-nums transition-colors"
+                    >
+                      {release ? `v${release.version}` : t("changelog")}
+                    </Link>
+                  </dd>
+                </div>
+              );
+            })}
+            <div className={statClassName}>
+              <dt className={statLabelClassName}>{t("licenseLabel")}</dt>
+              <dd className="text-site-ink font-mono">MIT</dd>
+            </div>
+            <div className={statClassName}>
+              <dt className={statLabelClassName}>{t("languageLabel")}</dt>
+              <dd className="text-site-ink font-mono">TypeScript</dd>
+            </div>
+          </dl>
+        </div>
       </Container>
     </Section>
   );

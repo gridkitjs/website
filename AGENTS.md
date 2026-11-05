@@ -158,13 +158,17 @@ runs; add a new published package to the script when `gridkit` ships one.
   footer — use the `-inverted` tokens (`bg-`, `surface-`, `ink-`,
   `ink-muted-`, `line-inverted`), which stay dark in both themes; reach for
   them instead of hand-picking a dark color.
-- **Identity** is dense and rectilinear, like the grid it sells: buttons,
-  controls and cards take `rounded-site`/`rounded-site-sm`, never pills
-  (`rounded-full`) or `rounded-xl`+; groups of items are 1px hairline
-  lattices in `line`/`line-strong` rather than gapped card grids; versions
-  and counts are `font-mono tabular-nums`; a section label, when one earns
-  its place, is a small uppercase header-cell style line, at most one per
-  three sections. No gradients, gradient-clipped text or radial
+- **Identity** is dense and rectilinear, like the grid it sells: every bordered
+  container (card, panel, frame, lattice, button, control) uses `rounded-site`;
+  small inline chips (badges, `<Kbd>`) use `rounded-site-sm`; never pills
+  (`rounded-full`), `rounded-lg`+ or square corners. Groups of items are 1px
+  hairline lattices in `line`/`line-strong` rather than gapped card grids,
+  framed by a bordered wrapper with `rounded-site` and `overflow-hidden`: each
+  cell draws its right and bottom edge and the inner grid takes `-mr-px -mb-px`,
+  so the outermost cell borders sit under the frame's and none pokes through a
+  corner; versions and counts are `font-mono tabular-nums`; a section label,
+  when one earns its place, is a small uppercase header-cell style line, at most
+  one per three sections. No gradients, gradient-clipped text or radial
   backgrounds.
 - **Dark mode** is the `.dark` class on `<html>`. Every token above is
   redefined under `@variant dark` in `globals.css`, so a new token needs a
