@@ -19,19 +19,22 @@ export async function CodeBlock({
   const trimmed = code.trim();
   const html = await codeToHtml(trimmed, {
     lang,
-    theme: "github-light",
+    // Colours come out as --shiki-light/--shiki-dark variables, which
+    // globals.css picks between by theme.
+    themes: { light: "github-light", dark: "github-dark-dimmed" },
+    defaultColor: false,
   });
 
   return (
     <div
       className={cn(
-        "border-site-line bg-site-surface relative overflow-hidden rounded-xl border text-sm",
+        "border-site-code-border bg-site-code-bg relative overflow-hidden rounded-xl border text-sm",
         className,
       )}
     >
       <CopyButton code={trimmed} />
       <div
-        className="overflow-x-auto [&_pre]:bg-transparent! [&_pre]:p-4 [&_pre]:leading-relaxed"
+        className="overflow-x-auto [&_pre]:p-4 [&_pre]:leading-relaxed"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
