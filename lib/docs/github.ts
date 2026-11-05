@@ -115,23 +115,3 @@ export async function fetchFileFromApi(
 export function getEditUrl(repoPath: string): string {
   return `https://github.com/${OWNER}/${REPO}/edit/${BRANCH}/${repoPath}`;
 }
-
-/**
- * The commit date of the last change to `repoPath`, or `null` if it has no
- * history (e.g. a new file not yet pushed). Throws on a failed request rather
- * than returning `null`, so a rate limit isn't cached as "never updated".
- */
-export async function fetchLastCommitDate(
-  repoPath: string,
-): Promise<Date | null> {
-  const res = await fetchFromGithub(
-    `https://api.github.com/repos/${OWNER}/${REPO}/commits?path=${encodeURIComponent(repoPath)}&sha=${BRANCH}&per_page=1`,
-    `the commit history of ${repoPath}`,
-    "application/vnd.github+json",
-  );
-  const commits = (await res.json()) as Array<{
-    commit: { committer: { date: string } | null };
-  }>;
-  const date = commits[0]?.commit.committer?.date;
-  return date ? new Date(date) : null;
-}

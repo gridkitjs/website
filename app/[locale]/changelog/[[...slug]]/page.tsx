@@ -10,7 +10,7 @@ import {
   getChangelogTree,
   type ChangelogSection,
 } from "@/lib/changelog/source";
-import { fetchLastCommitDate, getEditUrl } from "@/lib/docs/github";
+import { getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { JsonLd, techArticleJsonLd } from "@/lib/json-ld";
 
@@ -153,9 +153,9 @@ export default async function ChangelogSlugPage({
     index < section.versions.length - 1
       ? section.versions[index + 1]
       : undefined;
-  const lastUpdated = isLatest
-    ? await fetchLastCommitDate(section.repoPath)
-    : null;
+  // The file's last commit is the latest version's; an older version's page
+  // would otherwise claim a date that isn't its own.
+  const lastUpdated = isLatest ? section.lastModified : null;
   const toc = extractToc(version.content);
 
   const crumbs = [

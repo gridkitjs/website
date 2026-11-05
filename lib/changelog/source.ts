@@ -13,8 +13,10 @@ export interface ChangelogVersion {
 export interface ChangelogSection {
   slug: string;
   title: string;
-  /** Path within the gridkit repo, for last-updated/edit-url lookups. */
+  /** Path within the gridkit repo, for the edit link. */
   repoPath: string;
+  /** The file's last commit date, so the latest version's; `null` when it isn't known. */
+  lastModified: Date | null;
   /** Every version, newest first — versions[0] is what /changelog/{slug} (no version segment) shows. */
   versions: ChangelogVersion[];
 }
@@ -55,27 +57,49 @@ async function fetchChangelogFile(repoPath: string): Promise<string | null> {
   }
 }
 
+interface ChangelogFile {
+  body: string;
+  lastModified: Date | null;
+}
+
 /** A package's whole `CHANGELOG.md`, or `null` when it has none. */
 async function readChangelog(
   slug: string,
   repoPath: string,
-): Promise<string | null> {
+): Promise<ChangelogFile | null> {
   const manifest = await getDocsManifest();
-  if (!manifest) return fetchChangelogFile(repoPath);
-  return manifest.packages[slug]?.changelog?.body ?? null;
+  if (!manifest) {
+    const body = await fetchChangelogFile(repoPath);
+    // Only the manifest carries commit dates.
+    return body === null ? null : { body, lastModified: null };
+  }
+  const changelog = manifest.packages[slug]?.changelog;
+  if (!changelog) return null;
+  return {
+    body: changelog.body,
+    lastModified: changelog.lastModified
+      ? new Date(changelog.lastModified)
+      : null,
+  };
 }
 
 async function buildSection(
   pkg: (typeof PACKAGES)[number],
 ): Promise<ChangelogSection | undefined> {
   const repoPath = `packages/${pkg.slug}/CHANGELOG.md`;
-  const content = await readChangelog(pkg.slug, repoPath);
-  if (content === null) return undefined;
+  const changelog = await readChangelog(pkg.slug, repoPath);
+  if (changelog === null) return undefined;
 
-  const versions = parseVersions(content);
+  const versions = parseVersions(changelog.body);
   if (versions.length === 0) return undefined;
 
-  return { slug: pkg.slug, title: npmName(pkg.slug), repoPath, versions };
+  return {
+    slug: pkg.slug,
+    title: npmName(pkg.slug),
+    repoPath,
+    lastModified: changelog.lastModified,
+    versions,
+  };
 }
 
 async function loadChangelogTree(): Promise<ChangelogTree> {
