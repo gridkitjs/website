@@ -2,6 +2,9 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/Container";
+import { GitHubIcon } from "@/components/ui/icons";
+import { siteConfig } from "@/lib/seo/site-config";
+import { HeaderNav } from "./HeaderNav";
 
 export async function SiteHeader() {
   const t = await getTranslations("common.nav");
@@ -28,18 +31,16 @@ export async function SiteHeader() {
             </span>
           </Link>
           <div className="flex items-center gap-6">
-            <Link
-              href="/changelog"
-              className="text-site-ink text-sm font-medium transition-opacity hover:opacity-70"
+            <HeaderNav />
+            <a
+              href={siteConfig.github}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={t("github")}
+              className="text-site-ink transition-opacity hover:opacity-70"
             >
-              {t("changelog")}
-            </Link>
-            <Link
-              href="/docs"
-              className="text-site-ink text-sm font-medium transition-opacity hover:opacity-70"
-            >
-              {t("docs")}
-            </Link>
+              <GitHubIcon className="size-5" />
+            </a>
           </div>
         </nav>
       </Container>

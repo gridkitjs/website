@@ -2,7 +2,8 @@
   "nav": {
     "home": "Home",
     "changelog": "Changelog",
-    "docs": "Docs"
+    "docs": "Docs",
+    "github": "GridKit on GitHub"
   },
   "footer": {
     "tagline": "A headless data-grid toolkit for TypeScript.",
