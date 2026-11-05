@@ -160,3 +160,93 @@ body {
     color: var(--shiki-dark);
   }
 }
+
+/*
+ * Code-block lines (CodeFrame). Each line is a full-width row, padded here
+ * rather than on the <pre>, so a highlighted or diffed line's background runs
+ * edge to edge, and past the visible width when the block scrolls. In the
+ * components layer, so a utility on the block can still override them.
+ */
+@layer components {
+  .code-block pre {
+    padding-block: 1rem;
+    line-height: 1.625;
+  }
+
+  .code-block code {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+    counter-reset: line;
+  }
+
+  .code-block .line {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    min-height: 1lh;
+    padding-inline: 1rem;
+  }
+
+  .code-block[data-wrap] pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .code-block[data-wrap] code {
+    width: auto;
+  }
+
+  .code-block[data-line-numbers] .line::before {
+    display: inline-block;
+    width: 2ch;
+    margin-right: 1.25rem;
+    color: var(--site-ink-faint);
+    text-align: right;
+    content: counter(line);
+    counter-increment: line;
+  }
+
+  .code-block .line.highlighted {
+    background: var(--site-accent-soft);
+    box-shadow: inset 2px 0 var(--site-accent);
+  }
+
+  /* The +/- sits in the line's left padding, clear of any line number. */
+  .code-block .line.diff::after {
+    position: absolute;
+    left: 0.35rem;
+  }
+
+  .code-block .line.diff.add {
+    background: var(--site-success-soft);
+  }
+
+  .code-block .line.diff.add::after {
+    color: var(--site-success);
+    content: "+";
+  }
+
+  .code-block .line.diff.remove {
+    background: var(--site-danger-soft);
+  }
+
+  .code-block .line.diff.remove::after {
+    color: var(--site-danger);
+    content: "-";
+  }
+
+  .code-block .has-focused .line:not(.focused) {
+    opacity: 0.45;
+    filter: blur(0.08rem);
+    transition:
+      opacity 150ms,
+      filter 150ms;
+  }
+
+  .code-block .has-focused:hover .line,
+  .code-block .has-focused:focus-visible .line {
+    opacity: 1;
+    filter: none;
+  }
+}
