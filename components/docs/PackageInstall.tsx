@@ -45,7 +45,7 @@ export function PackageInstall({
   return (
     <div
       className={cn(
-        "border-site-code-border bg-site-code-bg my-4 overflow-hidden rounded-xl border text-sm",
+        "border-site-code-border bg-site-code-bg rounded-site my-4 overflow-hidden border text-sm",
         className,
       )}
       {...props}

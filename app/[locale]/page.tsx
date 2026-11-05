@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/marketing/Hero";
-import { FeaturesSection } from "@/components/marketing/FeaturesSection";
+import { FeatureMatrix } from "@/components/marketing/FeatureMatrix";
+import { HeadlessSection } from "@/components/marketing/HeadlessSection";
 import { PackagesSection } from "@/components/marketing/PackagesSection";
 import { StorySection } from "@/components/marketing/StorySection";
 import { CtaSection } from "@/components/marketing/CtaSection";
@@ -13,11 +14,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "home.hero" });
+  const t = await getTranslations({ locale, namespace: "home.meta" });
 
   return buildMetadata({
-    title: "GridKit — a headless data-grid toolkit",
-    description: t("subtitle"),
+    title: t("title"),
+    description: t("description"),
     path: "",
     locale,
   });
@@ -34,7 +35,8 @@ export default async function HomePage({
   return (
     <>
       <Hero />
-      <FeaturesSection />
+      <FeatureMatrix />
+      <HeadlessSection />
       <PackagesSection />
       <StorySection />
       <CtaSection />

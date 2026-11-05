@@ -1,43 +1,82 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { GitHubIcon } from "@/components/ui/icons";
+import { PackageInstall } from "@/components/docs/PackageInstall";
+import { Link } from "@/i18n/navigation";
+import { PACKAGES } from "@/lib/packages";
+import { getLatestReleases } from "@/lib/packages/npm";
 import { siteConfig } from "@/lib/seo/site-config";
+import { HeroGrid } from "./HeroGrid";
+
+const INSTALL_PACKAGES = "@gridkitjs/react @gridkitjs/theme-tailwind";
+
+// The list draws the lattice's top and left edges, each cell its right and
+// bottom, so a short last row ends cleanly.
+const statClassName =
+  "border-site-line flex flex-col gap-0.5 border-r border-b px-4 py-3";
+const statLabelClassName = "text-site-ink-muted font-mono text-xs";
 
 export async function Hero() {
   const t = await getTranslations("home.hero");
+  const releases = await getLatestReleases();
 
   return (
-    <Section variant="gradient" className="overflow-hidden">
-      <div className="mx-auto mt-14 max-w-md">
-        <Image
-          src="/brand/gridkit-header.svg"
-          alt="GridKit"
-          width={1920}
-          height={950}
-          priority
-          sizes="(min-width: 896px) 896px, 100vw"
-          className="h-auto w-full"
-        />
-      </div>
-      <Container className="relative pt-14 pb-20 text-center sm:pt-18 sm:pb-28">
-        <h1 className="from-site-ink-inverted to-site-ink-muted-inverted mx-auto max-w-3xl bg-linear-to-b bg-clip-text text-4xl font-semibold tracking-tight text-balance text-transparent sm:text-6xl">
-          {t("title")}
-        </h1>
-        <p className="text-site-ink-muted-inverted mx-auto mt-6 max-w-2xl text-lg text-balance">
-          {t("subtitle")}
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <Button href="/docs">{t("primaryCta")}</Button>
-          <Button
-            href={siteConfig.github}
-            external
-            variant="secondary-inverted"
-          >
-            {t("secondaryCta")}
-          </Button>
+    <Section variant="default" className="border-site-line border-b">
+      <Container className="grid grid-cols-1 items-center gap-10 pt-12 pb-10 lg:grid-cols-2 lg:gap-12 lg:pt-16">
+        <div>
+          <h1 className="text-site-ink text-4xl font-semibold tracking-tight sm:text-5xl lg:text-4xl xl:text-[2.5rem]">
+            {t("titleLead")}
+            <span className="text-site-ink-muted block">{t("titleTail")}</span>
+          </h1>
+          <p className="text-site-ink-muted mt-5 max-w-xl text-lg text-pretty">
+            {t("subtitle")}
+          </p>
+          <PackageInstall pkg={INSTALL_PACKAGES} className="mt-7 mb-0" />
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Button href="/docs">{t("primaryCta")}</Button>
+            <Button
+              href={siteConfig.github}
+              external
+              variant="secondary"
+              className="gap-2"
+            >
+              <GitHubIcon className="size-4" />
+              {t("secondaryCta")}
+            </Button>
+          </div>
         </div>
+        <HeroGrid />
+      </Container>
+
+      <Container className="pb-12 lg:pb-16">
+        <dl className="border-site-line grid grid-cols-2 border-t border-l text-sm sm:grid-cols-4 lg:grid-cols-7">
+          {PACKAGES.map(({ slug }) => {
+            const release = releases[slug];
+            return (
+              <div key={slug} className={statClassName}>
+                <dt className={statLabelClassName}>{slug}</dt>
+                <dd>
+                  <Link
+                    href={`/changelog/${slug}`}
+                    className="text-site-ink hover:text-site-accent font-mono tabular-nums transition-colors"
+                  >
+                    {release ? `v${release.version}` : t("changelog")}
+                  </Link>
+                </dd>
+              </div>
+            );
+          })}
+          <div className={statClassName}>
+            <dt className={statLabelClassName}>{t("licenseLabel")}</dt>
+            <dd className="text-site-ink font-mono">MIT</dd>
+          </div>
+          <div className={statClassName}>
+            <dt className={statLabelClassName}>{t("languageLabel")}</dt>
+            <dd className="text-site-ink font-mono">TypeScript</dd>
+          </div>
+        </dl>
       </Container>
     </Section>
   );

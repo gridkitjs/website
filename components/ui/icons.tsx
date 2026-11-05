@@ -1,25 +1,29 @@
 import type { SVGProps } from "react";
 
+const MARK_CELL_OFFSETS = [2, 9.5, 17, 24.5];
+
 /**
- * Placeholder nav mark — a stand-in for the eventual GridKit grid icon.
- * Swap the path data here once the real icon exists; call sites don't change.
+ * The GridKit mark: a four-by-four lattice with one cell selected. Brand
+ * colours, not tokens, so it reads the same in both themes and in the
+ * Open Graph images. `app/icon.svg` is the same drawing as a file, for the
+ * favicon; keep the two in step.
  */
-export function HomeIcon(props: SVGProps<SVGSVGElement>) {
+export function GridKitMark(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <rect x="3" y="3" width="7" height="7" rx="1.5" />
-      <rect x="14" y="3" width="7" height="7" rx="1.5" />
-      <rect x="3" y="14" width="7" height="7" rx="1.5" />
-      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    <svg viewBox="0 0 32 32" aria-hidden="true" {...props}>
+      <rect width="32" height="32" rx="4" fill="#8b939e" />
+      {MARK_CELL_OFFSETS.flatMap((y, row) =>
+        MARK_CELL_OFFSETS.map((x, column) => (
+          <rect
+            key={`${row}-${column}`}
+            x={x}
+            y={y}
+            width="5.5"
+            height="5.5"
+            fill={row === 1 && column === 1 ? "#096acb" : "#fff"}
+          />
+        )),
+      )}
     </svg>
   );
 }

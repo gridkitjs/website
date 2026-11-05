@@ -1,8 +1,7 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/Container";
-import { GitHubIcon } from "@/components/ui/icons";
+import { GitHubIcon, GridKitMark } from "@/components/ui/icons";
 import { SearchDialog } from "@/components/search/SearchDialog";
 import { SearchTrigger } from "@/components/search/SearchTrigger";
 import { siteConfig } from "@/lib/seo/site-config";
@@ -18,17 +17,9 @@ export async function SiteHeader() {
         <nav className="flex h-14 items-center justify-between">
           <Link
             href="/"
-            aria-label={t("home")}
             className="flex items-center gap-2 transition-opacity hover:opacity-70"
           >
-            <Image
-              src="/brand/grid-kit-logo.svg"
-              alt=""
-              width={24}
-              height={24}
-              className="size-6"
-              priority
-            />
+            <GridKitMark className="size-6" />
             <span className="text-site-accent text-sm font-semibold">
               GridKit
             </span>

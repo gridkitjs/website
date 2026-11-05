@@ -2113,7 +2113,7 @@ export function useEventLog(limit = 6) {
 
 export function EventLog({ entries }: { entries: readonly string[] }) {
   return (
-    <ol className="border-site-line mt-4 min-h-24 space-y-1 rounded-lg border p-3 text-xs">
+    <ol className="border-site-line rounded-site mt-4 min-h-24 space-y-1 border p-3 text-xs">
       {entries.length === 0 ? (
         <li className="text-site-ink-muted">
           Interact with the grid above to see its callbacks fire.

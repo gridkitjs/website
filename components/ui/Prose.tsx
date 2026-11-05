@@ -26,7 +26,7 @@ export function Prose({
         "[&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:space-y-3 [&_ol]:pl-6",
         "[&_li]:text-site-ink [&_li::marker]:text-site-ink-muted [&_li]:pl-1 [&_li]:leading-relaxed [&_li_p]:inline",
         "[&_ol_ol]:mt-3 [&_ol_ol]:mb-1 [&_ul_ul]:mt-3 [&_ul_ul]:mb-1",
-        "[&_code]:bg-site-surface [&_code]:text-site-ink [&_code]:border-site-line [&_code]:rounded [&_code]:border [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em]",
+        "[&_code]:bg-site-surface [&_code]:text-site-ink [&_code]:border-site-line [&_code]:rounded-site-sm [&_code]:border [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em]",
         "[&_pre_code]:border-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0",
         "[&_strong]:text-site-ink [&_strong]:font-semibold",
         "[&_blockquote]:border-site-line-strong [&_blockquote_li]:text-site-ink-muted [&_blockquote_p]:text-site-ink-muted [&_blockquote]:my-6 [&_blockquote]:border-l-2 [&_blockquote]:pl-4",

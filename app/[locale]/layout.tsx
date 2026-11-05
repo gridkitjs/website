@@ -51,7 +51,7 @@ export async function generateMetadata({
     metadataBase: new URL(siteConfig.baseUrl),
     title: {
       template: "%s · GridKit",
-      default: "GridKit — a headless data-grid toolkit",
+      default: "GridKit: a headless data grid for TypeScript and React",
     },
     description:
       "GridKit is a headless, framework-agnostic data-grid toolkit for TypeScript and React.",
@@ -67,13 +67,8 @@ export async function generateMetadata({
     openGraph: {
       locale,
     },
-    icons: {
-      icon: [
-        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      ],
-      apple: "/apple-touch-icon.png",
-    },
+    // No `icons`: favicon.ico, icon.svg and apple-icon.png in app/ are linked
+    // by file convention, and only while no `icons` key is set.
     manifest: "/site.webmanifest",
   };
 }

@@ -15,6 +15,7 @@ import {
 import type { PrevNextEntry } from "@/components/ui/PrevNextNav";
 import { getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { PACKAGES } from "@/lib/packages";
 import { JsonLd, techArticleJsonLd } from "@/lib/json-ld";
 
 /** A prev/next card, naming the page's section when it isn't `current`. */
@@ -61,6 +62,7 @@ export async function generateMetadata({
       description: t("description"),
       path: "docs",
       locale,
+      image: "og/docs",
     });
   }
 
@@ -68,11 +70,14 @@ export async function generateMetadata({
   const entry = tree.bySlug.get(path);
   if (!entry) return {};
 
+  // A package overview is a hub page, with a search snippet written for it.
+  const overview = PACKAGES.find((pkg) => pkg.slug === path);
   return buildMetadata({
     title: entry.page.title,
-    description: entry.page.description,
+    description: overview?.description ?? entry.page.description,
     path: `docs/${path}`,
     locale,
+    image: `og/docs/${path}`,
   });
 }
 
@@ -96,12 +101,14 @@ export default async function DocsSlugPage({
         <p className="text-site-ink-muted mt-3 max-w-2xl text-lg">
           {t("intro")}
         </p>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* A hairline lattice: the grid draws its top and left edges, each
+            cell its right and bottom, so a short last row ends cleanly. */}
+        <div className="border-site-line mt-10 grid border-t border-l sm:grid-cols-2 lg:grid-cols-3">
           {tree.sections.map((section) => (
             <Link
               key={section.slug}
               href={`/docs/${section.slug}`}
-              className="border-site-line hover:border-site-accent block rounded-2xl border p-6 transition-colors"
+              className="border-site-line hover:bg-site-surface block border-r border-b p-6 transition-colors"
             >
               <p className="text-site-ink font-mono text-sm font-medium">
                 {section.title}

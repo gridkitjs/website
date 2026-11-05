@@ -1,12 +1,12 @@
 {
   "nav": {
-    "home": "Home",
     "changelog": "Changelog",
     "docs": "Docs",
     "github": "GridKit on GitHub"
   },
   "footer": {
     "tagline": "A headless data-grid toolkit for TypeScript.",
+    "about": "About GridKit",
     "githubHeading": "Repository",
     "packagesHeading": "Packages",
     "copyright": "© {year} GridKit.",
@@ -34,5 +34,13 @@
     "dark": "dark",
     "system": "system"
   },
-  "wrapLines": "Wrap long lines"
+  "wrapLines": "Wrap long lines",
+  "og": {
+    "home": "Headless data grid",
+    "docs": "Docs",
+    "docsSection": "{section} docs",
+    "docsIndexTitle": "Guides, API reference and live examples",
+    "changelog": "Changelog",
+    "changelogIndexTitle": "Release notes for every package"
+  }
 }

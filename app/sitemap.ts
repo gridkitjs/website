@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getChangelogTree(),
   ]);
 
-  const staticEntries = ["", "docs", "changelog"].map((path) => ({
+  const staticEntries = ["", "about", "docs", "changelog"].map((path) => ({
     path,
     lastModified: undefined as Date | undefined,
   }));

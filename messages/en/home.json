@@ -1,79 +1,98 @@
 {
+  "meta": {
+    "title": "GridKit: headless data grid for TypeScript and React",
+    "description": "GridKit is a headless data grid for TypeScript and React: sorting, filtering, grouping, selection, virtualization and Excel export, with a Tailwind theme."
+  },
   "hero": {
-    "title": "Grid logic that stays out of your way.",
-    "subtitle": "GridKit separates grid logic from rendering. Column resolution, resizing, reordering, and selection live in framework-agnostic TypeScript — React binds it to real components today, with more framework adapters planned — so you're never fighting a component to get the behavior your data needs.",
+    "titleLead": "Grid logic in TypeScript.",
+    "titleTail": "Rendered natively in React.",
+    "subtitle": "Sorting, filtering, grouping, selection and export live in a framework-agnostic core. React draws the grid; your stylesheet decides how it looks.",
     "primaryCta": "Read the docs",
-    "secondaryCta": "View on GitHub"
+    "secondaryCta": "GitHub",
+    "gridLabel": "Tickets, grouped by region",
+    "gridToolbarLabel": "Ticket actions",
+    "changelog": "Changelog",
+    "licenseLabel": "license",
+    "languageLabel": "written in"
   },
   "features": {
+    "eyebrow": "Features",
     "title": "Everything the grid does today",
-    "subtitle": "Six real capabilities, built on a framework-agnostic core — React is the first adapter, with more on the way.",
-    "items": [
-      {
-        "title": "Columns that infer themselves",
-        "description": "Infer columns and their types straight from your data, or declare them by hand — custom header and cell templates take over whenever you need more control.",
-        "docsSlug": "core/column-definitions"
-      },
-      {
-        "title": "Resize, your way",
-        "description": "Drag a column's edge to resize it, double-click to auto-fit its content, or drive the whole thing from the keyboard.",
-        "docsSlug": "react/column-resizing"
-      },
-      {
-        "title": "Reorder without fighting state",
-        "description": "Drag a header into place or reorder with the keyboard — GridKit computes the new order and tells you once, on drop.",
-        "docsSlug": "react/column-reordering"
-      },
-      {
-        "title": "Selection for rows, columns, and cells",
-        "description": "Select any combination of rows, columns, and cells, single or multiple, fully controlled or left to sensible defaults.",
-        "docsSlug": "core/selection"
-      },
-      {
-        "title": "Keyboard-first and accessible",
-        "description": "A single roving tab stop, full arrow-key navigation, and ARIA roles with live announcements — built in, not bolted on.",
-        "docsSlug": "react/data-grid"
-      },
-      {
-        "title": "A theme you can swap",
-        "description": "@gridkitjs/react renders semantic class names and carries no styles of its own. @gridkitjs/theme-tailwind ships a ready-made palette with dark mode, or bring your own stylesheet.",
-        "docsSlug": "theme-tailwind"
-      }
-    ]
+    "subtitle": "<number>{count}</number> shipped features, each linked to the page that documents it.",
+    "groups": {
+      "columns": "Columns",
+      "rows": "Rows",
+      "selection": "Selection",
+      "data": "Data",
+      "integration": "Integration"
+    },
+    "items": {
+      "definitions": "Definitions and inference",
+      "templates": "Header and cell templates",
+      "resizing": "Resizing and autofit",
+      "reordering": "Drag to reorder",
+      "sorting": "Sorting and multi-sort",
+      "chooser": "Column chooser and hiding",
+      "grouping": "Grouping and group-by bar",
+      "aggregates": "Aggregates and totals",
+      "pagination": "Pagination",
+      "virtualization": "Row virtualization",
+      "infiniteScroll": "Infinite scroll",
+      "rowSelection": "Row selection",
+      "columnSelection": "Column selection",
+      "cellSelection": "Cell selection",
+      "keyboard": "Keyboard and ARIA",
+      "clipboard": "Clipboard copy",
+      "contextMenu": "Context menu",
+      "commands": "Commands",
+      "filtering": "Filtering",
+      "filterMenu": "Filter menu and Excel filter",
+      "toolbar": "Toolbar and search",
+      "export": "CSV, JSON and HTML export",
+      "excel": "Excel export",
+      "printing": "Printing",
+      "state": "Controlled or uncontrolled state",
+      "events": "Events",
+      "imperativeApi": "Imperative API and save/restore",
+      "controller": "Headless controller",
+      "viewPipeline": "View pipeline",
+      "localization": "Localization",
+      "theming": "Theming and dark mode",
+      "dom": "DOM behaviours"
+    }
   },
-  "packages": {
-    "title": "Four packages, one grid",
-    "subtitle": "Install just the layer you need — the core has no framework or styling dependency.",
+  "headless": {
+    "title": "A headless core, drawn by React",
+    "subtitle": "The grid is a plain TypeScript controller. The React DataGrid is one renderer of it, and the next framework adapter reuses the same core.",
     "core": {
-      "name": "@gridkitjs/core",
-      "description": "Framework-agnostic grid logic: column resolution, resizing, reordering, and selection, fully tested on its own."
+      "package": "@gridkitjs/core",
+      "description": "Holds the state, derives the view and runs every action, with no DOM and no framework."
     },
     "react": {
-      "name": "@gridkitjs/react",
-      "description": "Binds the core to real React components — hooks and a DataGridComponent, no virtual-DOM fighting."
-    },
-    "themeTailwind": {
-      "name": "@gridkitjs/theme-tailwind",
-      "description": "A ready-made palette with dark mode support, or use it as a reference for your own stylesheet."
-    },
-    "exportXlsx": {
-      "name": "@gridkitjs/export-xlsx",
-      "description": "Excel export writer for GridKit."
+      "package": "@gridkitjs/react",
+      "description": "Renders that controller as an accessible DataGrid, with a prop for every option."
+    }
+  },
+  "packages": {
+    "title": "Five packages, one grid",
+    "subtitle": "Install only the layers you use. The core has no framework or styling dependency.",
+    "npmLabel": "{name} on npm",
+    "roles": {
+      "react": "The DataGrid component: draws the core and attaches the browser behaviours.",
+      "core": "Framework-agnostic grid logic: state, view, actions and export, tested without a DOM.",
+      "dom": "Browser behaviours any renderer reuses: gestures, focus, observers and overlays.",
+      "theme-tailwind": "The grid stylesheet: palette tokens, dark mode and the styles for every part.",
+      "export-xlsx": "An Excel writer for the export menu, with typed cells and grouped outlines."
     }
   },
   "story": {
     "title": "Why another grid?",
-    "lede": "TL;DR: I got tired of fighting my tools.",
-    "paragraphs": {
-      "p1": "I've spent <b>2+ years</b> building grids and tables inside SaaS ERP products — the kind where a single view needs sorting, filtering, inline editing, and a few thousand rows to not fall over. Along the way I've reached for more than one big commercial grid library (won't name names), and the pattern was always the same: the library wasn't actually built for React, it was <b>ported</b> to it.",
-      "p2": "That shows up in specific ways. Conditional rendering or a prop change in the wrong order would <b>crash the whole grid</b>. Instability that only appeared under React's StrictMode or concurrent rendering. Internals reaching into the DOM with brittle selectors and zero guard rails, so a version bump could silently break your app. And TypeScript support that felt bolted on after the fact (if even) — types that lied about what the API actually accepted, instead of types that <b>were</b> the API.",
-      "p3": "<accent>GridKit</accent> is my attempt at doing it the other way around: write the grid <b>for</b> the framework, not around it. The core logic is framework-agnostic TypeScript so it's testable and predictable on its own, but the React package is a first-class citizen built with React's rendering model in mind from day one — not a jQuery-era widget wearing a component wrapper.",
-      "p4": "Long term, I want this to be the grid people reach for <b>without bracing for a fight</b> — something that gets out of your way, doesn't need a support contract to debug, and actually gets the max potential out of the framework it's built on. Everything I learned about what a robust grid needs to do in production ERP software is going into <accent>GridKit</accent>."
-    }
+    "teaser": "GridKit comes out of years of building grids for SaaS ERP products with commercial libraries that were ported to React rather than built for it. It works the other way around: a grid written for the framework, on a core you can test on its own.",
+    "readMore": "Read the full story"
   },
   "cta": {
     "title": "Start with the docs",
-    "description": "Every example on the docs site runs the real, published packages — nothing simplified for the demo.",
-    "button": "Explore the docs"
+    "description": "Every example on the docs site runs the real, published packages, with nothing simplified for the demo.",
+    "button": "Read the docs"
   }
 }

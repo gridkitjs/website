@@ -75,7 +75,7 @@
     --site-code-inline-bg: oklch(0.26 0.012 250);
   }
 
-  /* Inverted surfaces (hero, CTA, footer) stay dark in both themes. */
+  /* Inverted surfaces (the footer) stay dark in both themes. */
   --site-bg-inverted: oklch(0.15 0.012 255);
   --site-surface-inverted: oklch(0.2 0.016 255);
   --site-ink-inverted: oklch(0.97 0.003 250);
