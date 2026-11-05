@@ -1,0 +1,27 @@
+{
+  "trigger": "Search docs",
+  "label": "Search the docs",
+  "placeholder": "Search pages, sections and APIs…",
+  "results": "Search results",
+  "recent": "Recent",
+  "clearRecent": "Clear recent",
+  "hint": "Search the docs by page, section or API name.",
+  "loading": "Loading search…",
+  "error": "Search couldn't load.",
+  "retry": "Try again",
+  "noResults": "No results for “{query}”",
+  "resultCount": "{count, plural, =0 {No results} one {# result} other {# results}}",
+  "close": "Close search",
+  "keys": {
+    "ctrl": "Ctrl",
+    "cmd": "⌘",
+    "k": "K",
+    "up": "↑",
+    "down": "↓",
+    "enter": "Enter",
+    "escape": "Esc",
+    "navigate": "to move",
+    "open": "to open",
+    "close": "to close"
+  }
+}

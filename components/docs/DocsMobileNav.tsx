@@ -6,6 +6,7 @@ import { usePathname } from "@/i18n/navigation";
 import type { DocsNavSection } from "@/lib/docs/nav";
 import { Container } from "@/components/ui/Container";
 import { CloseIcon, MenuIcon } from "@/components/ui/icons";
+import { SearchTrigger } from "@/components/search/SearchTrigger";
 import { DocsSidebar } from "./DocsSidebar";
 import { revealInScrollParent } from "./revealInScrollParent";
 
@@ -19,7 +20,7 @@ interface DocsMobileNavProps {
 
 /**
  * Below `lg`: a bar under the site header whose "Menu" button opens the
- * docs sidebar in a modal drawer.
+ * docs sidebar in a modal drawer, with a search trigger opposite.
  */
 export function DocsMobileNav({
   sections,
@@ -93,6 +94,7 @@ export function DocsMobileNav({
             <MenuIcon className="size-5" />
             {t("menu")}
           </button>
+          <SearchTrigger variant="bar" />
         </Container>
       </div>
       <dialog
