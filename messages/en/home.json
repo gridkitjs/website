@@ -1,9 +1,15 @@
 {
   "hero": {
-    "title": "Grid logic that stays out of your way.",
-    "subtitle": "GridKit separates grid logic from rendering. Column resolution, resizing, reordering, and selection live in framework-agnostic TypeScript — React binds it to real components today, with more framework adapters planned — so you're never fighting a component to get the behavior your data needs.",
+    "titleLead": "Grid logic in TypeScript.",
+    "titleTail": "Rendered natively in React.",
+    "subtitle": "Sorting, filtering, grouping, selection and export live in a framework-agnostic core. React draws the grid; your stylesheet decides how it looks.",
     "primaryCta": "Read the docs",
-    "secondaryCta": "View on GitHub"
+    "secondaryCta": "GitHub",
+    "gridLabel": "Tickets, grouped by region",
+    "gridToolbarLabel": "Ticket actions",
+    "changelog": "Changelog",
+    "licenseLabel": "license",
+    "languageLabel": "written in"
   },
   "features": {
     "title": "Everything the grid does today",
