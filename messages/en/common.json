@@ -10,6 +10,7 @@
     "githubHeading": "Repository",
     "packagesHeading": "Packages",
     "copyright": "© {year} GridKit.",
+    "docsSynced": "Docs synced <time>{date}</time> · <commit>{sha}</commit>",
     "credit": "Built by <name>Blagoja Blazhevski</name>",
     "githubProfileLabel": "Blagoja Blazhevski on GitHub"
   },

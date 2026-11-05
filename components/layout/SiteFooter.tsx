@@ -1,10 +1,15 @@
-import { getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { Container } from "@/components/ui/Container";
+import { RelativeTime } from "@/components/ui/RelativeTime";
 import { GitHubIcon, NpmIcon } from "@/components/ui/icons";
+import { getCommitUrl } from "@/lib/docs/github";
+import { getDocsSync } from "@/lib/docs/manifest";
 import { siteConfig } from "@/lib/seo/site-config";
 
 export async function SiteFooter() {
   const t = await getTranslations("common.footer");
+  const format = await getFormatter();
+  const sync = await getDocsSync();
   const year = new Date().getFullYear();
 
   const packages = [
@@ -57,9 +62,38 @@ export async function SiteFooter() {
         </div>
       </Container>
       <Container className="border-site-line-inverted flex flex-wrap items-center justify-between gap-2 border-t py-6">
-        <p className="text-site-ink-muted-inverted text-xs">
-          {t("copyright", { year })}
-        </p>
+        <div className="space-y-1">
+          <p className="text-site-ink-muted-inverted text-xs">
+            {t("copyright", { year })}
+          </p>
+          {sync && (
+            <p className="text-site-ink-muted-inverted text-xs">
+              {t.rich("docsSynced", {
+                date: format.dateTime(sync.syncedAt, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }),
+                sha: sync.sha.slice(0, 7),
+                time: (chunks) => (
+                  <RelativeTime dateTime={sync.syncedAt.toISOString()}>
+                    {chunks}
+                  </RelativeTime>
+                ),
+                commit: (chunks) => (
+                  <a
+                    href={getCommitUrl(sync.sha)}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="text-site-ink-inverted hover:text-site-ink-muted-inverted font-mono underline underline-offset-2 transition-colors"
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
+            </p>
+          )}
+        </div>
         <p className="text-site-ink-muted-inverted flex items-center gap-1.5 text-xs">
           {t.rich("credit", {
             name: (chunks) => (

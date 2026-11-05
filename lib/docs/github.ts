@@ -115,3 +115,8 @@ export async function fetchFileFromApi(
 export function getEditUrl(repoPath: string): string {
   return `https://github.com/${OWNER}/${REPO}/edit/${BRANCH}/${repoPath}`;
 }
+
+/** The GitHub URL of a commit in the docs repo. */
+export function getCommitUrl(sha: string): string {
+  return `https://github.com/${OWNER}/${REPO}/commit/${sha}`;
+}
