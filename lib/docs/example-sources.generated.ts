@@ -2,6 +2,7 @@
 // components/live-examples/**/*.example.tsx. Do not edit by hand.
 import type { GeneratedExample } from "./examples";
 import { ColumnResizingExample } from "@/components/live-examples/columns/ColumnResizingExample.example";
+import { ColumnSortingExample } from "@/components/live-examples/columns/ColumnSortingExample.example";
 import { ColumnTemplatesExample } from "@/components/live-examples/columns/ColumnTemplatesExample.example";
 import { DarkModeExample } from "@/components/live-examples/grid/DarkModeExample.example";
 import { DataGridBasicExample } from "@/components/live-examples/grid/DataGridBasicExample.example";
@@ -80,6 +81,69 @@ export function ColumnResizingExample() {
           }}
         />
       </div>
+      <EventLog entries={entries} />
+    </div>
+  );
+}
+`,
+    localFiles: ["EventLog.tsx", "fixtures.ts"],
+    dependencies: {
+      "@gridkitjs/core": "^0.13.0",
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
+  ColumnSortingExample: {
+    Component: ColumnSortingExample,
+    meta: {
+      id: "column-sorting",
+      title: "Column sorting",
+      description:
+        "Click a header's sort toggle to sort by that column; Shift-click another to stack it as a tiebreaker.",
+      minHeight: 553,
+    },
+    fileName: "ColumnSortingExample.tsx",
+    source: `import type { ColumnSortState } from "@gridkitjs/core";
+import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+import { EventLog, useEventLog } from "./EventLog";
+
+const rows = makeRows(9);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency" },
+];
+
+/** "Region asc, then Amount desc" — the stack in priority order. */
+function describeSort(sort: ColumnSortState): string {
+  if (sort.length === 0) return "unsorted";
+  return sort
+    .map((entry) => \`\${entry.columnId} \${entry.direction}\`)
+    .join(", then ");
+}
+
+export function ColumnSortingExample() {
+  const { entries, record } = useEventLog();
+
+  return (
+    <div>
+      <DataGrid
+        columns={columns}
+        dataSource={rows}
+        getRowId={(row) => String(row.Id)}
+        label="Tickets"
+        borders="all"
+        sortableColumns
+        onColumnSortChange={({ sort }) => {
+          record(\`onColumnSortChange — \${describeSort(sort)}\`);
+        }}
+      />
       <EventLog entries={entries} />
     </div>
   );
