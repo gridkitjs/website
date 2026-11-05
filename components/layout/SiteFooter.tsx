@@ -16,25 +16,27 @@ export async function SiteFooter() {
   ];
 
   return (
-    <footer className="border-site-line bg-site-bg border-t">
+    <footer className="border-site-line-inverted bg-site-bg-inverted border-t">
       <Container className="grid gap-10 py-16 sm:grid-cols-2">
         <div>
-          <p className="text-site-ink text-sm font-semibold">GridKit</p>
-          <p className="text-site-ink-muted mt-2 max-w-sm text-sm">
+          <p className="text-site-ink-inverted text-sm font-semibold">
+            GridKit
+          </p>
+          <p className="text-site-ink-muted-inverted mt-2 max-w-sm text-sm">
             {t("tagline")}
           </p>
           <a
             href={siteConfig.github}
             target="_blank"
             rel="noreferrer noopener"
-            className="text-site-ink mt-4 inline-flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
+            className="text-site-ink-inverted mt-4 inline-flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
           >
             <GitHubIcon className="size-4" />
             {t("githubHeading")}
           </a>
         </div>
         <div>
-          <p className="text-site-ink text-sm font-semibold">
+          <p className="text-site-ink-inverted text-sm font-semibold">
             {t("packagesHeading")}
           </p>
           <ul className="mt-3 space-y-2">
@@ -44,7 +46,7 @@ export async function SiteFooter() {
                   href={pkg.href}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="text-site-ink-muted hover:text-site-ink inline-flex items-center gap-2 text-sm transition-colors"
+                  className="text-site-ink-muted-inverted hover:text-site-ink-inverted inline-flex items-center gap-2 text-sm transition-colors"
                 >
                   <NpmIcon className="size-4" />
                   {pkg.name}
@@ -54,18 +56,18 @@ export async function SiteFooter() {
           </ul>
         </div>
       </Container>
-      <Container className="border-site-line flex flex-wrap items-center justify-between gap-2 border-t py-6">
-        <p className="text-site-ink-muted text-xs">
+      <Container className="border-site-line-inverted flex flex-wrap items-center justify-between gap-2 border-t py-6">
+        <p className="text-site-ink-muted-inverted text-xs">
           {t("copyright", { year })}
         </p>
-        <p className="text-site-ink-muted flex items-center gap-1.5 text-xs">
+        <p className="text-site-ink-muted-inverted flex items-center gap-1.5 text-xs">
           {t.rich("credit", {
             name: (chunks) => (
               <a
                 href={siteConfig.author.portfolio}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="text-site-ink hover:text-site-accent underline underline-offset-2 transition-colors"
+                className="text-site-ink-inverted hover:text-site-ink-muted-inverted underline underline-offset-2 transition-colors"
               >
                 {chunks}
               </a>
@@ -76,7 +78,7 @@ export async function SiteFooter() {
             target="_blank"
             rel="noreferrer noopener"
             aria-label={t("githubProfileLabel")}
-            className="text-site-ink-muted hover:text-site-ink transition-colors"
+            className="text-site-ink-muted-inverted hover:text-site-ink-inverted transition-colors"
           >
             <GitHubIcon className="size-3.5" />
           </a>
