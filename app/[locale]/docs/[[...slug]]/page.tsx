@@ -101,23 +101,27 @@ export default async function DocsSlugPage({
         <p className="text-site-ink-muted mt-3 max-w-2xl text-lg">
           {t("intro")}
         </p>
-        {/* A hairline lattice: the grid draws its top and left edges, each
-            cell its right and bottom, so a short last row ends cleanly. */}
-        <div className="border-site-line mt-10 grid border-t border-l sm:grid-cols-2 lg:grid-cols-3">
-          {tree.sections.map((section) => (
-            <Link
-              key={section.slug}
-              href={`/docs/${section.slug}`}
-              className="border-site-line hover:bg-site-surface block border-r border-b p-6 transition-colors"
-            >
-              <p className="text-site-ink font-mono text-sm font-medium">
-                {section.title}
-              </p>
-              <p className="text-site-ink-muted mt-2 text-sm leading-relaxed">
-                {section.description}
-              </p>
-            </Link>
-          ))}
+        {/* A hairline lattice: the rounded frame draws the outer edge, each
+            cell its right and bottom, so a short last row ends cleanly. The
+            grid overhangs the frame by 1px on those sides, so the outermost
+            cell borders sit under the frame's own. */}
+        <div className="border-site-line rounded-site mt-10 overflow-hidden border">
+          <div className="-mr-px -mb-px grid sm:grid-cols-2 lg:grid-cols-3">
+            {tree.sections.map((section) => (
+              <Link
+                key={section.slug}
+                href={`/docs/${section.slug}`}
+                className="border-site-line hover:bg-site-surface block border-r border-b p-6 transition-colors"
+              >
+                <p className="text-site-ink font-mono text-sm font-medium">
+                  {section.title}
+                </p>
+                <p className="text-site-ink-muted mt-2 text-sm leading-relaxed">
+                  {section.description}
+                </p>
+              </Link>
+            ))}
+          </div>
         </div>
         <p className="mt-10 text-sm">
           <Link href="/changelog" className="text-site-accent">

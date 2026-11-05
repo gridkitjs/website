@@ -38,7 +38,7 @@ function ThemeSwatch({
       <p className="text-site-ink-muted mb-2 text-xs font-medium">{caption}</p>
       <div
         className={cn(
-          "border-line bg-surface text-fg rounded-lg border p-2",
+          "border-line bg-surface text-fg rounded-site border p-2",
           className,
         )}
       >
@@ -77,7 +77,7 @@ export function DarkModeExample() {
         <span className="text-site-ink-muted text-xs font-medium">
           App theme:
         </span>
-        <div className="border-site-line inline-flex overflow-hidden rounded-lg border text-xs">
+        <div className="border-site-line rounded-site inline-flex overflow-hidden border text-xs">
           {APP_THEMES.map((theme) => (
             <button
               key={theme}
