@@ -21,12 +21,14 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 | `app/[locale]/`                             | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`. The layout's skip link targets `<main id="main">`.                                      |
 | `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                                                                                        |
 | `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                                                                                   |
+| `app/api/search-index`                      | The docs search index as JSON (`lib/docs/search-index.ts`), prerendered and revalidated with the docs.                                                                                        |
 | `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                                                                                                                 |
+| `components/search/`                        | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).              |
 | `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`. |
 | `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                                                                                                    |
 | `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                   |
 | `components/code/`                          | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override.                                                                      |
-| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`).                                    |
+| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`).  |
 | `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                                                                                                  |
 | `lib/packages/`                             | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                      |
 | `lib/seo/`                                  | Metadata builders and site-wide constants (canonical URL, social image, etc).                                                                                                                 |
@@ -77,6 +79,14 @@ the changelog comes from that repo's per-package `CHANGELOG.md` files
 - Per-page "Last updated", JSON-LD `dateModified` and sitemap
   `lastModified` all come from the manifest's per-file commit dates; nothing
   calls GitHub's commits API.
+- The docs search index, `/api/search-index`, derives from `getDocsTree()`
+  in `lib/docs/search-index.ts`, so it shares the `docs-content` tag and
+  the webhook refreshes it with the pages; between webhooks it regenerates
+  hourly like them (`revalidate = 3600`, which Next sends to the CDN as
+  `s-maxage`). It holds a record per page and per h2/h3 section: titles, a
+  200-character snippet of prose (code fences left out, JSX tags reduced to
+  their text) and `terms`, the identifiers from inline code and first table
+  columns. No page body ships.
 - To preview gridkit docs before pushing them, build a manifest locally
   (`node scripts/build-docs-manifest.mjs <path>` in `gridkit`) and point
   `DOCS_MANIFEST_FILE` at it; this site then reads that file instead of
@@ -167,6 +177,16 @@ runs; add a new published package to the script when `gridkit` ships one.
   docs tree, titles and slugs only, so no page body reaches the client.
   The server renders only the current page's section and group open; the
   stored set applies after hydration.
+- **Search** fetches `/api/search-index` only when a reader hovers or
+  focuses a search trigger or opens the palette, then builds a MiniSearch
+  index in the browser (`useSearchIndex`), once per visit. Ranking: fields
+  boosted page > heading > terms > snippet, prefix and fuzzy (0.2) matching,
+  every word required, and a page's own record ahead of its sections. A
+  result links to its heading (`/docs/<slug>#<id>`). Ctrl/Cmd+K toggles the
+  palette anywhere and `/` opens it outside a text field. The last five
+  results opened are kept in `localStorage["gk-search-recent"]` and listed
+  while the query is empty. The palette's strings live in
+  `messages/en/search.json`.
 - The grid itself is styled by `@gridkitjs/theme-tailwind`, imported once in
   `globals.css`. Never hand-style `DataGrid` internals with
   site-local utility classes — that's the same "utility classes obliging

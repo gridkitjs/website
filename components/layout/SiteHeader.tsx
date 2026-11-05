@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/Container";
 import { GitHubIcon } from "@/components/ui/icons";
+import { SearchDialog } from "@/components/search/SearchDialog";
+import { SearchTrigger } from "@/components/search/SearchTrigger";
 import { siteConfig } from "@/lib/seo/site-config";
 import { HeaderNav } from "./HeaderNav";
 import { ThemeToggle } from "./ThemeToggle";
@@ -31,7 +33,8 @@ export async function SiteHeader() {
               GridKit
             </span>
           </Link>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <SearchTrigger />
             <HeaderNav />
             <a
               href={siteConfig.github}
@@ -46,6 +49,7 @@ export async function SiteHeader() {
           </div>
         </nav>
       </Container>
+      <SearchDialog />
     </header>
   );
 }
