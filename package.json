@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "node scripts/gen-example-sources.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/gen-example-sources.mjs && node scripts/export-mdx-tags.mjs",
+    "prebuild": "node scripts/gen-example-sources.mjs && node scripts/export-mdx-tags.mjs && node scripts/check-feature-slugs.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
