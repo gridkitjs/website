@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentProps } from "react";
 import { cn } from "./cn";
 
 const variantClasses = {
@@ -7,18 +7,16 @@ const variantClasses = {
   inverted: "bg-site-bg-inverted text-site-ink-inverted",
 } as const;
 
+interface SectionProps extends ComponentProps<"section"> {
+  variant?: keyof typeof variantClasses;
+}
+
 export function Section({
-  children,
   variant = "default",
   className,
-}: {
-  children: ReactNode;
-  variant?: keyof typeof variantClasses;
-  className?: string;
-}) {
+  ...props
+}: SectionProps) {
   return (
-    <section className={cn(variantClasses[variant], className)}>
-      {children}
-    </section>
+    <section className={cn(variantClasses[variant], className)} {...props} />
   );
 }
