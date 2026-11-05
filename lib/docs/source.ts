@@ -14,6 +14,8 @@ export interface DocPageNode {
   repoPath: string;
   /** MDX body with frontmatter already stripped. */
   content: string;
+  /** The file's last commit date; `null` when it isn't known. */
+  lastModified: Date | null;
 }
 
 export interface DocGroupNode {
@@ -63,6 +65,7 @@ interface DocsFile {
   title: string | null;
   description: string | null;
   content: string;
+  lastModified: Date | null;
 }
 
 /** What the tree is built from: every page, and every `_meta.json` keyed by its folder's repo path. */
@@ -133,6 +136,8 @@ function parseDocsFile(repoPath: string, raw: string): DocsFile {
     title: typeof data.title === "string" ? data.title : null,
     description: typeof data.description === "string" ? data.description : null,
     content,
+    // Only the manifest carries commit dates.
+    lastModified: null,
   };
 }
 
@@ -186,6 +191,7 @@ function docsSourceFromManifest(manifest: DocsManifest): DocsSource {
       title: doc.title,
       description: doc.description,
       content: doc.body,
+      lastModified: doc.lastModified ? new Date(doc.lastModified) : null,
     })),
     meta: new Map(Object.entries(manifest.meta)),
   };
@@ -205,6 +211,7 @@ function toPageNode(file: DocsFile, slug: string): DocPageNode {
     description: file.description ?? "",
     repoPath: file.repoPath,
     content: file.content,
+    lastModified: file.lastModified,
   };
 }
 

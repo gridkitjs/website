@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
 import { getDocsTree } from "@/lib/docs/source";
 import { getChangelogTree } from "@/lib/changelog/source";
-import { fetchLastCommitDate } from "@/lib/docs/github";
 import { siteConfig } from "@/lib/seo/site-config";
 
 function urlFor(locale: string, path: string): string {
@@ -27,31 +26,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     path,
     lastModified: undefined as Date | undefined,
   }));
-  const docEntries = await Promise.all(
-    docsTree.flat.map(async (page) => ({
-      path: `docs/${page.slug}`,
-      lastModified: (await fetchLastCommitDate(page.repoPath)) ?? undefined,
+  const docEntries = docsTree.flat.map((page) => ({
+    path: `docs/${page.slug}`,
+    lastModified: page.lastModified ?? undefined,
+  }));
+  const changelogEntries = changelogTree.sections.flatMap((section) =>
+    // Only the latest version's URL (the bare package path) reflects the
+    // file's last-commit date accurately — older versions keep the date they
+    // actually shipped, which changesets doesn't record, so we don't attach a
+    // misleading one.
+    section.versions.map((version, index) => ({
+      path:
+        index === 0
+          ? `changelog/${section.slug}`
+          : `changelog/${section.slug}/${version.version}`,
+      lastModified:
+        index === 0 ? (section.lastModified ?? undefined) : undefined,
     })),
   );
-  const changelogEntries = (
-    await Promise.all(
-      changelogTree.sections.map(async (section) => {
-        // Only the latest version's URL (the bare package path) reflects the
-        // file's last-commit date accurately — older versions keep the date
-        // they actually shipped, which changesets doesn't record, so we
-        // don't attach a misleading one.
-        const latestLastModified =
-          (await fetchLastCommitDate(section.repoPath)) ?? undefined;
-        return section.versions.map((version, index) => ({
-          path:
-            index === 0
-              ? `changelog/${section.slug}`
-              : `changelog/${section.slug}/${version.version}`,
-          lastModified: index === 0 ? latestLastModified : undefined,
-        }));
-      }),
-    )
-  ).flat();
 
   return [...staticEntries, ...docEntries, ...changelogEntries].map(
     ({ path, lastModified }) => ({

@@ -7,7 +7,7 @@ import { DocContent } from "@/lib/docs/mdx";
 import { extractToc } from "@/lib/docs/toc";
 import { Link, redirect } from "@/i18n/navigation";
 import { getDocsTree } from "@/lib/docs/source";
-import { fetchLastCommitDate, getEditUrl } from "@/lib/docs/github";
+import { getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { JsonLd, techArticleJsonLd } from "@/lib/json-ld";
 
@@ -117,7 +117,6 @@ export default async function DocsSlugPage({
     index >= 0 && index < tree.flat.length - 1
       ? tree.flat[index + 1]
       : undefined;
-  const lastUpdated = await fetchLastCommitDate(page.repoPath);
   const toc = extractToc(page.content);
   const t = await getTranslations("common");
 
@@ -136,7 +135,7 @@ export default async function DocsSlugPage({
           path: `docs/${path}`,
           title: page.title,
           description: page.description,
-          dateModified: lastUpdated,
+          dateModified: page.lastModified,
         })}
       />
       <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_200px] xl:items-start xl:gap-12">
@@ -144,7 +143,7 @@ export default async function DocsSlugPage({
           crumbs={crumbs}
           title={page.title}
           description={page.description}
-          lastUpdated={lastUpdated}
+          lastUpdated={page.lastModified}
           editUrl={getEditUrl(page.repoPath)}
           prev={
             prev ? { href: `/docs/${prev.slug}`, title: prev.title } : undefined
