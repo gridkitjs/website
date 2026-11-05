@@ -12,5 +12,10 @@
     "viewOnGithub": "Read on GitHub",
     "digest": "Error ID: {digest}"
   },
-  "loading": "Loading page"
+  "loading": "Loading page",
+  "nav": {
+    "label": "Docs",
+    "overview": "Overview",
+    "toggle": "{title} pages"
+  }
 }
