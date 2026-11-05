@@ -3,6 +3,7 @@ import {
   cloneElement,
   isValidElement,
   type ComponentProps,
+  type ComponentType,
   type ReactElement,
   type ReactNode,
 } from "react";
@@ -13,6 +14,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { Link } from "@/i18n/navigation";
 import { CodeBlock } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
+import { ClientOnly } from "@/components/ui/ClientOnly";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
 import { DataGridBasicExample } from "@/components/live-examples/DataGridBasicExample";
 import { StackblitzExample } from "@/components/live-examples/StackblitzExample";
@@ -141,6 +143,20 @@ function Tr(props: ComponentProps<"tr">) {
   return <tr className="last:[&>td]:border-b-0" {...props} />;
 }
 
+// @gridkitjs/react's DataGrid reads its stores through useSyncExternalStore
+// without a server snapshot, so prerendering it throws. Mount the grid
+// examples in the browser only until the package gives it one.
+function clientOnly(Example: ComponentType) {
+  function ClientOnlyExample() {
+    return (
+      <ClientOnly>
+        <Example />
+      </ClientOnly>
+    );
+  }
+  return ClientOnlyExample;
+}
+
 const mdxComponents = {
   pre: Pre,
   a: A,
@@ -153,13 +169,13 @@ const mdxComponents = {
   KbdGroup,
   LiveExampleFrame,
   StackblitzExample,
-  DataGridBasicExample,
-  DataGridResizeReorderExample,
-  ColumnTemplatesExample,
-  ColumnResizingExample,
-  EventsShowcaseExample,
-  DarkModeExample,
-  CombinedSelectionExample,
+  DataGridBasicExample: clientOnly(DataGridBasicExample),
+  DataGridResizeReorderExample: clientOnly(DataGridResizeReorderExample),
+  ColumnTemplatesExample: clientOnly(ColumnTemplatesExample),
+  ColumnResizingExample: clientOnly(ColumnResizingExample),
+  EventsShowcaseExample: clientOnly(EventsShowcaseExample),
+  DarkModeExample: clientOnly(DarkModeExample),
+  CombinedSelectionExample: clientOnly(CombinedSelectionExample),
 };
 
 /** Renders a doc page's MDX body (frontmatter already stripped by `gray-matter` in `lib/docs/source.ts`). */

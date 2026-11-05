@@ -124,6 +124,9 @@ runs; add a new published package to the script when `gridkit` ships one.
   (`fixtures.ts`). Keep one example per interaction being demonstrated
   (sorting, resizing, selection, …) rather than one large kitchen-sink grid
   — the doc page picks the example that matches the section it's in.
+  Register a grid example as `clientOnly(Example)` in `mdxComponents`:
+  `@gridkitjs/react`'s `DataGrid` has no server snapshot for its stores, so
+  prerendering it fails the build.
 - **Internal links inside MDX** must go through `next-intl`'s `Link` (see
   the `A` override in `lib/docs/mdx.tsx`) so they carry the current locale
   prefix; only external links get a plain `<a>`.
