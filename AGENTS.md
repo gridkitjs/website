@@ -23,6 +23,7 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 | `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                                                                                   |
 | `app/api/search-index`                      | The docs search index as JSON (`lib/docs/search-index.ts`), prerendered and revalidated with the docs.                                                                                        |
 | `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                                                                                                                 |
+| `components/search/`                        | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).              |
 | `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`. |
 | `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                                                                                                    |
 | `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                   |
@@ -176,6 +177,16 @@ runs; add a new published package to the script when `gridkit` ships one.
   docs tree, titles and slugs only, so no page body reaches the client.
   The server renders only the current page's section and group open; the
   stored set applies after hydration.
+- **Search** fetches `/api/search-index` only when a reader hovers or
+  focuses a search trigger or opens the palette, then builds a MiniSearch
+  index in the browser (`useSearchIndex`), once per visit. Ranking: fields
+  boosted page > heading > terms > snippet, prefix and fuzzy (0.2) matching,
+  every word required, and a page's own record ahead of its sections. A
+  result links to its heading (`/docs/<slug>#<id>`). Ctrl/Cmd+K toggles the
+  palette anywhere and `/` opens it outside a text field. The last five
+  results opened are kept in `localStorage["gk-search-recent"]` and listed
+  while the query is empty. The palette's strings live in
+  `messages/en/search.json`.
 - The grid itself is styled by `@gridkitjs/theme-tailwind`, imported once in
   `globals.css`. Never hand-style `DataGrid` internals with
   site-local utility classes — that's the same "utility classes obliging

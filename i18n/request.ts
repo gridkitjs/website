@@ -3,11 +3,12 @@ import { hasLocale } from "next-intl";
 import { routing } from "./routing";
 
 async function loadMessages(locale: string) {
-  const [common, home, docs, changelog] = await Promise.all([
+  const [common, home, docs, changelog, search] = await Promise.all([
     import(`../messages/${locale}/common.json`),
     import(`../messages/${locale}/home.json`),
     import(`../messages/${locale}/docs.json`),
     import(`../messages/${locale}/changelog.json`),
+    import(`../messages/${locale}/search.json`),
   ]);
 
   return {
@@ -15,6 +16,7 @@ async function loadMessages(locale: string) {
     home: home.default,
     docs: docs.default,
     changelog: changelog.default,
+    search: search.default,
   };
 }
 
