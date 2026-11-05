@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { Container } from "@/components/ui/Container";
+import { BackToTop } from "@/components/docs/BackToTop";
 import { DocsMobileNav } from "@/components/docs/DocsMobileNav";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import { toDocsNav } from "@/lib/docs/nav";
@@ -36,6 +37,7 @@ export default async function DocsLayout({
         </aside>
         <div className="min-w-0">{children}</div>
       </Container>
+      <BackToTop />
     </>
   );
 }
