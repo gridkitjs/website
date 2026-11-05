@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { fetchRawFile, isNotFound } from "@/lib/docs/github";
-import { getDocsManifest } from "@/lib/docs/manifest";
+import { getDocsManifest, type DocsManifest } from "@/lib/docs/manifest";
 import { npmPackageName } from "@/lib/packages/npm";
 import { PACKAGES } from "@/lib/packages";
 
@@ -61,10 +61,10 @@ interface ChangelogFile {
 
 /** A package's whole `CHANGELOG.md`, or `null` when it has none. */
 async function readChangelog(
+  manifest: DocsManifest | null,
   slug: string,
   repoPath: string,
 ): Promise<ChangelogFile | null> {
-  const manifest = await getDocsManifest();
   if (!manifest) {
     const body = await fetchChangelogFile(repoPath);
     // Only the manifest carries commit dates.
@@ -82,9 +82,10 @@ async function readChangelog(
 
 async function buildSection(
   pkg: (typeof PACKAGES)[number],
+  manifest: DocsManifest | null,
 ): Promise<ChangelogSection | undefined> {
   const repoPath = `packages/${pkg.slug}/CHANGELOG.md`;
-  const changelog = await readChangelog(pkg.slug, repoPath);
+  const changelog = await readChangelog(manifest, pkg.slug, repoPath);
   if (changelog === null) return undefined;
 
   const versions = parseVersions(changelog.body);
@@ -100,8 +101,9 @@ async function buildSection(
 }
 
 async function loadChangelogTree(): Promise<ChangelogTree> {
+  const manifest = await getDocsManifest();
   const sections = (
-    await Promise.all(PACKAGES.map((pkg) => buildSection(pkg)))
+    await Promise.all(PACKAGES.map((pkg) => buildSection(pkg, manifest)))
   ).filter((section): section is ChangelogSection => section != null);
 
   return { sections };
