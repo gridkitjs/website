@@ -45,16 +45,31 @@ export function isNotFound(error: unknown): boolean {
   return error instanceof GithubFetchError && error.status === 404;
 }
 
-/** A cached GET against GitHub; throws `GithubFetchError` on a non-OK response so no failure is cached as content. */
+export interface GithubFetchOptions {
+  /**
+   * The caller handles a 404 as an ordinary outcome, so it isn't logged as an
+   * error here; the `GithubFetchError` is still thrown.
+   */
+  notFoundExpected?: boolean;
+}
+
+/**
+ * A cached GET against GitHub; throws `GithubFetchError` on a non-OK response
+ * so no failure is cached as content.
+ */
 async function fetchFromGithub(
   url: string,
   resource: string,
   accept: string,
+  { notFoundExpected = false }: GithubFetchOptions = {},
 ): Promise<Response> {
   const res = await fetch(url, {
     headers: githubHeaders(accept),
     next: { revalidate: DOCS_CACHE_SECONDS, tags: [DOCS_CACHE_TAG] },
   });
+  if (res.status === 404 && notFoundExpected) {
+    throw new GithubFetchError(resource, res.status);
+  }
   if (!res.ok) {
     // raw.githubusercontent.com sends no rate-limit headers; the REST API does.
     const rateLimitRemaining =
@@ -102,11 +117,13 @@ export async function fetchRawFile(repoPath: string): Promise<string> {
 export async function fetchFileFromApi(
   repoPath: string,
   ref: string,
+  options?: GithubFetchOptions,
 ): Promise<string> {
   const res = await fetchFromGithub(
     `https://api.github.com/repos/${OWNER}/${REPO}/contents/${repoPath}?ref=${encodeURIComponent(ref)}`,
     `${repoPath}@${ref}`,
     "application/vnd.github.raw+json",
+    options,
   );
   return res.text();
 }
