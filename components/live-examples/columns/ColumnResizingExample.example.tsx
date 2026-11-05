@@ -7,26 +7,20 @@ import {
   type ColumnDefinition,
   type ResizeMode,
 } from "@gridkitjs/react";
-import { deploymentRows, type DeploymentRow } from "./fixtures";
+import { deploymentRows, type DeploymentRow } from "../fixtures";
+import { EventLog, useEventLog } from "../EventLog";
+import type { ExampleMeta } from "../meta";
 
-const currency = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
+export const meta: ExampleMeta = {
+  id: "column-resizing",
+  title: "Column resizing",
+  description:
+    "Drag a header edge to resize a column; in fit mode the others give way, in fixed mode the grid scrolls.",
+  minHeight: 420,
+};
 
 const columns: readonly ColumnDefinition<DeploymentRow>[] = [
   ...defineColumnsFromRows(deploymentRows),
-  {
-    field: "Cost",
-    id: "Cost.currency",
-    type: "currency",
-    headerTemplate: <span className="italic">Cost</span>,
-    cellTemplate: ({ value, row }) => (
-      <span className={row.Cost > 500 ? "font-semibold text-red-600" : ""}>
-        {currency.format(Number(value))}
-      </span>
-    ),
-  },
 ];
 
 const modes: readonly { value: ResizeMode; label: string }[] = [
@@ -34,11 +28,12 @@ const modes: readonly { value: ResizeMode; label: string }[] = [
   { value: "fixed", label: "fixed — columns keep their own width" },
 ];
 
-export function DataGridResizeReorderExample() {
+export function ColumnResizingExample() {
   const [resizeMode, setResizeMode] = useState<ResizeMode>("fit");
+  const { entries, record } = useEventLog();
 
   return (
-    <div className="space-y-4">
+    <div>
       <fieldset className="flex flex-wrap gap-4 text-sm">
         <legend className="sr-only">Resize mode</legend>
         {modes.map((mode) => (
@@ -48,7 +43,7 @@ export function DataGridResizeReorderExample() {
           >
             <input
               type="radio"
-              name="resize-mode"
+              name="column-resizing-mode"
               checked={resizeMode === mode.value}
               onChange={() => {
                 setResizeMode(mode.value);
@@ -58,14 +53,23 @@ export function DataGridResizeReorderExample() {
           </label>
         ))}
       </fieldset>
-      <DataGrid
-        columns={columns}
-        dataSource={deploymentRows}
-        borders="all"
-        resizableColumns
-        reorderableColumns
-        resizeMode={resizeMode}
-      />
+      <div className="mt-4">
+        <DataGrid
+          columns={columns}
+          dataSource={deploymentRows}
+          borders="all"
+          resizableColumns
+          resizeMode={resizeMode}
+          onColumnResize={({ columnId, width, phase }) => {
+            if (phase === "end") {
+              record(
+                `onColumnResize — ${columnId} to ${String(Math.round(width))}px`,
+              );
+            }
+          }}
+        />
+      </div>
+      <EventLog entries={entries} />
     </div>
   );
 }

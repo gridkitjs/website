@@ -2,7 +2,16 @@
 
 import { defineColumnsFromRows } from "@gridkitjs/core";
 import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
-import { deploymentRows, type DeploymentRow } from "./fixtures";
+import { deploymentRows, type DeploymentRow } from "../fixtures";
+import type { ExampleMeta } from "../meta";
+
+export const meta: ExampleMeta = {
+  id: "column-templates",
+  title: "Column templates",
+  description:
+    "A header template and a cell template format the cost column as currency.",
+  minHeight: 260,
+};
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",

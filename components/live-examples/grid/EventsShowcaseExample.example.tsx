@@ -2,8 +2,17 @@
 
 import { defineColumnsFromRows } from "@gridkitjs/core";
 import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
-import { deploymentRows, type DeploymentRow } from "./fixtures";
-import { EventLog, useEventLog } from "./EventLog";
+import { deploymentRows, type DeploymentRow } from "../fixtures";
+import { EventLog, useEventLog } from "../EventLog";
+import type { ExampleMeta } from "../meta";
+
+export const meta: ExampleMeta = {
+  id: "events-showcase",
+  title: "Every DataGrid callback",
+  description:
+    "Resize, reorder or select anything in the grid; each callback logs a line below it.",
+  minHeight: 460,
+};
 
 const columns: readonly ColumnDefinition<DeploymentRow>[] = [
   ...defineColumnsFromRows(deploymentRows),

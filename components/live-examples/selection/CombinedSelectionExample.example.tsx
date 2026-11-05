@@ -2,8 +2,17 @@
 
 import { defineColumnsFromRows } from "@gridkitjs/core";
 import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
-import { deploymentRows, type DeploymentRow } from "./fixtures";
-import { EventLog, useEventLog } from "./EventLog";
+import { deploymentRows, type DeploymentRow } from "../fixtures";
+import { EventLog, useEventLog } from "../EventLog";
+import type { ExampleMeta } from "../meta";
+
+export const meta: ExampleMeta = {
+  id: "combined-selection",
+  title: "Row, column and cell selection",
+  description:
+    "Click a row, a header or a cell; each selection change logs a line below the grid.",
+  minHeight: 400,
+};
 
 const columns: readonly ColumnDefinition<DeploymentRow>[] = [
   ...defineColumnsFromRows(deploymentRows),

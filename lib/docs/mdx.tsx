@@ -24,14 +24,14 @@ import { Since } from "@/components/docs/Since";
 import { ClientOnly } from "@/components/ui/ClientOnly";
 import { cn } from "@/components/ui/cn";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
-import { DataGridBasicExample } from "@/components/live-examples/DataGridBasicExample";
+import { DataGridBasicExample } from "@/components/live-examples/grid/DataGridBasicExample.example";
 import { StackblitzExample } from "@/components/live-examples/StackblitzExample";
-import { DataGridResizeReorderExample } from "@/components/live-examples/DataGridResizeReorderExample";
-import { ColumnTemplatesExample } from "@/components/live-examples/ColumnTemplatesExample";
-import { ColumnResizingExample } from "@/components/live-examples/ColumnResizingExample";
-import { EventsShowcaseExample } from "@/components/live-examples/EventsShowcaseExample";
-import { DarkModeExample } from "@/components/live-examples/DarkModeExample";
-import { CombinedSelectionExample } from "@/components/live-examples/CombinedSelectionExample";
+import { DataGridResizeReorderExample } from "@/components/live-examples/grid/DataGridResizeReorderExample.example";
+import { ColumnTemplatesExample } from "@/components/live-examples/columns/ColumnTemplatesExample.example";
+import { ColumnResizingExample } from "@/components/live-examples/columns/ColumnResizingExample.example";
+import { EventsShowcaseExample } from "@/components/live-examples/grid/EventsShowcaseExample.example";
+import { DarkModeExample } from "@/components/live-examples/grid/DarkModeExample.example";
+import { CombinedSelectionExample } from "@/components/live-examples/selection/CombinedSelectionExample.example";
 
 function isBundledLanguage(lang: string): lang is BundledLanguage {
   return Object.hasOwn(bundledLanguages, lang);
