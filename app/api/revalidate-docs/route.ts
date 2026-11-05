@@ -17,22 +17,42 @@ function isValidSignature(
   );
 }
 
-/** The git ref the gridkit Action reports pushing, for the log line only. */
-function pushedRef(body: string): string {
+/** How far a request's `ts` may be from now before it's treated as a replay. */
+const MAX_CLOCK_SKEW_SECONDS = 5 * 60;
+
+/** The body gridkit's revalidate-docs Action signs and posts. */
+interface RevalidationPayload {
+  ref: string;
+  sha: string;
+  /** Unix seconds when the Action first sent the request; retries resend it unchanged. */
+  ts: number;
+}
+
+function parsePayload(body: string): RevalidationPayload | null {
   try {
-    const { ref } = JSON.parse(body) as { ref?: unknown };
-    return typeof ref === "string" ? ref : "an unnamed ref";
+    const { ref, sha, ts } = JSON.parse(body) as Partial<RevalidationPayload>;
+    return typeof ref === "string" &&
+      typeof sha === "string" &&
+      typeof ts === "number"
+      ? { ref, sha, ts }
+      : null;
   } catch {
-    return "an unnamed ref";
+    return null;
   }
 }
 
+function isFresh(ts: number): boolean {
+  return Math.abs(Date.now() / 1000 - ts) <= MAX_CLOCK_SKEW_SECONDS;
+}
+
 /**
- * Called by the `gridkit` repo's `revalidate-docs` GitHub Action (or a native
- * GitHub webhook) after a push touching `packages/*\/docs`, so edits go live
- * without a website redeploy. Verifies an HMAC-SHA256 signature over the raw
- * body rather than trusting the caller, so this endpoint can't be used to
- * spam cache invalidation from the public internet.
+ * Called by the `gridkit` repo's `revalidate-docs` GitHub Action after it
+ * publishes a new docs manifest, so docs and changelog edits go live without
+ * a website redeploy. Verifies an HMAC-SHA256 signature over the raw body
+ * rather than trusting the caller, so this endpoint can't be used to spam
+ * cache invalidation from the public internet, and rejects a signed body
+ * whose `ts` is more than five minutes off, so a captured request can't be
+ * replayed later.
  */
 export async function POST(request: Request) {
   const secret = process.env.DOCS_REVALIDATE_SECRET;
@@ -51,12 +71,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
+  const payload = parsePayload(body);
+  if (!payload || !isFresh(payload.ts)) {
+    console.warn(
+      "[revalidate-docs] Rejected a signed request that is malformed or outside the replay window",
+    );
+    return NextResponse.json(
+      { error: "Missing or stale timestamp" },
+      { status: 401 },
+    );
+  }
+
   // This is a webhook from an external system (gridkit's Action), so it needs
   // immediate expiration rather than "max"'s stale-while-revalidate profile —
   // otherwise docs stay stale until a second visitor happens to hit the page.
   revalidateTag(DOCS_CACHE_TAG, { expire: 0 });
   console.info(
-    `[revalidate-docs] Revalidated ${DOCS_CACHE_TAG} for ${pushedRef(body)}`,
+    `[revalidate-docs] Revalidated ${DOCS_CACHE_TAG} for ${payload.ref} at ${payload.sha}`,
   );
   return NextResponse.json({ revalidated: true, tag: DOCS_CACHE_TAG });
 }
