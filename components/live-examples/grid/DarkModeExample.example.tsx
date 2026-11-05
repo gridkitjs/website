@@ -4,6 +4,15 @@ import { useState } from "react";
 import { defineColumnsFromRows } from "@gridkitjs/core";
 import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
 import { cn } from "@/components/ui/cn";
+import type { ExampleMeta } from "../meta";
+
+export const meta: ExampleMeta = {
+  id: "dark-mode",
+  title: ".gridkit-light / .gridkit-dark",
+  description:
+    "Switch the app theme: only the first grid follows it, the other two stay pinned.",
+  minHeight: 260,
+};
 
 const rows = [
   { Service: "checkout-api", Status: "healthy" },
