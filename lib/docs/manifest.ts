@@ -82,6 +82,33 @@ async function loadDocsManifest(): Promise<DocsManifest | null> {
   return manifest;
 }
 
+export interface DocsSync {
+  /** When the manifest was built. */
+  syncedAt: Date;
+  /** The gridkit commit it was built from. */
+  sha: string;
+}
+
+/**
+ * When the docs were last synced and from which gridkit commit, or `null`
+ * without a manifest. It only decorates the footer of every page, so a failed
+ * fetch is logged and leaves the line out rather than failing the page.
+ */
+export async function getDocsSync(): Promise<DocsSync | null> {
+  try {
+    const manifest = await getDocsManifest();
+    return (
+      manifest && {
+        syncedAt: new Date(manifest.generatedAt),
+        sha: manifest.sha,
+      }
+    );
+  } catch (error) {
+    console.error(`[docs] No sync time for the footer: ${String(error)}`);
+    return null;
+  }
+}
+
 /**
  * The published docs manifest, or `null` when there is none yet (or it's a
  * schema this site can't read), in which case callers fall back to fetching
