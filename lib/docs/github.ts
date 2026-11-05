@@ -55,7 +55,15 @@ async function fetchFromGithub(
     headers: githubHeaders(accept),
     next: { revalidate: DOCS_CACHE_SECONDS, tags: [DOCS_CACHE_TAG] },
   });
-  if (!res.ok) throw new GithubFetchError(resource, res.status);
+  if (!res.ok) {
+    // raw.githubusercontent.com sends no rate-limit headers; the REST API does.
+    const rateLimitRemaining =
+      res.headers.get("x-ratelimit-remaining") ?? "n/a";
+    console.error(
+      `[github] ${res.status} for ${resource} (${url}), rate limit remaining: ${rateLimitRemaining}`,
+    );
+    throw new GithubFetchError(resource, res.status);
+  }
   return res;
 }
 
