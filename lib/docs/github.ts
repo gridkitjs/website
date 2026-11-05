@@ -11,8 +11,8 @@ import "server-only";
 export const DOCS_CACHE_TAG = "docs-content";
 const DOCS_CACHE_SECONDS = 60 * 60;
 
-const OWNER = process.env.DOCS_GITHUB_OWNER ?? "blagojablazhevski";
-const REPO = process.env.DOCS_GITHUB_REPO ?? "gridkit";
+const OWNER = process.env.DOCS_GITHUB_OWNER ?? "gridkitjs";
+const REPO = process.env.DOCS_GITHUB_REPO ?? "gridkitjs";
 const BRANCH = process.env.DOCS_GITHUB_BRANCH ?? "main";
 
 function githubHeaders(accept: string): HeadersInit {
