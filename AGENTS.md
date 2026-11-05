@@ -16,19 +16,19 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 
 ## Structure
 
-| Path                     | What belongs in it                                                                                        |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `app/[locale]/`          | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`.       |
-| `app/api/revalidate-docs`| Webhook the `gridkit` repo calls after a docs push, to bust the fetch cache without a redeploy.             |
-| `components/live-examples/` | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                  |
-| `components/docs/`, `components/changelog/` | Page chrome for the docs/changelog readers — sidebar, prev/next, breadcrumbs.             |
-| `components/marketing/`  | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                   |
-| `components/ui/`         | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.  |
-| `components/code/`       | `CodeBlock` (Shiki highlighting) and `CopyButton`, used by the MDX `pre` override.                          |
-| `lib/docs/`              | GitHub-fetch client (`github.ts`), docs tree builder (`source.ts`), MDX renderer (`mdx.tsx`).                |
-| `lib/changelog/`         | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                 |
-| `lib/seo/`               | Metadata builders and site-wide constants (canonical URL, social image, etc).                                |
-| `i18n/`                  | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                  |
+| Path                                        | What belongs in it                                                                                          |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `app/[locale]/`                             | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`.       |
+| `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after a docs push, to bust the fetch cache without a redeploy.             |
+| `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                               |
+| `components/docs/`, `components/changelog/` | Page chrome for the docs/changelog readers — sidebar, prev/next, breadcrumbs.                               |
+| `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                  |
+| `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content. |
+| `components/code/`                          | `CodeBlock` (Shiki highlighting) and `CopyButton`, used by the MDX `pre` override.                          |
+| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), docs tree builder (`source.ts`), MDX renderer (`mdx.tsx`).               |
+| `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                |
+| `lib/seo/`                                  | Metadata builders and site-wide constants (canonical URL, social image, etc).                               |
+| `i18n/`                                     | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                 |
 
 ## Relationship to the `gridkit` repo
 
@@ -178,7 +178,7 @@ chore(deps): bump next to 16.3
   `seo`, `i18n`. Omit it for changes that cut across areas.
 - Breaking changes (e.g. an env var rename, a route shape change) take a
   `!` before the colon plus a `BREAKING CHANGE:` footer.
-- **Default to no body.** Add one only for a non-obvious *why* — a
+- **Default to no body.** Add one only for a non-obvious _why_ — a
   workaround, a rejected alternative, a constraint from outside the diff.
   Don't restate the diff in prose.
 - No changesets here — this app is `"private": true` and never published;
