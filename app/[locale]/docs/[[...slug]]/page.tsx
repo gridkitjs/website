@@ -62,6 +62,7 @@ export async function generateMetadata({
       description: t("description"),
       path: "docs",
       locale,
+      image: "og/docs",
     });
   }
 
@@ -76,6 +77,7 @@ export async function generateMetadata({
     description: overview?.description ?? entry.page.description,
     path: `docs/${path}`,
     locale,
+    image: `og/docs/${path}`,
   });
 }
 

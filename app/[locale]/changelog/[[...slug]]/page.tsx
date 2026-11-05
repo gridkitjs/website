@@ -83,6 +83,7 @@ export async function generateMetadata({
       description: t("description"),
       path: "changelog",
       locale,
+      image: "og/changelog",
     });
   }
 
@@ -102,6 +103,7 @@ export async function generateMetadata({
     }),
     path,
     locale,
+    image: `og/changelog/${path}`,
   });
 }
 

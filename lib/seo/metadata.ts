@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { routing } from "@/i18n/routing";
+import { ogImageSize } from "./og-image";
 import { siteConfig } from "./site-config";
 
 interface BuildMetadataOptions {
@@ -8,6 +9,12 @@ interface BuildMetadataOptions {
   /** Locale-less path, e.g. "" for the homepage or "docs/react/data-grid". */
   path: string;
   locale: string;
+  /**
+   * Locale-less path of the page's Open Graph image route, e.g.
+   * "og/docs/react/data-grid". Defaults to the site image,
+   * `app/[locale]/opengraph-image.tsx`.
+   */
+  image?: string;
 }
 
 function localizedUrl(locale: string, path: string): string {
@@ -20,6 +27,7 @@ export function buildMetadata({
   description,
   path,
   locale,
+  image = "opengraph-image",
 }: BuildMetadataOptions): Metadata {
   const url = localizedUrl(locale, path);
   const languages = Object.fromEntries([
@@ -29,13 +37,9 @@ export function buildMetadata({
     ]),
     ["x-default", localizedUrl(routing.defaultLocale, path)],
   ]);
-  const ogImage = {
-    url: "/brand/repository-open-graph-template.png",
-    width: 1280,
-    height: 640,
-    alt: siteConfig.name,
-  };
 
+  // Set explicitly: a page's own `openGraph` replaces its layout's, file
+  // based image included. Next copies the image to the Twitter card.
   return {
     title,
     description,
@@ -50,13 +54,12 @@ export function buildMetadata({
       siteName: siteConfig.name,
       locale,
       type: "website",
-      images: [ogImage],
+      images: [{ url: `/${locale}/${image}`, ...ogImageSize, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [ogImage.url],
     },
   };
 }
