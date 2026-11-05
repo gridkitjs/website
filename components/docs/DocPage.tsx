@@ -30,8 +30,9 @@ export async function DocPage({
   const t = await getTranslations("common");
   const format = await getFormatter();
 
+  // Below xl no contents column narrows the article, so cap its line length.
   return (
-    <article className="min-w-0">
+    <article className="max-w-[65ch] min-w-0 xl:max-w-none">
       <Breadcrumbs
         root={{ name: t("nav.docs"), path: "docs" }}
         crumbs={crumbs}
@@ -54,7 +55,7 @@ export async function DocPage({
       {toc}
       {/* Below lg the docs bar sits under the site header, so a heading
           jumped to has to clear both. */}
-      <Prose className="mt-8 [&_h2]:scroll-mt-28 lg:[&_h2]:scroll-mt-20 [&_h3]:scroll-mt-28 lg:[&_h3]:scroll-mt-20">
+      <Prose className="mt-8 [&_h2]:scroll-mt-28 lg:[&_h2]:scroll-mt-20 [&_h3]:scroll-mt-28 lg:[&_h3]:scroll-mt-20 [&_h4]:scroll-mt-28 lg:[&_h4]:scroll-mt-20">
         {children}
       </Prose>
       <a

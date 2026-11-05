@@ -75,7 +75,7 @@ async function Pre({
       code={code}
       lang={fenceLanguage(children.props.className)}
       {...parseFenceMeta(meta)}
-      className="mt-4"
+      className="my-4"
     />
   );
 }
