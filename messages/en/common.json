@@ -25,5 +25,11 @@
     "description": "The page you're looking for doesn't exist, or was moved.",
     "backHome": "Back home",
     "readDocs": "Read the docs"
+  },
+  "theme": {
+    "label": "Theme: {current}. Switch to {next}.",
+    "light": "light",
+    "dark": "dark",
+    "system": "system"
   }
 }
