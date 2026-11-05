@@ -11,6 +11,7 @@ import { DataGridBasicExample } from "@/components/live-examples/grid/DataGridBa
 import { DataGridResizeReorderExample } from "@/components/live-examples/grid/DataGridResizeReorderExample.example";
 import { EventsShowcaseExample } from "@/components/live-examples/grid/EventsShowcaseExample.example";
 import { InfiniteScrollExample } from "@/components/live-examples/rows/InfiniteScrollExample.example";
+import { PaginationExample } from "@/components/live-examples/rows/PaginationExample.example";
 import { RowVirtualizationExample } from "@/components/live-examples/rows/RowVirtualizationExample.example";
 import { CombinedSelectionExample } from "@/components/live-examples/selection/CombinedSelectionExample.example";
 
@@ -869,6 +870,63 @@ export function InfiniteScrollExample() {
 }
 `,
     localFiles: ["fixtures.ts"],
+    dependencies: {
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
+  PaginationExample: {
+    Component: PaginationExample,
+    meta: {
+      id: "pagination",
+      title: "Pagination",
+      description:
+        "Page through 95 rows with the numbered pager, or change how many rows a page holds.",
+      minHeight: 436,
+    },
+    fileName: "PaginationExample.tsx",
+    source: `import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+import { EventLog, useEventLog } from "./EventLog";
+
+const rows = makeRows(95);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency" },
+];
+
+export function PaginationExample() {
+  const { entries, record } = useEventLog();
+
+  return (
+    <div>
+      <DataGrid
+        columns={columns}
+        dataSource={rows}
+        getRowId={(row) => String(row.Id)}
+        label="Tickets"
+        borders="all"
+        paginated
+        defaultPagination={{ pageIndex: 0, pageSize: 5 }}
+        pager={{ variant: "numbered", sizeOptions: [5, 10, 25] }}
+        onPaginationChange={({ pagination, pageCount }) => {
+          record(
+            \`onPaginationChange — page \${String(pagination.pageIndex + 1)} of \${String(pageCount)}, \${String(pagination.pageSize)} per page\`,
+          );
+        }}
+      />
+      <EventLog entries={entries} />
+    </div>
+  );
+}
+`,
+    localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "^0.12.0",
       "@gridkitjs/theme-tailwind": "^0.9.0",
