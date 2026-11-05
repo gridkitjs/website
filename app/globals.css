@@ -127,3 +127,17 @@ body {
   color: var(--site-ink);
   overflow-x: hidden;
 }
+
+/*
+ * Code blocks are highlighted with both Shiki themes at once (CodeBlock);
+ * each token carries its colour for each as a variable. The block's own
+ * background comes from the code tokens, not from Shiki.
+ */
+.shiki,
+.shiki span {
+  color: var(--shiki-light);
+
+  @variant dark {
+    color: var(--shiki-dark);
+  }
+}
