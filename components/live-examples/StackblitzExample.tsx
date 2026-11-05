@@ -1,11 +1,5 @@
 import { StackblitzIcon } from "@/components/ui/icons";
-
-const REPO = "gridkitjs/gridkitjs";
-const BRANCH = "main";
-
-function projectUrl(path: string): string {
-  return `https://stackblitz.com/github/${REPO}/tree/${BRANCH}/examples/${path}`;
-}
+import { githubProjectUrl } from "./stackblitz";
 
 /**
  * Links out to a live example hosted as a real, standalone project under
@@ -33,7 +27,7 @@ export function StackblitzExample({
         This example runs as a real project on StackBlitz.
       </p>
       <a
-        href={projectUrl(path)}
+        href={githubProjectUrl(path)}
         target="_blank"
         rel="noreferrer noopener"
         aria-label={`Open ${title} on StackBlitz`}

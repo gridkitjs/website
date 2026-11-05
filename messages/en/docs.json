@@ -34,6 +34,13 @@
     },
     "since": "Since {version}",
     "sinceInPackage": "Since {pkg} {version}",
-    "packageManager": "Package manager"
+    "packageManager": "Package manager",
+    "example": {
+      "views": "Example views",
+      "preview": "Preview",
+      "code": "Code",
+      "reset": "Reset",
+      "openInStackblitz": "Open in StackBlitz"
+    }
   }
 }

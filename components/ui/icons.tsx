@@ -328,3 +328,21 @@ export function WrapIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function ResetIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M3 12a9 9 0 1 0 2.64-6.36L3 8.27" />
+      <path d="M3 3v5.27h5.27" />
+    </svg>
+  );
+}
