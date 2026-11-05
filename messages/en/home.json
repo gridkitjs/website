@@ -16,8 +16,9 @@
     "languageLabel": "written in"
   },
   "features": {
+    "eyebrow": "Features",
     "title": "Everything the grid does today",
-    "subtitle": "{count} shipped features, each linked to the page that documents it.",
+    "subtitle": "<number>{count}</number> shipped features, each linked to the page that documents it.",
     "groups": {
       "columns": "Columns",
       "rows": "Rows",

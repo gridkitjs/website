@@ -41,7 +41,7 @@ export async function PrevNextNav({
       {prev ? (
         <Link
           href={prev.href}
-          className="border-site-line hover:border-site-accent rounded-xl border p-4 transition-colors"
+          className="border-site-line hover:border-site-accent rounded-site border p-4 transition-colors"
         >
           <CardLabel label={prevLabel} section={prev.section} />
           <p className="text-site-ink mt-1 text-sm font-medium">{prev.title}</p>
@@ -52,7 +52,7 @@ export async function PrevNextNav({
       {next && (
         <Link
           href={next.href}
-          className="border-site-line hover:border-site-accent rounded-xl border p-4 text-right transition-colors"
+          className="border-site-line hover:border-site-accent rounded-site border p-4 text-right transition-colors"
         >
           <CardLabel label={nextLabel} section={next.section} />
           <p className="text-site-ink mt-1 text-sm font-medium">{next.title}</p>

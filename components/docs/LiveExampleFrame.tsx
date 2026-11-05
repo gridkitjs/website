@@ -41,8 +41,8 @@ export async function LiveExampleFrame({
   const t = await getTranslations("common");
 
   return (
-    <div className="border-site-accent/30 bg-site-bg my-6 rounded-2xl border">
-      <div className="border-site-accent/30 bg-site-accent-soft flex items-start justify-between gap-3 rounded-t-2xl border-b px-4 py-2.5">
+    <div className="border-site-accent/30 bg-site-bg rounded-site my-6 border">
+      <div className="border-site-accent/30 bg-site-accent-soft rounded-t-site flex items-start justify-between gap-3 border-b px-4 py-2.5">
         <div className="min-w-0">
           <p className="text-site-ink text-sm font-medium">{title}</p>
           {example && (
@@ -65,7 +65,7 @@ export async function LiveExampleFrame({
             <CodeBlock
               code={example.source}
               title={example.fileName}
-              className="rounded-t-none rounded-b-2xl border-0"
+              className="rounded-b-site rounded-t-none border-0"
             />
           }
           stackblitz={stackblitzTarget(example)}

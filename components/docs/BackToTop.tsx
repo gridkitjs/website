@@ -50,7 +50,7 @@ export function BackToTop() {
       type="button"
       onClick={backToTop}
       aria-label={t("backToTop")}
-      className="bg-site-surface-raised text-site-ink-muted hover:text-site-ink border-site-line fixed right-4 bottom-4 z-30 rounded-full border p-2.5 shadow-sm transition-colors sm:right-6 sm:bottom-6"
+      className="bg-site-surface-raised text-site-ink-muted hover:text-site-ink border-site-line rounded-site fixed right-4 bottom-4 z-30 border p-2.5 shadow-sm transition-colors sm:right-6 sm:bottom-6"
     >
       <ArrowUpIcon className="size-5" />
     </button>

@@ -22,7 +22,7 @@ export function StackblitzExample({
   title: string;
 }) {
   return (
-    <div className="border-site-line bg-site-surface flex flex-col items-center gap-3 rounded-lg border border-dashed p-8 text-center">
+    <div className="border-site-line bg-site-surface rounded-site flex flex-col items-center gap-3 border border-dashed p-8 text-center">
       <p className="text-site-ink-muted text-sm">
         This example runs as a real project on StackBlitz.
       </p>
@@ -31,7 +31,7 @@ export function StackblitzExample({
         target="_blank"
         rel="noreferrer noopener"
         aria-label={`Open ${title} on StackBlitz`}
-        className="bg-site-accent text-site-accent-ink hover:bg-site-accent-hover inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors"
+        className="bg-site-accent text-site-accent-ink hover:bg-site-accent-hover rounded-site inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors"
       >
         <StackblitzIcon className="h-4 w-4" />
         Open in StackBlitz

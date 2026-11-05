@@ -4,7 +4,9 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/components/ui/cn";
 
 function Bar({ className }: { className?: string }) {
-  return <div className={cn("bg-site-line/70 h-4 rounded", className)} />;
+  return (
+    <div className={cn("bg-site-line/70 rounded-site-sm h-4", className)} />
+  );
 }
 
 // The docs layout keeps the sidebar on screen while a page loads, so this
@@ -30,7 +32,7 @@ export default function DocsLoading() {
           <Bar />
           <Bar className="w-5/6" />
         </div>
-        <Bar className="mt-8 h-40 rounded-xl" />
+        <Bar className="rounded-site mt-8 h-40" />
         <div className="mt-8 space-y-3">
           <Bar />
           <Bar className="w-4/6" />

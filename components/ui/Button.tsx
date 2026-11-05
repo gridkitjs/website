@@ -25,7 +25,7 @@ export function buttonClasses(
   className?: string,
 ): string {
   return cn(
-    "inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium transition-colors",
+    "inline-flex items-center justify-center rounded-site px-4 py-2.5 text-sm font-medium transition-colors",
     variantClasses[variant],
     className,
   );

@@ -57,7 +57,7 @@ export function CodeFrame({
           aria-pressed={wrapped}
           onClick={() => setWrapped(!wrapped)}
           className={cn(
-            "border-site-line bg-site-surface inline-flex h-7 w-7 items-center justify-center rounded-md border transition-colors",
+            "border-site-line bg-site-surface rounded-site inline-flex h-7 w-7 items-center justify-center border transition-colors",
             wrapped
               ? "text-site-accent"
               : "text-site-ink-muted hover:text-site-ink",
@@ -75,7 +75,7 @@ export function CodeFrame({
       data-wrap={wrapped || undefined}
       data-line-numbers={showLineNumbers || undefined}
       className={cn(
-        "code-block border-site-code-border bg-site-code-bg relative overflow-hidden rounded-xl border text-sm",
+        "code-block border-site-code-border bg-site-code-bg rounded-site relative overflow-hidden border text-sm",
         className,
       )}
     >
