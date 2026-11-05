@@ -231,7 +231,13 @@ export function DocContent({ source }: { source: string }) {
                   className: ["anchor-link"],
                   ariaLabel: "Link to this section",
                 },
-                content: { type: "text", value: "#" },
+                // The link's label names it; the glyph is decoration.
+                content: {
+                  type: "element",
+                  tagName: "span",
+                  properties: { ariaHidden: "true" },
+                  children: [{ type: "text", value: "#" }],
+                },
               },
             ],
           ],
