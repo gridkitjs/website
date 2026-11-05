@@ -16,20 +16,21 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 
 ## Structure
 
-| Path                                        | What belongs in it                                                                                          |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `app/[locale]/`                             | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`.       |
-| `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.      |
-| `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after a docs push, to bust the fetch cache without a redeploy.             |
-| `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                               |
-| `components/docs/`, `components/changelog/` | Page chrome for the docs/changelog readers — sidebar, prev/next, breadcrumbs.                               |
-| `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                  |
-| `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content. |
-| `components/code/`                          | `CodeBlock` (Shiki highlighting) and `CopyButton`, used by the MDX `pre` override.                          |
-| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), docs tree builder (`source.ts`), MDX renderer (`mdx.tsx`).               |
-| `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                |
-| `lib/seo/`                                  | Metadata builders and site-wide constants (canonical URL, social image, etc).                               |
-| `i18n/`                                     | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                 |
+| Path                                        | What belongs in it                                                                                                                  |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `app/[locale]/`                             | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`.                               |
+| `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                              |
+| `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                         |
+| `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                                                       |
+| `components/docs/`, `components/changelog/` | Page chrome for the docs/changelog readers — sidebar, prev/next, breadcrumbs.                                                       |
+| `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                                          |
+| `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                         |
+| `components/code/`                          | `CodeBlock` (Shiki highlighting) and `CopyButton`, used by the MDX `pre` override.                                                  |
+| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), docs manifest reader (`manifest.ts`), docs tree builder (`source.ts`), MDX renderer (`mdx.tsx`). |
+| `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                                        |
+| `lib/packages/`                             | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                            |
+| `lib/seo/`                                  | Metadata builders and site-wide constants (canonical URL, social image, etc).                                                       |
+| `i18n/`                                     | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                         |
 
 ## Relationship to the `gridkit` repo
 
@@ -38,16 +39,49 @@ authored as `.mdx` under `packages/*/docs/` in the sibling `gridkit` repo and
 the changelog comes from that repo's per-package `CHANGELOG.md` files
 (generated by Changesets). This site only fetches, renders, and caches them:
 
-- `lib/docs/github.ts` hits the GitHub REST API (tree + raw file contents)
-  for the repo/branch in `DOCS_GITHUB_OWNER`/`DOCS_GITHUB_REPO`/
-  `DOCS_GITHUB_BRANCH` (see `.env.example`). Every fetch goes through Next's
-  `fetch` cache, tagged `docs-content`, with a 1-hour time-based fallback.
-- `app/api/revalidate-docs` is the on-demand hook: `gridkit`'s
-  `revalidate-docs` GitHub Action POSTs here (HMAC-signed with
-  `DOCS_REVALIDATE_SECRET`, which must match on both sides) after a push
-  touching `packages/*/docs`, so a doc edit goes live without redeploying
-  this site.
-- `lib/docs/source.ts` turns the raw file tree into a `DocsTree`: one
+- `gridkit`'s `revalidate-docs` GitHub Action runs on every push to `main`
+  touching `packages/*/docs/**`, `packages/*/CHANGELOG.md` or
+  `packages/*/package.json`. It builds `docs-manifest.json` (every page's
+  frontmatter and body, every `_meta.json`, every changelog, and each file's
+  last commit date) and commits it to the orphan `docs-meta` branch.
+- `lib/docs/manifest.ts` fetches that file in **one request**, through the
+  GitHub contents API (`lib/docs/github.ts`) with the raw media type, from
+  the ref in `DOCS_MANIFEST_REF` (default `docs-meta`; see `.env.example`).
+  The API isn't behind a CDN, unlike raw.githubusercontent.com, so a refetch
+  right after a push can't cache the previous revision. The fetch goes
+  through Next's `fetch` cache, tagged `docs-content`, with a 1-hour
+  time-based fallback; the docs tree, the changelog and the footer's "Docs
+  synced" line all read it. `cacheComponents` is off, so this is the
+  `fetch`-cache model, not `use cache`.
+- While no manifest is published (a 404), `lib/docs/source.ts` and
+  `lib/changelog/source.ts` fall back, with a logged warning, to the old
+  per-file path: the repo tree for `DOCS_GITHUB_BRANCH`, then each file from
+  raw.githubusercontent.com, ~57 requests per render and no last-updated
+  dates. The fallback is temporary; remove it once the manifest has been
+  live for a while.
+- `app/api/revalidate-docs` is the on-demand hook: after publishing the
+  manifest, the Action POSTs `{ ref, sha, manifestSha, ts }` here,
+  HMAC-SHA256-signed in `X-Hub-Signature-256` with `DOCS_REVALIDATE_SECRET`
+  (which must match on both sides). A request whose `ts` (Unix seconds) is
+  more than five minutes from the server's clock gets a 401, so a captured
+  request can't be replayed; the Action's retries resend the same `ts`, so
+  they must land inside that window too. A valid one calls
+  `revalidateTag("docs-content", { expire: 0 })`, so a doc or changelog
+  edit goes live without redeploying this site.
+- Package versions and release dates come from the npm registry, not the
+  manifest: `lib/packages/npm.ts` fetches
+  `registry.npmjs.org/@gridkitjs/<pkg>` for each package (5 requests, no
+  auth), tagged `pkg-freshness` with a 1-hour fallback, for the changelog
+  pages, the changelog index and the docs sidebar. A registry failure is
+  logged and the page renders without the version rather than failing.
+- Per-page "Last updated", JSON-LD `dateModified` and sitemap
+  `lastModified` all come from the manifest's per-file commit dates; nothing
+  calls GitHub's commits API.
+- To preview gridkit docs before pushing them, build a manifest locally
+  (`node scripts/build-docs-manifest.mjs <path>` in `gridkit`) and point
+  `DOCS_MANIFEST_FILE` at it; this site then reads that file instead of
+  GitHub. Local only, never on Vercel.
+- `lib/docs/source.ts` turns the manifest into a `DocsTree`: one
   section per package, ordered by that package's `docs/_meta.json`
   (`order` array), with subfolders becoming groups. A package's
   `docs/overview.mdx` becomes the section root (`/docs/react`, not
@@ -83,9 +117,10 @@ npm run dev      # http://localhost:3000
 ```
 
 Requires `.env` (copy from `.env.example`) for the GitHub-fetch config.
-`GITHUB_TOKEN` is required for `npm run build`, which fetches every page
-and its commit history, more than GitHub's unauthenticated rate limit (60
-req/hr) allows; set it for local dev too.
+`GITHUB_TOKEN` is required for `npm run build` and on Vercel: the manifest
+comes through the rate-limited GitHub API, and the per-file fallback makes
+more requests than GitHub's unauthenticated limit (60 req/hr) allows; set it
+for local dev too.
 
 `npm run update-gridkit` moves all five `@gridkitjs/*` packages (`core`,
 `dom`, `react`, `theme-tailwind`, `export-xlsx`) to their `latest` releases.
