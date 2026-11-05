@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { fetchRawFile, isNotFound } from "@/lib/docs/github";
 import { getDocsManifest } from "@/lib/docs/manifest";
+import { npmPackageName } from "@/lib/packages/npm";
 import { PACKAGES } from "@/lib/packages";
 
 export interface ChangelogVersion {
@@ -36,10 +37,6 @@ function parseVersions(content: string): ChangelogVersion[] {
     const end = matches[index + 1]?.index ?? content.length;
     return { version, content: content.slice(start, end).trim() };
   });
-}
-
-function npmName(slug: string): string {
-  return `@gridkitjs/${slug}`;
 }
 
 /**
@@ -95,7 +92,7 @@ async function buildSection(
 
   return {
     slug: pkg.slug,
-    title: npmName(pkg.slug),
+    title: npmPackageName(pkg.slug),
     repoPath,
     lastModified: changelog.lastModified,
     versions,
