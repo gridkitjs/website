@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/marketing/Hero";
 import { FeatureMatrix } from "@/components/marketing/FeatureMatrix";
+import { HeadlessSection } from "@/components/marketing/HeadlessSection";
 import { PackagesSection } from "@/components/marketing/PackagesSection";
 import { StorySection } from "@/components/marketing/StorySection";
 import { CtaSection } from "@/components/marketing/CtaSection";
@@ -35,6 +36,7 @@ export default async function HomePage({
     <>
       <Hero />
       <FeatureMatrix />
+      <HeadlessSection />
       <PackagesSection />
       <StorySection />
       <CtaSection />
