@@ -19,7 +19,10 @@ import { InfiniteScrollExample } from "@/components/live-examples/rows/InfiniteS
 import { PaginationExample } from "@/components/live-examples/rows/PaginationExample.example";
 import { RowGroupingExample } from "@/components/live-examples/rows/RowGroupingExample.example";
 import { RowVirtualizationExample } from "@/components/live-examples/rows/RowVirtualizationExample.example";
+import { CellSelectionExample } from "@/components/live-examples/selection/CellSelectionExample.example";
+import { ColumnSelectionExample } from "@/components/live-examples/selection/ColumnSelectionExample.example";
 import { CombinedSelectionExample } from "@/components/live-examples/selection/CombinedSelectionExample.example";
+import { RowSelectionExample } from "@/components/live-examples/selection/RowSelectionExample.example";
 
 export const generatedExamples = {
   ColumnFilteringExample: {
@@ -1573,6 +1576,126 @@ export function RowVirtualizationExample() {
       "react-dom": "19.2.4",
     },
   },
+  CellSelectionExample: {
+    Component: CellSelectionExample,
+    meta: {
+      id: "cell-selection",
+      title: "Cell selection",
+      description:
+        "Click a cell to select it, or move with the arrow keys and press Space; Ctrl+click the selected cell to clear it.",
+      minHeight: 357,
+    },
+    fileName: "CellSelectionExample.tsx",
+    source: `import { useState } from "react";
+import {
+  DataGrid,
+  type ColumnDefinition,
+  type SelectedCell,
+} from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+
+const rows = makeRows(6);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency" },
+];
+
+export function CellSelectionExample() {
+  const [cell, setCell] = useState<SelectedCell<TicketRow> | null>(null);
+
+  return (
+    <div>
+      <DataGrid
+        columns={columns}
+        dataSource={rows}
+        getRowId={(row) => String(row.Id)}
+        label="Tickets"
+        borders="all"
+        selectable={{ cells: "single" }}
+        onCellSelectionChange={({ selected }) => {
+          setCell(selected);
+        }}
+      />
+      <p className="text-site-ink-muted mt-4 text-sm" aria-live="polite">
+        {cell === null ? (
+          "No cell selected."
+        ) : (
+          <>
+            {cell.columnId} of {cell.row.Name}:{" "}
+            <code className="text-site-ink">{String(cell.value)}</code>
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
+`,
+    localFiles: ["fixtures.ts"],
+    dependencies: {
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
+  ColumnSelectionExample: {
+    Component: ColumnSelectionExample,
+    meta: {
+      id: "column-selection",
+      title: "Column selection",
+      description:
+        "Click a header to select its column, Ctrl+click to add or remove one and Shift+click to take every column in between.",
+      minHeight: 430,
+    },
+    fileName: "ColumnSelectionExample.tsx",
+    source: `import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+import { EventLog, useEventLog } from "./EventLog";
+
+const rows = makeRows(6);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency" },
+];
+
+export function ColumnSelectionExample() {
+  const { entries, record } = useEventLog();
+
+  return (
+    <div>
+      <DataGrid
+        columns={columns}
+        dataSource={rows}
+        getRowId={(row) => String(row.Id)}
+        label="Tickets"
+        borders="all"
+        selectable={{ columns: "multiple" }}
+        onColumnSelectionChange={({ selected }) => {
+          const names = selected.map((column) => column.columnId);
+          record(\`onColumnSelectionChange — [\${names.join(", ")}]\`);
+        }}
+      />
+      <EventLog entries={entries} />
+    </div>
+  );
+}
+`,
+    localFiles: ["EventLog.tsx", "fixtures.ts"],
+    dependencies: {
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
   CombinedSelectionExample: {
     Component: CombinedSelectionExample,
     meta: {
@@ -1622,6 +1745,99 @@ export function CombinedSelectionExample() {
     localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/core": "^0.13.0",
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
+  RowSelectionExample: {
+    Component: RowSelectionExample,
+    meta: {
+      id: "row-selection",
+      title: "Row selection",
+      description:
+        "Click a row to select it, Ctrl+click to add one and Shift+click to take a range; switch the mode or let a plain click toggle.",
+      minHeight: 548,
+    },
+    fileName: "RowSelectionExample.tsx",
+    source: `import { useState } from "react";
+import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+import { EventLog, useEventLog } from "./EventLog";
+
+const rows = makeRows(8);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency" },
+];
+
+const modes = ["single", "multiple"] as const;
+
+export function RowSelectionExample() {
+  const { entries, record } = useEventLog();
+  const [mode, setMode] = useState<(typeof modes)[number]>("multiple");
+  const [toggleOnClick, setToggleOnClick] = useState(false);
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <fieldset className="flex gap-4">
+          <legend className="sr-only">Selection mode</legend>
+          {modes.map((option) => (
+            <label
+              key={option}
+              className="text-site-ink-muted flex items-center gap-1.5"
+            >
+              <input
+                type="radio"
+                name="row-selection-mode"
+                checked={mode === option}
+                onChange={() => {
+                  setMode(option);
+                }}
+              />
+              {option}
+            </label>
+          ))}
+        </fieldset>
+        <label className="text-site-ink-muted flex items-center gap-1.5">
+          <input
+            type="checkbox"
+            checked={toggleOnClick}
+            onChange={(event) => {
+              setToggleOnClick(event.target.checked);
+            }}
+          />
+          toggleOnClick
+        </label>
+      </div>
+      <div className="mt-4">
+        <DataGrid
+          columns={columns}
+          dataSource={rows}
+          getRowId={(row) => String(row.Id)}
+          label="Tickets"
+          borders="all"
+          selectable={{ rows: mode, toggleOnClick }}
+          onRowSelectionChange={({ added, removed, selection }) => {
+            record(
+              \`onRowSelectionChange — +\${String(added.length)} −\${String(removed.length)}, selected: [\${selection.join(", ")}]\`,
+            );
+          }}
+        />
+      </div>
+      <EventLog entries={entries} />
+    </div>
+  );
+}
+`,
+    localFiles: ["EventLog.tsx", "fixtures.ts"],
+    dependencies: {
       "@gridkitjs/react": "^0.12.0",
       "@gridkitjs/theme-tailwind": "^0.9.0",
       react: "19.2.4",
