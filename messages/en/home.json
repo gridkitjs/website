@@ -56,6 +56,18 @@
       "dom": "DOM behaviours"
     }
   },
+  "headless": {
+    "title": "A headless core, drawn by React",
+    "subtitle": "The grid is a plain TypeScript controller. The React DataGrid is one renderer of it, and the next framework adapter reuses the same core.",
+    "core": {
+      "package": "@gridkitjs/core",
+      "description": "Holds the state, derives the view and runs every action, with no DOM and no framework."
+    },
+    "react": {
+      "package": "@gridkitjs/react",
+      "description": "Renders that controller as an accessible DataGrid, with a prop for every option."
+    }
+  },
   "packages": {
     "title": "Four packages, one grid",
     "subtitle": "Install just the layer you need — the core has no framework or styling dependency.",
