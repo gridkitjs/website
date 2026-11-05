@@ -87,14 +87,74 @@ function A({ className, ...props }: ComponentProps<"a">) {
   return <DocLink className={cn(LINK_CLASS, className)} {...props} />;
 }
 
+// Header names of the columns whose cells hold identifiers (prop names,
+// types, keys), which are set in monospace; every other column is prose.
+const IDENTIFIER_HEADERS = new Set([
+  "Prop",
+  "Field",
+  "Function",
+  "Option",
+  "Type",
+  "Default",
+  "Key",
+  "Class",
+  "Member",
+  "Method",
+]);
+
+// Elements only: drops the newline text MDX leaves between table rows.
+function elementsIn<P>(node: ReactNode): ReactElement<P>[] {
+  return Children.toArray(node).filter(isValidElement<P>);
+}
+
+function textContent(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  return elementsIn<{ children?: ReactNode }>(node)
+    .map((element) => textContent(element.props.children))
+    .join("");
+}
+
+type Section = ReactElement<{ children?: ReactNode }>;
+
+/** Which columns are identifier columns, read from the header row. */
+function monoColumnsOf(head: Section | undefined): boolean[] {
+  const [headerRow] = elementsIn<{ children?: ReactNode }>(
+    head?.props.children,
+  );
+  return elementsIn<{ children?: ReactNode }>(headerRow?.props.children).map(
+    (cell) => IDENTIFIER_HEADERS.has(textContent(cell.props.children).trim()),
+  );
+}
+
+function withMonoCells(body: Section, monoColumns: boolean[]): Section {
+  const rows = elementsIn<{ children?: ReactNode }>(body.props.children).map(
+    (row) =>
+      cloneElement(
+        row,
+        undefined,
+        elementsIn<TdProps>(row.props.children).map((cell, column) =>
+          cloneElement(cell, { mono: monoColumns[column] ?? false }),
+        ),
+      ),
+  );
+  return cloneElement(body, undefined, rows);
+}
+
 // GFM tables (e.g. props reference tables) styled to match the site's
-// rounded, bordered look: a tinted header row and code-styled cells for
-// every column but the last, which holds prose description text. Narrower
-// than min-w-160 the table scrolls inside its wrapper.
-function Table(props: ComponentProps<"table">) {
+// rounded, bordered look: a tinted header row, and monospace cells in the
+// columns whose header names an identifier. Narrower than min-w-160 the
+// table scrolls inside its wrapper.
+function Table({ children, ...props }: ComponentProps<"table">) {
+  const sections = elementsIn<{ children?: ReactNode }>(children);
+  const head = sections.find((section) => section.type === Thead);
+  const monoColumns = monoColumnsOf(head);
   return (
     <div className="border-site-line my-6 w-full overflow-x-auto rounded-xl border">
-      <table className="w-full min-w-160 border-collapse text-sm" {...props} />
+      <table className="w-full min-w-160 border-collapse text-sm" {...props}>
+        {sections.map((section) =>
+          section === head ? section : withMonoCells(section, monoColumns),
+        )}
+      </table>
     </div>
   );
 }
@@ -166,10 +226,19 @@ function breakCellText(node: ReactNode): ReactNode {
   });
 }
 
-function Td({ children, ...props }: ComponentProps<"td">) {
+interface TdProps extends ComponentProps<"td"> {
+  /** Set by `Table` on cells of an identifier column. */
+  mono?: boolean;
+}
+
+function Td({ mono = false, children, className, ...props }: TdProps) {
   return (
     <td
-      className="border-site-line text-site-ink-muted border-b px-3 py-3 align-top text-xs not-last:font-mono last:text-sm"
+      className={cn(
+        "border-site-line text-site-ink-muted border-b px-3 py-3 align-top",
+        mono ? "font-mono text-xs" : "text-sm",
+        className,
+      )}
       {...props}
     >
       {children === "" ? "—" : breakCellText(children)}
