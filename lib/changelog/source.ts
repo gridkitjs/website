@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { fetchRawFile } from "@/lib/docs/github";
+import { fetchRawFile, isNotFound } from "@/lib/docs/github";
 import { PACKAGES } from "@/lib/packages";
 
 export interface ChangelogVersion {
@@ -46,8 +46,12 @@ async function buildSection(
   let content: string;
   try {
     content = await fetchRawFile(repoPath);
-  } catch {
-    return undefined;
+  } catch (error) {
+    // A package that has never been released has no CHANGELOG.md yet. Any
+    // other failure is rethrown so a GitHub blip isn't cached as a missing
+    // changelog.
+    if (isNotFound(error)) return undefined;
+    throw error;
   }
 
   const versions = parseVersions(content);

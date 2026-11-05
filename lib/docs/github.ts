@@ -23,6 +23,42 @@ function githubHeaders(accept: string): HeadersInit {
   return headers;
 }
 
+/**
+ * A non-OK response from GitHub. Carries the status so callers can tell a
+ * missing file (404) from a failure that must not be cached, such as a rate
+ * limit (403/429) or an outage.
+ */
+export class GithubFetchError extends Error {
+  readonly resource: string;
+  readonly status: number;
+
+  constructor(resource: string, status: number) {
+    super(`GitHub request for ${resource} failed: ${status}`);
+    this.name = "GithubFetchError";
+    this.resource = resource;
+    this.status = status;
+  }
+}
+
+/** Whether `error` is GitHub reporting that the requested file or ref doesn't exist. */
+export function isNotFound(error: unknown): boolean {
+  return error instanceof GithubFetchError && error.status === 404;
+}
+
+/** A cached GET against GitHub; throws `GithubFetchError` on a non-OK response so no failure is cached as content. */
+async function fetchFromGithub(
+  url: string,
+  resource: string,
+  accept: string,
+): Promise<Response> {
+  const res = await fetch(url, {
+    headers: githubHeaders(accept),
+    next: { revalidate: DOCS_CACHE_SECONDS, tags: [DOCS_CACHE_TAG] },
+  });
+  if (!res.ok) throw new GithubFetchError(resource, res.status);
+  return res;
+}
+
 export interface GithubTreeEntry {
   path: string;
   type: "blob" | "tree";
@@ -30,32 +66,22 @@ export interface GithubTreeEntry {
 
 /** The full recursive file tree of the docs repo, for building the docs source tree from. */
 export async function fetchRepoTree(): Promise<GithubTreeEntry[]> {
-  const res = await fetch(
+  const res = await fetchFromGithub(
     `https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`,
-    {
-      headers: githubHeaders("application/vnd.github+json"),
-      next: { revalidate: DOCS_CACHE_SECONDS, tags: [DOCS_CACHE_TAG] },
-    },
+    `the ${OWNER}/${REPO}@${BRANCH} tree`,
+    "application/vnd.github+json",
   );
-  if (!res.ok) {
-    throw new Error(`Failed to list ${OWNER}/${REPO}@${BRANCH}: ${res.status}`);
-  }
   const data = (await res.json()) as { tree: GithubTreeEntry[] };
   return data.tree;
 }
 
 /** The raw text content of a single file at `repoPath` (e.g. "packages/core/docs/overview.mdx"). */
 export async function fetchRawFile(repoPath: string): Promise<string> {
-  const res = await fetch(
+  const res = await fetchFromGithub(
     `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${repoPath}`,
-    {
-      headers: githubHeaders("text/plain"),
-      next: { revalidate: DOCS_CACHE_SECONDS, tags: [DOCS_CACHE_TAG] },
-    },
+    repoPath,
+    "text/plain",
   );
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${repoPath}: ${res.status}`);
-  }
   return res.text();
 }
 
@@ -64,18 +90,19 @@ export function getEditUrl(repoPath: string): string {
   return `https://github.com/${OWNER}/${REPO}/edit/${BRANCH}/${repoPath}`;
 }
 
-/** The commit date of the last change to `repoPath`, or `null` if it has no history (e.g. a new file not yet pushed). */
+/**
+ * The commit date of the last change to `repoPath`, or `null` if it has no
+ * history (e.g. a new file not yet pushed). Throws on a failed request rather
+ * than returning `null`, so a rate limit isn't cached as "never updated".
+ */
 export async function fetchLastCommitDate(
   repoPath: string,
 ): Promise<Date | null> {
-  const res = await fetch(
+  const res = await fetchFromGithub(
     `https://api.github.com/repos/${OWNER}/${REPO}/commits?path=${encodeURIComponent(repoPath)}&sha=${BRANCH}&per_page=1`,
-    {
-      headers: githubHeaders("application/vnd.github+json"),
-      next: { revalidate: DOCS_CACHE_SECONDS, tags: [DOCS_CACHE_TAG] },
-    },
+    `the commit history of ${repoPath}`,
+    "application/vnd.github+json",
   );
-  if (!res.ok) return null;
   const commits = (await res.json()) as Array<{
     commit: { committer: { date: string } | null };
   }>;
