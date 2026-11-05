@@ -3,7 +3,6 @@ import {
   cloneElement,
   isValidElement,
   type ComponentProps,
-  type ComponentType,
   type ReactElement,
   type ReactNode,
 } from "react";
@@ -11,6 +10,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { examples, type GeneratedExample } from "./examples";
 import { rehypeCodeMeta } from "./rehype-code-meta";
 import { bundledLanguages, type BundledLanguage } from "shiki";
 import { parseMetaHighlightString } from "@shikijs/transformers";
@@ -24,14 +24,7 @@ import { Since } from "@/components/docs/Since";
 import { ClientOnly } from "@/components/ui/ClientOnly";
 import { cn } from "@/components/ui/cn";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
-import { DataGridBasicExample } from "@/components/live-examples/grid/DataGridBasicExample.example";
 import { StackblitzExample } from "@/components/live-examples/StackblitzExample";
-import { DataGridResizeReorderExample } from "@/components/live-examples/grid/DataGridResizeReorderExample.example";
-import { ColumnTemplatesExample } from "@/components/live-examples/columns/ColumnTemplatesExample.example";
-import { ColumnResizingExample } from "@/components/live-examples/columns/ColumnResizingExample.example";
-import { EventsShowcaseExample } from "@/components/live-examples/grid/EventsShowcaseExample.example";
-import { DarkModeExample } from "@/components/live-examples/grid/DarkModeExample.example";
-import { CombinedSelectionExample } from "@/components/live-examples/selection/CombinedSelectionExample.example";
 
 function isBundledLanguage(lang: string): lang is BundledLanguage {
   return Object.hasOwn(bundledLanguages, lang);
@@ -251,17 +244,51 @@ function Tr(props: ComponentProps<"tr">) {
 }
 
 // @gridkitjs/react's DataGrid reads its stores through useSyncExternalStore
-// without a server snapshot, so prerendering it throws. Mount the grid
-// examples in the browser only until the package gives it one.
-function clientOnly(Example: ComponentType) {
-  function ClientOnlyExample() {
+// without a server snapshot, so prerendering it throws. Each example mounts
+// in the browser only, inside a frame that reserves its height, until the
+// package gives it one.
+function framedExample({ Component, ...example }: GeneratedExample) {
+  function FramedExample({ title = example.meta.title }: { title?: string }) {
     return (
-      <ClientOnly>
-        <Example />
-      </ClientOnly>
+      <LiveExampleFrame title={title} example={example}>
+        <ClientOnly>
+          <Component />
+        </ClientOnly>
+      </LiveExampleFrame>
     );
   }
-  return ClientOnlyExample;
+  return FramedExample;
+}
+
+/** One tag per registered example, each rendering inside its own frame. */
+const exampleTags = Object.fromEntries(
+  Object.entries(examples).map(([tag, example]) => [
+    tag,
+    framedExample(example),
+  ]),
+);
+
+const framedTags = new Set<unknown>(Object.values(exampleTags));
+
+/**
+ * The `<LiveExampleFrame title="…">` doc pages write around an example. A
+ * registered example frames itself, so wrapping one passes the title on
+ * instead of framing it twice; anything else, such as a
+ * `<StackblitzExample>`, gets a plain frame.
+ */
+function MdxLiveExampleFrame({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  const elements = elementsIn<{ title?: string }>(children);
+  const [only] = elements;
+  if (elements.length === 1 && only && framedTags.has(only.type)) {
+    return cloneElement(only, { title });
+  }
+  return <LiveExampleFrame title={title}>{children}</LiveExampleFrame>;
 }
 
 const mdxComponents = {
@@ -277,17 +304,11 @@ const mdxComponents = {
   KbdGroup,
   LinkCard,
   LinkCards,
-  LiveExampleFrame,
+  LiveExampleFrame: MdxLiveExampleFrame,
   PackageInstall,
   Since,
   StackblitzExample,
-  DataGridBasicExample: clientOnly(DataGridBasicExample),
-  DataGridResizeReorderExample: clientOnly(DataGridResizeReorderExample),
-  ColumnTemplatesExample: clientOnly(ColumnTemplatesExample),
-  ColumnResizingExample: clientOnly(ColumnResizingExample),
-  EventsShowcaseExample: clientOnly(EventsShowcaseExample),
-  DarkModeExample: clientOnly(DarkModeExample),
-  CombinedSelectionExample: clientOnly(CombinedSelectionExample),
+  ...exampleTags,
 };
 
 /** Renders a doc page's MDX body (frontmatter already stripped by `gray-matter` in `lib/docs/source.ts`). */

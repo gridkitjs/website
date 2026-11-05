@@ -5,7 +5,10 @@
  * not in the list, which would otherwise render as literal text here.
  *
  * Only capitalised keys are listed: the lowercase ones (`pre`, `a`, …)
- * restyle plain markdown elements rather than add tags.
+ * restyle plain markdown elements rather than add tags. The live examples
+ * are spread in as `...exampleTags`; their tags are the keys of
+ * `generatedExamples` in `lib/docs/example-sources.generated.ts`, which
+ * `scripts/gen-example-sources.mjs` writes.
  *
  * Runs as `prebuild`. Usage: node scripts/export-mdx-tags.mjs
  */
@@ -13,34 +16,60 @@ import { readFile, writeFile } from "node:fs/promises";
 import ts from "typescript";
 
 const SOURCE = new URL("../lib/docs/mdx.tsx", import.meta.url);
+const EXAMPLES = new URL(
+  "../lib/docs/example-sources.generated.ts",
+  import.meta.url,
+);
 const OUTPUT = new URL("../public/mdx-tags.json", import.meta.url);
 
-function findComponentsObject(sourceFile) {
+/** The object literal `const <name> = { ... }` holds, `satisfies` or not. */
+function findObject(sourceFile, name) {
   let found;
   sourceFile.forEachChild(function visit(node) {
     if (
       ts.isVariableDeclaration(node) &&
-      node.name.getText(sourceFile) === "mdxComponents" &&
-      node.initializer &&
-      ts.isObjectLiteralExpression(node.initializer)
+      node.name.getText(sourceFile) === name &&
+      node.initializer
     ) {
-      found = node.initializer;
+      const value = ts.isSatisfiesExpression(node.initializer)
+        ? node.initializer.expression
+        : node.initializer;
+      if (ts.isObjectLiteralExpression(value)) found = value;
     }
     if (!found) node.forEachChild(visit);
   });
   return found;
 }
 
-const text = await readFile(SOURCE, "utf8");
-const sourceFile = ts.createSourceFile("mdx.tsx", text, ts.ScriptTarget.Latest);
-const components = findComponentsObject(sourceFile);
-if (!components) {
-  throw new Error("No `const mdxComponents = { ... }` in lib/docs/mdx.tsx");
+async function keysOf(url, name) {
+  const text = await readFile(url, "utf8");
+  const sourceFile = ts.createSourceFile(
+    url.pathname,
+    text,
+    ts.ScriptTarget.Latest,
+  );
+  const object = findObject(sourceFile, name);
+  if (!object) {
+    throw new Error(`No \`const ${name} = { ... }\` in ${url.pathname}`);
+  }
+
+  const keys = [];
+  for (const property of object.properties) {
+    if (!ts.isSpreadAssignment(property)) {
+      keys.push(property.name.getText(sourceFile));
+      continue;
+    }
+    const spread = property.expression.getText(sourceFile);
+    if (spread !== "exampleTags") {
+      throw new Error(`Cannot list the tags of \`...${spread}\``);
+    }
+    keys.push(...(await keysOf(EXAMPLES, "generatedExamples")));
+  }
+  return keys;
 }
 
-const tags = components.properties
-  .map((property) => property.name?.getText(sourceFile))
-  .filter((name) => name && /^[A-Z]/.test(name))
+const tags = (await keysOf(SOURCE, "mdxComponents"))
+  .filter((name) => /^[A-Z]/.test(name))
   .sort();
 
 await writeFile(OUTPUT, `${JSON.stringify(tags, null, 2)}\n`);
