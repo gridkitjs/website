@@ -7,6 +7,7 @@
   },
   "footer": {
     "tagline": "A headless data-grid toolkit for TypeScript.",
+    "about": "About GridKit",
     "githubHeading": "Repository",
     "packagesHeading": "Packages",
     "copyright": "© {year} GridKit.",
