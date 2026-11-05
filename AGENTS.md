@@ -25,12 +25,13 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 | `components/live-examples/`                 | `DataGrid` demos, one `<area>/<Name>.example.tsx` each, and their fixtures; registered via `lib/docs/examples.ts` (see **Live examples**).                                                    |
 | `components/search/`                        | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).              |
 | `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`. |
-| `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                                                                                                    |
+| `components/marketing/`                     | Homepage sections: `Hero` (with `HeroGrid`, the live grid), `FeatureMatrix`, `PackagesSection`, `StorySection`, `CtaSection`. Not used inside docs (see **Home page**).                       |
 | `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                   |
 | `components/code/`                          | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override.                                                                      |
 | `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`).  |
 | `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                                                                                                  |
 | `lib/packages/`                             | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                      |
+| `lib/marketing/`                            | Home page data: `features.ts`, the feature matrix (`FEATURE_GROUPS`).                                                                                                                         |
 | `lib/seo/`                                  | Metadata builders and site-wide constants (canonical URL, social image, etc).                                                                                                                 |
 | `i18n/`                                     | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                                                                                   |
 
@@ -297,6 +298,27 @@ runs; add a new published package to the script when `gridkit` ships one.
   `LinkCard`) so they carry the current locale prefix. In-page `#anchor`
   and relative links get a plain `<a>` in the same tab; only `http(s)://`
   links open a new tab.
+
+## Home page
+
+`app/[locale]/page.tsx` stacks the sections in `components/marketing/`.
+Two of them need care:
+
+- **`HeroGrid`** is a live `DataGrid` (200 rows from `makeRows`, grouped
+  by region). Like a live example it mounts in the browser only, inside
+  `ClientOnly`, so its wrapper reserves the grid's whole height
+  (`h-[432px]`) and the page doesn't move when it appears. The grid's
+  `height` bounds only the rows area, so after changing it, the toolbar or
+  the group-by bar, measure the mounted grid and update the wrapper.
+- **`FeatureMatrix`** renders `FEATURE_GROUPS` from
+  `lib/marketing/features.ts`: each feature is a `key`, its label under
+  `features.items` in `messages/<locale>/home.json`, and the `slug` of
+  its doc page. `prebuild` runs `scripts/check-feature-slugs.mjs`, which
+  fails the build when a slug isn't a page of the docs tree (read as the
+  site reads it: `DOCS_MANIFEST_FILE`, the manifest, or the repo tree) or a
+  key has no label; run it by hand with
+  `node scripts/check-feature-slugs.mjs`. A doc page gridkit renames or
+  removes fails the next build here; a new feature page is added by hand.
 
 ## i18n
 

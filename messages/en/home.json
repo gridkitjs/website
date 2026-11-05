@@ -13,39 +13,48 @@
   },
   "features": {
     "title": "Everything the grid does today",
-    "subtitle": "Six real capabilities, built on a framework-agnostic core — React is the first adapter, with more on the way.",
-    "items": [
-      {
-        "title": "Columns that infer themselves",
-        "description": "Infer columns and their types straight from your data, or declare them by hand — custom header and cell templates take over whenever you need more control.",
-        "docsSlug": "core/column-definitions"
-      },
-      {
-        "title": "Resize, your way",
-        "description": "Drag a column's edge to resize it, double-click to auto-fit its content, or drive the whole thing from the keyboard.",
-        "docsSlug": "react/column-resizing"
-      },
-      {
-        "title": "Reorder without fighting state",
-        "description": "Drag a header into place or reorder with the keyboard — GridKit computes the new order and tells you once, on drop.",
-        "docsSlug": "react/column-reordering"
-      },
-      {
-        "title": "Selection for rows, columns, and cells",
-        "description": "Select any combination of rows, columns, and cells, single or multiple, fully controlled or left to sensible defaults.",
-        "docsSlug": "core/selection"
-      },
-      {
-        "title": "Keyboard-first and accessible",
-        "description": "A single roving tab stop, full arrow-key navigation, and ARIA roles with live announcements — built in, not bolted on.",
-        "docsSlug": "react/data-grid"
-      },
-      {
-        "title": "A theme you can swap",
-        "description": "@gridkitjs/react renders semantic class names and carries no styles of its own. @gridkitjs/theme-tailwind ships a ready-made palette with dark mode, or bring your own stylesheet.",
-        "docsSlug": "theme-tailwind"
-      }
-    ]
+    "subtitle": "{count} shipped features, each linked to the page that documents it.",
+    "groups": {
+      "columns": "Columns",
+      "rows": "Rows",
+      "selection": "Selection",
+      "data": "Data",
+      "integration": "Integration"
+    },
+    "items": {
+      "definitions": "Definitions and inference",
+      "templates": "Header and cell templates",
+      "resizing": "Resizing and autofit",
+      "reordering": "Drag to reorder",
+      "sorting": "Sorting and multi-sort",
+      "chooser": "Column chooser and hiding",
+      "grouping": "Grouping and group-by bar",
+      "aggregates": "Aggregates and totals",
+      "pagination": "Pagination",
+      "virtualization": "Row virtualization",
+      "infiniteScroll": "Infinite scroll",
+      "rowSelection": "Row selection",
+      "columnSelection": "Column selection",
+      "cellSelection": "Cell selection",
+      "keyboard": "Keyboard and ARIA",
+      "clipboard": "Clipboard copy",
+      "contextMenu": "Context menu",
+      "commands": "Commands",
+      "filtering": "Filtering",
+      "filterMenu": "Filter menu and Excel filter",
+      "toolbar": "Toolbar and search",
+      "export": "CSV, JSON and HTML export",
+      "excel": "Excel export",
+      "printing": "Printing",
+      "state": "Controlled or uncontrolled state",
+      "events": "Events",
+      "imperativeApi": "Imperative API and save/restore",
+      "controller": "Headless controller",
+      "viewPipeline": "View pipeline",
+      "localization": "Localization",
+      "theming": "Theming and dark mode",
+      "dom": "DOM behaviours"
+    }
   },
   "packages": {
     "title": "Four packages, one grid",
