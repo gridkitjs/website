@@ -11,10 +11,16 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import { Link } from "@/i18n/navigation";
+import { rehypeCodeMeta } from "./rehype-code-meta";
 import { bundledLanguages, type BundledLanguage } from "shiki";
+import { parseMetaHighlightString } from "@shikijs/transformers";
 import { CodeBlock, type CodeLanguage } from "@/components/code/CodeBlock";
+import { Callout } from "@/components/docs/Callout";
+import { DocLink } from "@/components/docs/DocLink";
+import { LinkCard, LinkCards } from "@/components/docs/LinkCards";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
+import { PackageInstall } from "@/components/docs/PackageInstall";
+import { Since } from "@/components/docs/Since";
 import { ClientOnly } from "@/components/ui/ClientOnly";
 import { cn } from "@/components/ui/cn";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
@@ -40,19 +46,36 @@ function fenceLanguage(className = ""): CodeLanguage {
   return isBundledLanguage(lang) ? lang : "text";
 }
 
+/**
+ * Reads a fence's meta string, ```` ```tsx title="App.tsx" {1,3-5} showLineNumbers wrap ````:
+ * a title bar, lines to highlight, line numbers, and lines wrapped from the start.
+ */
+function parseFenceMeta(meta = "") {
+  return {
+    title: /\btitle=(["'])(.*?)\1/.exec(meta)?.[2],
+    highlightLines: parseMetaHighlightString(meta) ?? [],
+    showLineNumbers: /(?:^|\s)showLineNumbers(?:\s|$)/.test(meta),
+    wrap: /(?:^|\s)wrap(?:\s|$)/.test(meta),
+  };
+}
+
 // MDX compiles fenced code blocks to <pre><code className="language-x">...</code></pre>;
 // route that through the site's Shiki-highlighted, copy-button CodeBlock instead.
+// `data-meta` is the fence's meta string, put there by rehypeCodeMeta.
 async function Pre({
   children,
+  "data-meta": meta,
 }: {
   children: ReactElement<{ className?: string; children?: unknown }>;
+  "data-meta"?: string;
 }) {
   const code = String(children.props.children).replace(/\n$/, "");
   return (
     <CodeBlock
       code={code}
       lang={fenceLanguage(children.props.className)}
-      className="mt-4"
+      {...parseFenceMeta(meta)}
+      className="my-4"
     />
   );
 }
@@ -60,37 +83,78 @@ async function Pre({
 const LINK_CLASS =
   "text-site-ink decoration-site-accent hover:text-site-accent underline underline-offset-4 transition-colors";
 
-// Site-absolute links (docs content links to other /docs/... pages) go through
-// next-intl's Link so they pick up the current locale prefix. Only http(s)
-// links leave the site, so only they open a new tab; in-page `#anchor` and
-// relative links stay in this one.
-function A({ href = "", className, ...props }: ComponentProps<"a">) {
-  const linkClass = cn(LINK_CLASS, className);
-  if (href.startsWith("/")) {
-    return <Link href={href} className={linkClass} {...props} />;
-  }
-  if (/^https?:\/\//.test(href)) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className={linkClass}
-        {...props}
-      />
-    );
-  }
-  return <a href={href} className={linkClass} {...props} />;
+function A({ className, ...props }: ComponentProps<"a">) {
+  return <DocLink className={cn(LINK_CLASS, className)} {...props} />;
+}
+
+// Header names of the columns whose cells hold identifiers (prop names,
+// types, keys), which are set in monospace; every other column is prose.
+const IDENTIFIER_HEADERS = new Set([
+  "Prop",
+  "Field",
+  "Function",
+  "Option",
+  "Type",
+  "Default",
+  "Key",
+  "Class",
+  "Member",
+  "Method",
+]);
+
+// Elements only: drops the newline text MDX leaves between table rows.
+function elementsIn<P>(node: ReactNode): ReactElement<P>[] {
+  return Children.toArray(node).filter(isValidElement<P>);
+}
+
+function textContent(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  return elementsIn<{ children?: ReactNode }>(node)
+    .map((element) => textContent(element.props.children))
+    .join("");
+}
+
+type Section = ReactElement<{ children?: ReactNode }>;
+
+/** Which columns are identifier columns, read from the header row. */
+function monoColumnsOf(head: Section | undefined): boolean[] {
+  const [headerRow] = elementsIn<{ children?: ReactNode }>(
+    head?.props.children,
+  );
+  return elementsIn<{ children?: ReactNode }>(headerRow?.props.children).map(
+    (cell) => IDENTIFIER_HEADERS.has(textContent(cell.props.children).trim()),
+  );
+}
+
+function withMonoCells(body: Section, monoColumns: boolean[]): Section {
+  const rows = elementsIn<{ children?: ReactNode }>(body.props.children).map(
+    (row) =>
+      cloneElement(
+        row,
+        undefined,
+        elementsIn<TdProps>(row.props.children).map((cell, column) =>
+          cloneElement(cell, { mono: monoColumns[column] ?? false }),
+        ),
+      ),
+  );
+  return cloneElement(body, undefined, rows);
 }
 
 // GFM tables (e.g. props reference tables) styled to match the site's
-// rounded, bordered look: a tinted header row and code-styled cells for
-// every column but the last, which holds prose description text. Narrower
-// than min-w-160 the table scrolls inside its wrapper.
-function Table(props: ComponentProps<"table">) {
+// rounded, bordered look: a tinted header row, and monospace cells in the
+// columns whose header names an identifier. Narrower than min-w-160 the
+// table scrolls inside its wrapper.
+function Table({ children, ...props }: ComponentProps<"table">) {
+  const sections = elementsIn<{ children?: ReactNode }>(children);
+  const head = sections.find((section) => section.type === Thead);
+  const monoColumns = monoColumnsOf(head);
   return (
     <div className="border-site-line my-6 w-full overflow-x-auto rounded-xl border">
-      <table className="w-full min-w-160 border-collapse text-sm" {...props} />
+      <table className="w-full min-w-160 border-collapse text-sm" {...props}>
+        {sections.map((section) =>
+          section === head ? section : withMonoCells(section, monoColumns),
+        )}
+      </table>
     </div>
   );
 }
@@ -162,10 +226,19 @@ function breakCellText(node: ReactNode): ReactNode {
   });
 }
 
-function Td({ children, ...props }: ComponentProps<"td">) {
+interface TdProps extends ComponentProps<"td"> {
+  /** Set by `Table` on cells of an identifier column. */
+  mono?: boolean;
+}
+
+function Td({ mono = false, children, className, ...props }: TdProps) {
   return (
     <td
-      className="border-site-line text-site-ink-muted border-b px-3 py-3 align-top text-xs not-last:font-mono last:text-sm"
+      className={cn(
+        "border-site-line text-site-ink-muted border-b px-3 py-3 align-top",
+        mono ? "font-mono text-xs" : "text-sm",
+        className,
+      )}
       {...props}
     >
       {children === "" ? "—" : breakCellText(children)}
@@ -199,9 +272,14 @@ const mdxComponents = {
   th: Th,
   td: Td,
   tr: Tr,
+  Callout,
   Kbd,
   KbdGroup,
+  LinkCard,
+  LinkCards,
   LiveExampleFrame,
+  PackageInstall,
+  Since,
   StackblitzExample,
   DataGridBasicExample: clientOnly(DataGridBasicExample),
   DataGridResizeReorderExample: clientOnly(DataGridResizeReorderExample),
@@ -222,6 +300,7 @@ export function DocContent({ source }: { source: string }) {
         mdxOptions: {
           remarkPlugins: [remarkGfm],
           rehypePlugins: [
+            rehypeCodeMeta,
             rehypeSlug,
             [
               rehypeAutolinkHeadings,
