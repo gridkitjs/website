@@ -57,19 +57,34 @@ const MANIFEST_FILE = process.env.DOCS_MANIFEST_FILE;
 async function readManifest(): Promise<string | null> {
   if (MANIFEST_FILE) return readFile(MANIFEST_FILE, "utf8");
   try {
-    return await fetchFileFromApi(MANIFEST_PATH, MANIFEST_REF);
+    return await fetchFileFromApi(MANIFEST_PATH, MANIFEST_REF, {
+      notFoundExpected: true,
+    });
   } catch (error) {
     if (isNotFound(error)) return null;
     throw error;
   }
 }
 
+/**
+ * Whether the missing-manifest warning has been logged. Every page reads the
+ * manifest (the footer does), so until one is published the fallback is the
+ * normal path and one warning per server process says so.
+ */
+let warnedMissingManifest = false;
+
+function warnMissingManifestOnce(): void {
+  if (warnedMissingManifest) return;
+  warnedMissingManifest = true;
+  console.warn(
+    `[docs] No ${MANIFEST_PATH} on ${MANIFEST_REF}, falling back to per-file fetches`,
+  );
+}
+
 async function loadDocsManifest(): Promise<DocsManifest | null> {
   const raw = await readManifest();
   if (raw === null) {
-    console.warn(
-      `[docs] No ${MANIFEST_PATH} on ${MANIFEST_REF}, falling back to per-file fetches`,
-    );
+    warnMissingManifestOnce();
     return null;
   }
   const manifest = JSON.parse(raw) as DocsManifest;
