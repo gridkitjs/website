@@ -4,5 +4,13 @@
     "description": "Reference and live examples for @gridkitjs/core, @gridkitjs/react, and @gridkitjs/theme-tailwind.",
     "intro": "GridKit is early: the API is still moving and may break between minor versions. These docs cover what's shipped today and run against the real, published packages.",
     "changelogCta": "See what's changed"
-  }
+  },
+  "error": {
+    "title": "This page didn't load",
+    "description": "Docs are fetched from GitHub, and that request failed. It's usually temporary: try again, or read the docs on GitHub in the meantime.",
+    "retry": "Try again",
+    "viewOnGithub": "Read on GitHub",
+    "digest": "Error ID: {digest}"
+  },
+  "loading": "Loading page"
 }

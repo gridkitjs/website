@@ -44,3 +44,6 @@ next-env.d.ts
 # extensions
 .history
 *.tmp*
+
+# Claude Code (plans, local state) - never committed, same as the gridkit repo
+.claude/

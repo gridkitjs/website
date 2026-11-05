@@ -17,6 +17,16 @@ function isValidSignature(
   );
 }
 
+/** The git ref the gridkit Action reports pushing, for the log line only. */
+function pushedRef(body: string): string {
+  try {
+    const { ref } = JSON.parse(body) as { ref?: unknown };
+    return typeof ref === "string" ? ref : "an unnamed ref";
+  } catch {
+    return "an unnamed ref";
+  }
+}
+
 /**
  * Called by the `gridkit` repo's `revalidate-docs` GitHub Action (or a native
  * GitHub webhook) after a push touching `packages/*\/docs`, so edits go live
@@ -27,6 +37,7 @@ function isValidSignature(
 export async function POST(request: Request) {
   const secret = process.env.DOCS_REVALIDATE_SECRET;
   if (!secret) {
+    console.error("[revalidate-docs] DOCS_REVALIDATE_SECRET is not configured");
     return NextResponse.json(
       { error: "DOCS_REVALIDATE_SECRET is not configured" },
       { status: 500 },
@@ -36,6 +47,7 @@ export async function POST(request: Request) {
   const signature = request.headers.get("x-hub-signature-256");
   const body = await request.text();
   if (!signature || !isValidSignature(body, signature, secret)) {
+    console.warn("[revalidate-docs] Rejected a request with a bad signature");
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
@@ -43,5 +55,8 @@ export async function POST(request: Request) {
   // immediate expiration rather than "max"'s stale-while-revalidate profile —
   // otherwise docs stay stale until a second visitor happens to hit the page.
   revalidateTag(DOCS_CACHE_TAG, { expire: 0 });
+  console.info(
+    `[revalidate-docs] Revalidated ${DOCS_CACHE_TAG} for ${pushedRef(body)}`,
+  );
   return NextResponse.json({ revalidated: true, tag: DOCS_CACHE_TAG });
 }

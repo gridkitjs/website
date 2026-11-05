@@ -9,12 +9,26 @@ const variantClasses = {
     "border border-site-line-inverted text-site-ink-inverted hover:bg-white/5",
 } as const;
 
+type ButtonVariant = keyof typeof variantClasses;
+
 interface ButtonProps {
   href: string;
   children: ReactNode;
-  variant?: keyof typeof variantClasses;
+  variant?: ButtonVariant;
   external?: boolean;
   className?: string;
+}
+
+/** The button look, for a `<button>` that acts rather than links. */
+export function buttonClasses(
+  variant: ButtonVariant = "primary",
+  className?: string,
+): string {
+  return cn(
+    "inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium transition-colors",
+    variantClasses[variant],
+    className,
+  );
 }
 
 export function Button({
@@ -24,11 +38,7 @@ export function Button({
   external = false,
   className,
 }: ButtonProps) {
-  const classes = cn(
-    "inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium transition-colors",
-    variantClasses[variant],
-    className,
-  );
+  const classes = buttonClasses(variant, className);
 
   if (external) {
     return (

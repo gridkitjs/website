@@ -1,7 +1,12 @@
 import "server-only";
 import { cache } from "react";
 import matter from "gray-matter";
-import { fetchRawFile, fetchRepoTree, type GithubTreeEntry } from "./github";
+import {
+  fetchRawFile,
+  fetchRepoTree,
+  isNotFound,
+  type GithubTreeEntry,
+} from "./github";
 import { PACKAGES as PACKAGE_REGISTRY } from "@/lib/packages";
 
 export interface DocPageNode {
@@ -41,13 +46,13 @@ export interface DocsTree {
 
 interface PackageConfig {
   slug: string;
-  title: string | undefined;
+  title: string;
   docsPath: string;
 }
 
 const PACKAGES: PackageConfig[] = PACKAGE_REGISTRY.map(({ slug, title }) => ({
   slug,
-  title,
+  title: title ?? titleCase(slug),
   docsPath: `packages/${slug}/docs`,
 }));
 
@@ -79,6 +84,38 @@ function sortByMeta<T extends { key: string }>(
   });
 }
 
+function isDefined<T>(value: T | undefined): value is T {
+  return value !== undefined;
+}
+
+/**
+ * Fetches and parses one docs file, or returns `undefined` when that file
+ * alone is bad: missing from raw.githubusercontent.com (its CDN can lag the
+ * tree) or unparseable. Those are logged and skipped so one broken file
+ * doesn't take down every page. Any other fetch failure (rate limit, outage)
+ * is rethrown, so ISR keeps serving the last good render instead of caching
+ * a tree with pages missing.
+ */
+async function readDocsFile<T>(
+  repoPath: string,
+  parse: (raw: string) => T,
+): Promise<T | undefined> {
+  let raw: string;
+  try {
+    raw = await fetchRawFile(repoPath);
+  } catch (error) {
+    if (!isNotFound(error)) throw error;
+    console.error(`[docs] Skipping ${repoPath}: not found`);
+    return undefined;
+  }
+  try {
+    return parse(raw);
+  } catch (error) {
+    console.error(`[docs] Skipping ${repoPath}: ${String(error)}`);
+    return undefined;
+  }
+}
+
 async function readMetaJson(
   entries: GithubTreeEntry[],
   dirPath: string,
@@ -88,21 +125,23 @@ async function readMetaJson(
     (entry) => entry.path === metaPath && entry.type === "blob",
   );
   if (!exists) return undefined;
-  return JSON.parse(await fetchRawFile(metaPath)) as MetaJson;
+  return readDocsFile(metaPath, (raw) => JSON.parse(raw) as MetaJson);
 }
 
-async function readDocPage(
+function readDocPage(
   repoPath: string,
   slug: string,
-): Promise<DocPageNode> {
-  const { data, content } = matter(await fetchRawFile(repoPath));
-  return {
-    slug,
-    title: typeof data.title === "string" ? data.title : slug,
-    description: typeof data.description === "string" ? data.description : "",
-    repoPath,
-    content,
-  };
+): Promise<DocPageNode | undefined> {
+  return readDocsFile(repoPath, (raw) => {
+    const { data, content } = matter(raw);
+    return {
+      slug,
+      title: typeof data.title === "string" ? data.title : slug,
+      description: typeof data.description === "string" ? data.description : "",
+      repoPath,
+      content,
+    };
+  });
 }
 
 async function buildSection(
@@ -136,14 +175,21 @@ async function buildSection(
   const pageEntries = await Promise.all(
     topLevelFiles.map(async (entry) => {
       const fileName = entry.path.slice(prefix.length).replace(/\.mdx$/, "");
+      const isOverview = fileName === "overview";
       // The package's overview page is the section's own root, e.g. /docs/core
-      // rather than /docs/core/overview.
-      const slug =
-        fileName === "overview" ? pkg.slug : `${pkg.slug}/${fileName}`;
-      return { key: fileName, page: await readDocPage(entry.path, slug) };
+      // rather than /docs/core/overview. Every package titles it "Overview",
+      // so name the package to keep the overview pages' titles distinct.
+      const slug = isOverview ? pkg.slug : `${pkg.slug}/${fileName}`;
+      const page = await readDocPage(entry.path, slug);
+      return (
+        page && {
+          key: fileName,
+          page: isOverview ? { ...page, title: `${pkg.title} overview` } : page,
+        }
+      );
     }),
   );
-  const pages = sortByMeta(pageEntries, rootMeta?.order).map(
+  const pages = sortByMeta(pageEntries.filter(isDefined), rootMeta?.order).map(
     (entry) => entry.page,
   );
 
@@ -162,15 +208,14 @@ async function buildSection(
           const fileName = entry.path
             .slice(groupPath.length + 1)
             .replace(/\.mdx$/, "");
-          return {
-            key: fileName,
-            page: await readDocPage(entry.path, `${pkg.slug}/${fileName}`),
-          };
+          const page = await readDocPage(entry.path, `${pkg.slug}/${fileName}`);
+          return page && { key: fileName, page };
         }),
       );
-      const groupPages = sortByMeta(groupPageEntries, groupMeta?.order).map(
-        (entry) => entry.page,
-      );
+      const groupPages = sortByMeta(
+        groupPageEntries.filter(isDefined),
+        groupMeta?.order,
+      ).map((entry) => entry.page);
       return {
         key: dir,
         title: groupMeta?.title ?? titleCase(dir),
@@ -183,7 +228,7 @@ async function buildSection(
   const overview = pages.find((page) => page.slug === pkg.slug);
   return {
     slug: pkg.slug,
-    title: pkg.title ?? titleCase(pkg.slug),
+    title: pkg.title,
     description: overview?.description ?? "",
     pages,
     groups,
@@ -194,7 +239,7 @@ async function loadDocsTree(): Promise<DocsTree> {
   const entries = await fetchRepoTree();
   const sections = (
     await Promise.all(PACKAGES.map((pkg) => buildSection(pkg, entries)))
-  ).filter((section): section is DocSectionNode => section != null);
+  ).filter(isDefined);
 
   const flat: DocPageNode[] = [];
   const bySlug: DocsTree["bySlug"] = new Map();

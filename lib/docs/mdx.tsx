@@ -3,6 +3,7 @@ import {
   cloneElement,
   isValidElement,
   type ComponentProps,
+  type ComponentType,
   type ReactElement,
   type ReactNode,
 } from "react";
@@ -11,8 +12,11 @@ import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { Link } from "@/i18n/navigation";
-import { CodeBlock } from "@/components/code/CodeBlock";
+import { bundledLanguages, type BundledLanguage } from "shiki";
+import { CodeBlock, type CodeLanguage } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
+import { ClientOnly } from "@/components/ui/ClientOnly";
+import { cn } from "@/components/ui/cn";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
 import { DataGridBasicExample } from "@/components/live-examples/DataGridBasicExample";
 import { StackblitzExample } from "@/components/live-examples/StackblitzExample";
@@ -23,7 +27,18 @@ import { EventsShowcaseExample } from "@/components/live-examples/EventsShowcase
 import { DarkModeExample } from "@/components/live-examples/DarkModeExample";
 import { CombinedSelectionExample } from "@/components/live-examples/CombinedSelectionExample";
 
-type CodeLang = "tsx" | "ts" | "css";
+function isBundledLanguage(lang: string): lang is BundledLanguage {
+  return Object.hasOwn(bundledLanguages, lang);
+}
+
+// Many `ts` fences in the gridkit docs hold JSX, which Shiki's `ts` grammar
+// mis-highlights; `tsx` is a superset, so plain TypeScript loses nothing.
+// A fence naming a language Shiki doesn't bundle renders as plain text.
+function fenceLanguage(className = ""): CodeLanguage {
+  const lang = /language-([\w-]+)/.exec(className)?.[1] ?? "tsx";
+  if (lang === "ts") return "tsx";
+  return isBundledLanguage(lang) ? lang : "text";
+}
 
 // MDX compiles fenced code blocks to <pre><code className="language-x">...</code></pre>;
 // route that through the site's Shiki-highlighted, copy-button CodeBlock instead.
@@ -32,19 +47,40 @@ async function Pre({
 }: {
   children: ReactElement<{ className?: string; children?: unknown }>;
 }) {
-  const lang = (/language-(\w+)/.exec(children.props.className ?? "")?.[1] ??
-    "ts") as CodeLang;
   const code = String(children.props.children).replace(/\n$/, "");
-  return <CodeBlock code={code} lang={lang} className="mt-4" />;
+  return (
+    <CodeBlock
+      code={code}
+      lang={fenceLanguage(children.props.className)}
+      className="mt-4"
+    />
+  );
 }
 
-// Internal links (docs content links to other /docs/... pages) go through
-// next-intl's Link so they pick up the current locale prefix.
-function A({ href = "", ...props }: ComponentProps<"a">) {
+const LINK_CLASS =
+  "text-site-ink decoration-site-accent hover:text-site-accent underline underline-offset-4 transition-colors";
+
+// Site-absolute links (docs content links to other /docs/... pages) go through
+// next-intl's Link so they pick up the current locale prefix. Only http(s)
+// links leave the site, so only they open a new tab; in-page `#anchor` and
+// relative links stay in this one.
+function A({ href = "", className, ...props }: ComponentProps<"a">) {
+  const linkClass = cn(LINK_CLASS, className);
   if (href.startsWith("/")) {
-    return <Link href={href} className="text-site-accent" {...props} />;
+    return <Link href={href} className={linkClass} {...props} />;
   }
-  return <a href={href} target="_blank" rel="noreferrer noopener" {...props} />;
+  if (/^https?:\/\//.test(href)) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={linkClass}
+        {...props}
+      />
+    );
+  }
+  return <a href={href} className={linkClass} {...props} />;
 }
 
 // GFM tables (e.g. props reference tables) styled to match the site's
@@ -141,6 +177,20 @@ function Tr(props: ComponentProps<"tr">) {
   return <tr className="last:[&>td]:border-b-0" {...props} />;
 }
 
+// @gridkitjs/react's DataGrid reads its stores through useSyncExternalStore
+// without a server snapshot, so prerendering it throws. Mount the grid
+// examples in the browser only until the package gives it one.
+function clientOnly(Example: ComponentType) {
+  function ClientOnlyExample() {
+    return (
+      <ClientOnly>
+        <Example />
+      </ClientOnly>
+    );
+  }
+  return ClientOnlyExample;
+}
+
 const mdxComponents = {
   pre: Pre,
   a: A,
@@ -153,13 +203,13 @@ const mdxComponents = {
   KbdGroup,
   LiveExampleFrame,
   StackblitzExample,
-  DataGridBasicExample,
-  DataGridResizeReorderExample,
-  ColumnTemplatesExample,
-  ColumnResizingExample,
-  EventsShowcaseExample,
-  DarkModeExample,
-  CombinedSelectionExample,
+  DataGridBasicExample: clientOnly(DataGridBasicExample),
+  DataGridResizeReorderExample: clientOnly(DataGridResizeReorderExample),
+  ColumnTemplatesExample: clientOnly(ColumnTemplatesExample),
+  ColumnResizingExample: clientOnly(ColumnResizingExample),
+  EventsShowcaseExample: clientOnly(EventsShowcaseExample),
+  DarkModeExample: clientOnly(DarkModeExample),
+  CombinedSelectionExample: clientOnly(CombinedSelectionExample),
 };
 
 /** Renders a doc page's MDX body (frontmatter already stripped by `gray-matter` in `lib/docs/source.ts`). */

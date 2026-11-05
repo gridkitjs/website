@@ -9,12 +9,16 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "update-gridkit": "npm i @gridkitjs/core@latest @gridkitjs/react@latest @gridkitjs/theme-tailwind@latest"
+    "update-gridkit": "npm i @gridkitjs/core@latest @gridkitjs/dom@latest @gridkitjs/react@latest @gridkitjs/theme-tailwind@latest @gridkitjs/export-xlsx@latest"
   },
   "dependencies": {
-    "@gridkitjs/core": "^0.10.0",
-    "@gridkitjs/react": "^0.9.0",
-    "@gridkitjs/theme-tailwind": "^0.7.0",
+    "@gridkitjs/core": "^0.13.0",
+    "@gridkitjs/dom": "^0.3.0",
+    "@gridkitjs/export-xlsx": "^0.1.0",
+    "@gridkitjs/react": "^0.12.0",
+    "@gridkitjs/theme-tailwind": "^0.9.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "clsx": "^2.1.1",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",

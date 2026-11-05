@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { defineColumnsFromRows } from "@gridkitjs/core";
-import { DataGridComponent, type ColumnDefinition } from "@gridkitjs/react";
+import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
 import { cn } from "@/components/ui/cn";
 
 const rows = [
@@ -33,7 +33,7 @@ function ThemeSwatch({
           className,
         )}
       >
-        <DataGridComponent
+        <DataGrid
           columns={columns}
           dataSource={rows}
           borders="all"

@@ -9,6 +9,7 @@ export async function SiteFooter() {
 
   const packages = [
     { name: "@gridkitjs/core", href: siteConfig.npm.core },
+    { name: "@gridkitjs/dom", href: siteConfig.npm.dom },
     { name: "@gridkitjs/react", href: siteConfig.npm.react },
     { name: "@gridkitjs/theme-tailwind", href: siteConfig.npm.themeTailwind },
     { name: "@gridkitjs/export-xlsx", href: siteConfig.npm.exportXlsx },
