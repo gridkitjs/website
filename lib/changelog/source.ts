@@ -1,6 +1,8 @@
 import "server-only";
 import { cache } from "react";
 import { fetchRawFile, isNotFound } from "@/lib/docs/github";
+import { getDocsManifest, type DocsManifest } from "@/lib/docs/manifest";
+import { npmPackageName } from "@/lib/packages/npm";
 import { PACKAGES } from "@/lib/packages";
 
 export interface ChangelogVersion {
@@ -12,8 +14,10 @@ export interface ChangelogVersion {
 export interface ChangelogSection {
   slug: string;
   title: string;
-  /** Path within the gridkit repo, for last-updated/edit-url lookups. */
+  /** Path within the gridkit repo, for the edit link. */
   repoPath: string;
+  /** The file's last commit date, so the latest version's; `null` when it isn't known. */
+  lastModified: Date | null;
   /** Every version, newest first — versions[0] is what /changelog/{slug} (no version segment) shows. */
   versions: ChangelogVersion[];
 }
@@ -35,34 +39,71 @@ function parseVersions(content: string): ChangelogVersion[] {
   });
 }
 
-function npmName(slug: string): string {
-  return `@gridkitjs/${slug}`;
+/**
+ * The fallback for when no manifest is published: one package's
+ * `CHANGELOG.md` from raw.githubusercontent.com, or `null` for a package that
+ * has never been released and so has none yet. Any other failure is rethrown
+ * so a GitHub blip isn't cached as a missing changelog.
+ */
+async function fetchChangelogFile(repoPath: string): Promise<string | null> {
+  try {
+    return await fetchRawFile(repoPath);
+  } catch (error) {
+    if (isNotFound(error)) return null;
+    throw error;
+  }
+}
+
+interface ChangelogFile {
+  body: string;
+  lastModified: Date | null;
+}
+
+/** A package's whole `CHANGELOG.md`, or `null` when it has none. */
+async function readChangelog(
+  manifest: DocsManifest | null,
+  slug: string,
+  repoPath: string,
+): Promise<ChangelogFile | null> {
+  if (!manifest) {
+    const body = await fetchChangelogFile(repoPath);
+    // Only the manifest carries commit dates.
+    return body === null ? null : { body, lastModified: null };
+  }
+  const changelog = manifest.packages[slug]?.changelog;
+  if (!changelog) return null;
+  return {
+    body: changelog.body,
+    lastModified: changelog.lastModified
+      ? new Date(changelog.lastModified)
+      : null,
+  };
 }
 
 async function buildSection(
   pkg: (typeof PACKAGES)[number],
+  manifest: DocsManifest | null,
 ): Promise<ChangelogSection | undefined> {
   const repoPath = `packages/${pkg.slug}/CHANGELOG.md`;
-  let content: string;
-  try {
-    content = await fetchRawFile(repoPath);
-  } catch (error) {
-    // A package that has never been released has no CHANGELOG.md yet. Any
-    // other failure is rethrown so a GitHub blip isn't cached as a missing
-    // changelog.
-    if (isNotFound(error)) return undefined;
-    throw error;
-  }
+  const changelog = await readChangelog(manifest, pkg.slug, repoPath);
+  if (changelog === null) return undefined;
 
-  const versions = parseVersions(content);
+  const versions = parseVersions(changelog.body);
   if (versions.length === 0) return undefined;
 
-  return { slug: pkg.slug, title: npmName(pkg.slug), repoPath, versions };
+  return {
+    slug: pkg.slug,
+    title: npmPackageName(pkg.slug),
+    repoPath,
+    lastModified: changelog.lastModified,
+    versions,
+  };
 }
 
 async function loadChangelogTree(): Promise<ChangelogTree> {
+  const manifest = await getDocsManifest();
   const sections = (
-    await Promise.all(PACKAGES.map((pkg) => buildSection(pkg)))
+    await Promise.all(PACKAGES.map((pkg) => buildSection(pkg, manifest)))
   ).filter((section): section is ChangelogSection => section != null);
 
   return { sections };

@@ -10,6 +10,10 @@
     "description": "Release notes for {package} v{version}."
   },
   "versionHeading": "{package} v{version}",
+  "released": "Released {date}",
+  "latest": "Latest",
+  "latestRelease": "v{version} · released {date}",
+  "viewOnNpm": "View on npm",
   "newerVersion": "Newer",
   "olderVersion": "Older",
   "viewDocs": "View docs for {package}"

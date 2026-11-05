@@ -93,27 +93,30 @@ export async function fetchRawFile(repoPath: string): Promise<string> {
   return res.text();
 }
 
+/**
+ * The raw content of `repoPath` at `ref` through the contents API. Unlike
+ * raw.githubusercontent.com, the API isn't behind a CDN, so it serves a push
+ * the moment it lands; it costs one call against the rate limit. The raw
+ * media type is what lets it return files over the JSON response's 1 MB cap.
+ */
+export async function fetchFileFromApi(
+  repoPath: string,
+  ref: string,
+): Promise<string> {
+  const res = await fetchFromGithub(
+    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${repoPath}?ref=${encodeURIComponent(ref)}`,
+    `${repoPath}@${ref}`,
+    "application/vnd.github.raw+json",
+  );
+  return res.text();
+}
+
 /** The GitHub URL for editing `repoPath` directly, e.g. via github.dev's web editor. */
 export function getEditUrl(repoPath: string): string {
   return `https://github.com/${OWNER}/${REPO}/edit/${BRANCH}/${repoPath}`;
 }
 
-/**
- * The commit date of the last change to `repoPath`, or `null` if it has no
- * history (e.g. a new file not yet pushed). Throws on a failed request rather
- * than returning `null`, so a rate limit isn't cached as "never updated".
- */
-export async function fetchLastCommitDate(
-  repoPath: string,
-): Promise<Date | null> {
-  const res = await fetchFromGithub(
-    `https://api.github.com/repos/${OWNER}/${REPO}/commits?path=${encodeURIComponent(repoPath)}&sha=${BRANCH}&per_page=1`,
-    `the commit history of ${repoPath}`,
-    "application/vnd.github+json",
-  );
-  const commits = (await res.json()) as Array<{
-    commit: { committer: { date: string } | null };
-  }>;
-  const date = commits[0]?.commit.committer?.date;
-  return date ? new Date(date) : null;
+/** The GitHub URL of a commit in the docs repo. */
+export function getCommitUrl(sha: string): string {
+  return `https://github.com/${OWNER}/${REPO}/commit/${sha}`;
 }

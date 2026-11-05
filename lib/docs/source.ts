@@ -1,12 +1,8 @@
 import "server-only";
 import { cache } from "react";
 import matter from "gray-matter";
-import {
-  fetchRawFile,
-  fetchRepoTree,
-  isNotFound,
-  type GithubTreeEntry,
-} from "./github";
+import { fetchRawFile, fetchRepoTree, isNotFound } from "./github";
+import { getDocsManifest, type DocsManifest } from "./manifest";
 import { PACKAGES as PACKAGE_REGISTRY } from "@/lib/packages";
 
 export interface DocPageNode {
@@ -14,10 +10,12 @@ export interface DocPageNode {
   slug: string;
   title: string;
   description: string;
-  /** Path within the gridkit repo, for last-updated lookups. */
+  /** Path within the gridkit repo, for the edit link. */
   repoPath: string;
   /** MDX body with frontmatter already stripped. */
   content: string;
+  /** The file's last commit date; `null` when it isn't known. */
+  lastModified: Date | null;
 }
 
 export interface DocGroupNode {
@@ -59,6 +57,21 @@ const PACKAGES: PackageConfig[] = PACKAGE_REGISTRY.map(({ slug, title }) => ({
 interface MetaJson {
   title?: string;
   order?: string[];
+}
+
+/** One `.mdx` page as read from GitHub, before it has a place in the tree. */
+interface DocsFile {
+  repoPath: string;
+  title: string | null;
+  description: string | null;
+  content: string;
+  lastModified: Date | null;
+}
+
+/** What the tree is built from: every page, and every `_meta.json` keyed by its folder's repo path. */
+interface DocsSource {
+  files: DocsFile[];
+  meta: Map<string, MetaJson>;
 }
 
 function titleCase(key: string): string {
@@ -116,104 +129,147 @@ async function readDocsFile<T>(
   }
 }
 
-async function readMetaJson(
-  entries: GithubTreeEntry[],
-  dirPath: string,
-): Promise<MetaJson | undefined> {
-  const metaPath = `${dirPath}/_meta.json`;
-  const exists = entries.some(
-    (entry) => entry.path === metaPath && entry.type === "blob",
-  );
-  if (!exists) return undefined;
-  return readDocsFile(metaPath, (raw) => JSON.parse(raw) as MetaJson);
+function parseDocsFile(repoPath: string, raw: string): DocsFile {
+  const { data, content } = matter(raw);
+  return {
+    repoPath,
+    title: typeof data.title === "string" ? data.title : null,
+    description: typeof data.description === "string" ? data.description : null,
+    content,
+    // Only the manifest carries commit dates.
+    lastModified: null,
+  };
 }
 
-function readDocPage(
-  repoPath: string,
-  slug: string,
-): Promise<DocPageNode | undefined> {
-  return readDocsFile(repoPath, (raw) => {
-    const { data, content } = matter(raw);
-    return {
-      slug,
-      title: typeof data.title === "string" ? data.title : slug,
-      description: typeof data.description === "string" ? data.description : "",
-      repoPath,
-      content,
-    };
-  });
+function folderOf(repoPath: string): string {
+  return repoPath.slice(0, repoPath.lastIndexOf("/"));
 }
 
-async function buildSection(
+/**
+ * The fallback for when no manifest is published: the repo tree, then every
+ * docs file one by one from raw.githubusercontent.com — ~57 requests, and its
+ * CDN can serve a file from before the push that triggered the refetch.
+ */
+async function loadDocsSourceFileByFile(): Promise<DocsSource> {
+  const entries = await fetchRepoTree();
+  const docsPaths = entries
+    .filter(
+      (entry) =>
+        entry.type === "blob" &&
+        PACKAGES.some((pkg) => entry.path.startsWith(`${pkg.docsPath}/`)),
+    )
+    .map((entry) => entry.path);
+
+  const [files, metaEntries] = await Promise.all([
+    Promise.all(
+      docsPaths
+        .filter((path) => path.endsWith(".mdx"))
+        .map((path) => readDocsFile(path, (raw) => parseDocsFile(path, raw))),
+    ),
+    Promise.all(
+      docsPaths
+        .filter((path) => path.endsWith("/_meta.json"))
+        .map(async (path) => {
+          const meta = await readDocsFile(
+            path,
+            (raw) => JSON.parse(raw) as MetaJson,
+          );
+          return meta && ([folderOf(path), meta] as const);
+        }),
+    ),
+  ]);
+  return {
+    files: files.filter(isDefined),
+    meta: new Map(metaEntries.filter(isDefined)),
+  };
+}
+
+function docsSourceFromManifest(manifest: DocsManifest): DocsSource {
+  return {
+    files: manifest.docs.map((doc) => ({
+      repoPath: doc.repoPath,
+      title: doc.title,
+      description: doc.description,
+      content: doc.body,
+      lastModified: doc.lastModified ? new Date(doc.lastModified) : null,
+    })),
+    meta: new Map(Object.entries(manifest.meta)),
+  };
+}
+
+async function loadDocsSource(): Promise<DocsSource> {
+  const manifest = await getDocsManifest();
+  return manifest
+    ? docsSourceFromManifest(manifest)
+    : loadDocsSourceFileByFile();
+}
+
+function toPageNode(file: DocsFile, slug: string): DocPageNode {
+  return {
+    slug,
+    title: file.title ?? slug,
+    description: file.description ?? "",
+    repoPath: file.repoPath,
+    content: file.content,
+    lastModified: file.lastModified,
+  };
+}
+
+function buildSection(
   pkg: PackageConfig,
-  entries: GithubTreeEntry[],
-): Promise<DocSectionNode | undefined> {
+  { files, meta }: DocsSource,
+): DocSectionNode | undefined {
   const prefix = `${pkg.docsPath}/`;
-  const scoped = entries.filter((entry) => entry.path.startsWith(prefix));
+  const scoped = files.filter((file) => file.repoPath.startsWith(prefix));
   if (scoped.length === 0) return undefined;
 
-  const rootMeta = await readMetaJson(entries, pkg.docsPath);
+  const relativePath = (file: DocsFile) => file.repoPath.slice(prefix.length);
+  const rootOrder = meta.get(pkg.docsPath)?.order;
 
-  const topLevelFiles = scoped.filter(
-    (entry) =>
-      entry.type === "blob" &&
-      entry.path.endsWith(".mdx") &&
-      !entry.path.slice(prefix.length).includes("/"),
-  );
+  const pages = sortByMeta(
+    scoped
+      .filter((file) => !relativePath(file).includes("/"))
+      .map((file) => {
+        const fileName = relativePath(file).replace(/\.mdx$/, "");
+        const isOverview = fileName === "overview";
+        // The package's overview page is the section's own root, e.g.
+        // /docs/core rather than /docs/core/overview. Every package titles it
+        // "Overview", so name the package to keep the overview pages' titles
+        // distinct.
+        const slug = isOverview ? pkg.slug : `${pkg.slug}/${fileName}`;
+        const page = toPageNode(file, slug);
+        return {
+          key: fileName,
+          page: isOverview ? { ...page, title: `${pkg.title} overview` } : page,
+        };
+      }),
+    rootOrder,
+  ).map((entry) => entry.page);
+
   const groupDirs = [
     ...new Set(
       scoped
-        .filter(
-          (entry) =>
-            entry.type === "blob" &&
-            entry.path.slice(prefix.length).includes("/"),
-        )
-        .map((entry) => entry.path.slice(prefix.length).split("/")[0]),
+        .map(relativePath)
+        .filter((path) => path.includes("/"))
+        .map((path) => path.split("/")[0]),
     ),
   ];
-
-  const pageEntries = await Promise.all(
-    topLevelFiles.map(async (entry) => {
-      const fileName = entry.path.slice(prefix.length).replace(/\.mdx$/, "");
-      const isOverview = fileName === "overview";
-      // The package's overview page is the section's own root, e.g. /docs/core
-      // rather than /docs/core/overview. Every package titles it "Overview",
-      // so name the package to keep the overview pages' titles distinct.
-      const slug = isOverview ? pkg.slug : `${pkg.slug}/${fileName}`;
-      const page = await readDocPage(entry.path, slug);
-      return (
-        page && {
-          key: fileName,
-          page: isOverview ? { ...page, title: `${pkg.title} overview` } : page,
-        }
-      );
-    }),
-  );
-  const pages = sortByMeta(pageEntries.filter(isDefined), rootMeta?.order).map(
-    (entry) => entry.page,
-  );
-
-  const groupEntries = await Promise.all(
-    groupDirs.map(async (dir) => {
+  const groups = sortByMeta(
+    groupDirs.map((dir) => {
       const groupPath = `${pkg.docsPath}/${dir}`;
-      const groupMeta = await readMetaJson(entries, groupPath);
-      const files = scoped.filter(
-        (entry) =>
-          entry.type === "blob" &&
-          entry.path.startsWith(`${groupPath}/`) &&
-          entry.path.endsWith(".mdx"),
-      );
-      const groupPageEntries = await Promise.all(
-        files.map(async (entry) => {
-          const fileName = entry.path
-            .slice(groupPath.length + 1)
-            .replace(/\.mdx$/, "");
-          const page = await readDocPage(entry.path, `${pkg.slug}/${fileName}`);
-          return page && { key: fileName, page };
-        }),
-      );
+      const groupMeta = meta.get(groupPath);
       const groupPages = sortByMeta(
-        groupPageEntries.filter(isDefined),
+        scoped
+          .filter((file) => file.repoPath.startsWith(`${groupPath}/`))
+          .map((file) => {
+            const fileName = file.repoPath
+              .slice(groupPath.length + 1)
+              .replace(/\.mdx$/, "");
+            return {
+              key: fileName,
+              page: toPageNode(file, `${pkg.slug}/${fileName}`),
+            };
+          }),
         groupMeta?.order,
       ).map((entry) => entry.page);
       return {
@@ -222,8 +278,8 @@ async function buildSection(
         pages: groupPages,
       };
     }),
+    rootOrder,
   );
-  const groups = sortByMeta(groupEntries, rootMeta?.order);
 
   const overview = pages.find((page) => page.slug === pkg.slug);
   return {
@@ -236,10 +292,10 @@ async function buildSection(
 }
 
 async function loadDocsTree(): Promise<DocsTree> {
-  const entries = await fetchRepoTree();
-  const sections = (
-    await Promise.all(PACKAGES.map((pkg) => buildSection(pkg, entries)))
-  ).filter(isDefined);
+  const source = await loadDocsSource();
+  const sections = PACKAGES.map((pkg) => buildSection(pkg, source)).filter(
+    isDefined,
+  );
 
   const flat: DocPageNode[] = [];
   const bySlug: DocsTree["bySlug"] = new Map();
@@ -261,8 +317,8 @@ async function loadDocsTree(): Promise<DocsTree> {
 
 /**
  * The full docs tree. Memoized per-request with React's `cache()` so the
- * sidebar, breadcrumbs, prev/next, and page body all share one fetch —
- * cross-request freshness is handled by `fetchRepoTree`/`fetchRawFile`'s own
- * Next `fetch` cache (`DOCS_CACHE_TAG`), not by this memoization.
+ * sidebar, breadcrumbs, prev/next, and page body all share one build;
+ * cross-request freshness is the Next `fetch` cache's job (see
+ * `getDocsManifest`), not this memoization's.
  */
 export const getDocsTree = cache(loadDocsTree);
