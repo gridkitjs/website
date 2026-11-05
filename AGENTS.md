@@ -83,8 +83,9 @@ npm run dev      # http://localhost:3000
 ```
 
 Requires `.env` (copy from `.env.example`) for the GitHub-fetch config.
-Without `GITHUB_TOKEN`, GitHub's unauthenticated rate limit (60 req/hr) is
-easy to hit while iterating on `lib/docs/`; set it for local dev.
+`GITHUB_TOKEN` is required for `npm run build`, which fetches every page
+and its commit history, more than GitHub's unauthenticated rate limit (60
+req/hr) allows; set it for local dev too.
 
 `npm run update-gridkit` moves all five `@gridkitjs/*` packages (`core`,
 `dom`, `react`, `theme-tailwind`, `export-xlsx`) to their `latest` releases.
