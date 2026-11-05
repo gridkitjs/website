@@ -33,5 +33,6 @@
     "light": "light",
     "dark": "dark",
     "system": "system"
-  }
+  },
+  "wrapLines": "Wrap long lines"
 }

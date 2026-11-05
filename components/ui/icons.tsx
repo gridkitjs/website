@@ -292,3 +292,21 @@ export function ArrowRightIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function WrapIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M3 6h18M3 12h15a3 3 0 0 1 0 6h-4M3 18h7" />
+      <path d="m16 16-2 2 2 2" />
+    </svg>
+  );
+}

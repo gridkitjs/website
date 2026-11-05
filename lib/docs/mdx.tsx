@@ -11,7 +11,9 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { rehypeCodeMeta } from "./rehype-code-meta";
 import { bundledLanguages, type BundledLanguage } from "shiki";
+import { parseMetaHighlightString } from "@shikijs/transformers";
 import { CodeBlock, type CodeLanguage } from "@/components/code/CodeBlock";
 import { Callout } from "@/components/docs/Callout";
 import { DocLink } from "@/components/docs/DocLink";
@@ -44,18 +46,35 @@ function fenceLanguage(className = ""): CodeLanguage {
   return isBundledLanguage(lang) ? lang : "text";
 }
 
+/**
+ * Reads a fence's meta string, ```` ```tsx title="App.tsx" {1,3-5} showLineNumbers wrap ````:
+ * a title bar, lines to highlight, line numbers, and lines wrapped from the start.
+ */
+function parseFenceMeta(meta = "") {
+  return {
+    title: /\btitle=(["'])(.*?)\1/.exec(meta)?.[2],
+    highlightLines: parseMetaHighlightString(meta) ?? [],
+    showLineNumbers: /(?:^|\s)showLineNumbers(?:\s|$)/.test(meta),
+    wrap: /(?:^|\s)wrap(?:\s|$)/.test(meta),
+  };
+}
+
 // MDX compiles fenced code blocks to <pre><code className="language-x">...</code></pre>;
 // route that through the site's Shiki-highlighted, copy-button CodeBlock instead.
+// `data-meta` is the fence's meta string, put there by rehypeCodeMeta.
 async function Pre({
   children,
+  "data-meta": meta,
 }: {
   children: ReactElement<{ className?: string; children?: unknown }>;
+  "data-meta"?: string;
 }) {
   const code = String(children.props.children).replace(/\n$/, "");
   return (
     <CodeBlock
       code={code}
       lang={fenceLanguage(children.props.className)}
+      {...parseFenceMeta(meta)}
       className="mt-4"
     />
   );
@@ -212,6 +231,7 @@ export function DocContent({ source }: { source: string }) {
         mdxOptions: {
           remarkPlugins: [remarkGfm],
           rehypePlugins: [
+            rehypeCodeMeta,
             rehypeSlug,
             [
               rehypeAutolinkHeadings,
