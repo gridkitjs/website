@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { defineColumnsFromRows } from "@gridkitjs/core";
 import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
 import { cn } from "@/components/ui/cn";
@@ -44,22 +44,23 @@ function ThemeSwatch({
   );
 }
 
-const THEMES = ["light", "dark"] as const;
-
 /**
- * A `.dark` toggle on `<html>` is the real integration (see the snippet
- * below the frame this mounts in) — nothing on this site reads `dark:` yet,
- * so it only affects the grids here.
+ * Stands in for an app's theme by pinning a wrapper around all three grids,
+ * rather than toggling `.dark` on `<html>`, which belongs to the site's own
+ * theme toggle. The first grid follows the wrapper; the other two keep their
+ * own, closer pin.
  */
-export function DarkModeExample() {
-  const [appTheme, setAppTheme] = useState<(typeof THEMES)[number]>("light");
+const APP_THEME_CLASSES = {
+  light: "gridkit-light",
+  dark: "gridkit-dark",
+} as const;
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", appTheme === "dark");
-    return () => {
-      document.documentElement.classList.remove("dark");
-    };
-  }, [appTheme]);
+type AppTheme = keyof typeof APP_THEME_CLASSES;
+
+const APP_THEMES: readonly AppTheme[] = ["light", "dark"];
+
+export function DarkModeExample() {
+  const [appTheme, setAppTheme] = useState<AppTheme>("light");
 
   return (
     <div>
@@ -68,17 +69,18 @@ export function DarkModeExample() {
           App theme:
         </span>
         <div className="border-site-line inline-flex overflow-hidden rounded-lg border text-xs">
-          {THEMES.map((theme) => (
+          {APP_THEMES.map((theme) => (
             <button
               key={theme}
               type="button"
+              aria-pressed={appTheme === theme}
               onClick={() => {
                 setAppTheme(theme);
               }}
               className={cn(
                 "px-3 py-1.5 capitalize transition-colors",
                 appTheme === theme
-                  ? "bg-site-accent text-white"
+                  ? "bg-site-accent text-site-accent-ink"
                   : "text-site-ink hover:bg-site-surface",
               )}
             >
@@ -88,7 +90,12 @@ export function DarkModeExample() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-4 sm:grid-cols-3",
+          APP_THEME_CLASSES[appTheme],
+        )}
+      >
         <ThemeSwatch caption="Follows app theme" />
         <ThemeSwatch caption=".gridkit-light" className="gridkit-light" />
         <ThemeSwatch caption=".gridkit-dark" className="gridkit-dark" />

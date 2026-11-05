@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { GitHubIcon } from "@/components/ui/icons";
 import { siteConfig } from "@/lib/seo/site-config";
 import { HeaderNav } from "./HeaderNav";
+import { ThemeToggle } from "./ThemeToggle";
 
 export async function SiteHeader() {
   const t = await getTranslations("common.nav");
@@ -41,6 +42,7 @@ export async function SiteHeader() {
             >
               <GitHubIcon className="size-5" />
             </a>
+            <ThemeToggle />
           </div>
         </nav>
       </Container>

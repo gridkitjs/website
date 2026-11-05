@@ -3,10 +3,10 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "./cn";
 
 const variantClasses = {
-  primary: "bg-site-accent text-white hover:opacity-90",
+  primary: "bg-site-accent text-site-accent-ink hover:bg-site-accent-hover",
   secondary: "border border-site-line text-site-ink hover:bg-site-surface",
   "secondary-inverted":
-    "border border-site-line-inverted text-site-ink-inverted hover:bg-white/5",
+    "border border-site-line-inverted text-site-ink-inverted hover:bg-site-surface-inverted",
 } as const;
 
 type ButtonVariant = keyof typeof variantClasses;

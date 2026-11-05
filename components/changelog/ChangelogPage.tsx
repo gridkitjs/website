@@ -58,14 +58,14 @@ export async function ChangelogPage({
           href={editUrl}
           target="_blank"
           rel="noreferrer"
-          className="text-site-ink-muted hover:text-site-accent inline-flex items-center gap-1.5"
+          className="text-site-ink-muted hover:text-site-accent inline-flex items-center gap-1.5 transition-colors"
         >
           <GitHubIcon className="h-4 w-4" />
           {t("editOnGithub")}
         </a>
         <Link
           href={docsHref}
-          className="text-site-ink-muted hover:text-site-accent"
+          className="text-site-ink-muted hover:text-site-accent transition-colors"
         >
           {tChangelog("viewDocs", { package: packageTitle })}
         </Link>
