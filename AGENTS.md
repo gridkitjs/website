@@ -25,8 +25,8 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 | `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`. |
 | `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                                                                                                    |
 | `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                   |
-| `components/code/`                          | `CodeBlock` (Shiki highlighting) and `CopyButton`, used by the MDX `pre` override.                                                                                                            |
-| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), MDX renderer (`mdx.tsx`).                                                           |
+| `components/code/`                          | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override.                                                                      |
+| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`).                                    |
 | `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                                                                                                  |
 | `lib/packages/`                             | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                      |
 | `lib/seo/`                                  | Metadata builders and site-wide constants (canonical URL, social image, etc).                                                                                                                 |
@@ -185,7 +185,38 @@ runs; add a new published package to the script when `gridkit` ships one.
   primitive like `<Kbd>`) are registered in exactly one place —
   `mdxComponents` in `lib/docs/mdx.tsx`. Adding the component file without
   registering it there means `.mdx` content using it 404s silently into
-  literal text.
+  literal text. `npm run build` first runs `scripts/export-mdx-tags.mjs`
+  (`prebuild`), which reads that object's capitalised keys and writes
+  `public/mdx-tags.json`, served at `/mdx-tags.json`. `gridkit`'s docs check
+  fetches it from the deployed site and fails on any tag the docs use that
+  isn't listed. It is a build output, so it is gitignored; run the script by
+  hand to see it locally.
+- **Doc-content primitives** (`components/docs/`) give authors what they
+  used to fake with headings. next-mdx-remote runs with `blockJS: true`, so
+  every prop is a string — a flag is `dev="true"`, never `dev={true}`:
+  - `<Callout type="note|tip|warning|breaking" title="…">` — a boxed aside;
+    children are the content. `type` defaults to `note` (so does an unknown
+    one); without `title` the heading is the type's label, from
+    `messages/en/docs.json` (`content.callout`) like other site chrome.
+  - `<PackageInstall pkg="@gridkitjs/react @gridkitjs/theme-tailwind" dev="true" />`
+    — the install command with npm/pnpm/yarn/bun tabs and a copy button.
+    The choice is shared by every block and kept in
+    `localStorage["gk-pm"]` (`usePackageManager`); `dev` is optional.
+  - `<Since v="0.12.0" pkg="react" />` — an inline "since version" badge;
+    `pkg` (the package without its scope) is optional.
+  - `<LinkCards>` holding `<LinkCard href="/docs/…" title="…" description="…" />`
+    — a two-column grid of link cards, e.g. a page's next steps.
+    `description` is optional; `href` routes like a prose link.
+- **Code fences** take meta after the language, forwarded to `Pre` by
+  `lib/docs/rehype-code-meta.ts` and read by `parseFenceMeta` in `mdx.tsx`:
+  `title="App.tsx"` (a title bar), `{1,3-5}` (highlight lines),
+  `showLineNumbers`, and `wrap` (lines start wrapped). In the code itself,
+  Shiki's notation comments `// [!code highlight]`, `// [!code ++]`,
+  `// [!code --]` and `// [!code focus]` mark single lines; they are
+  stripped from the output and from what the copy button copies, which
+  also leaves out removed diff lines. `CodeFrame` adds a wrap toggle beside
+  the copy button whenever a line overflows. The line styles live in
+  `globals.css` under `.code-block`.
 - **Live examples** (`components/live-examples/`) are `"use client"`
   components that mount a real `DataGrid` against shared fixtures
   (`fixtures.ts`). Keep one example per interaction being demonstrated
@@ -195,9 +226,10 @@ runs; add a new published package to the script when `gridkit` ships one.
   `@gridkitjs/react`'s `DataGrid` has no server snapshot for its stores, so
   prerendering it fails the build.
 - **Internal links inside MDX** must go through `next-intl`'s `Link` (see
-  the `A` override in `lib/docs/mdx.tsx`) so they carry the current locale
-  prefix. In-page `#anchor` and relative links get a plain `<a>` in the same
-  tab; only `http(s)://` links open a new tab.
+  `DocLink` in `components/docs/`, behind both the `A` override and
+  `LinkCard`) so they carry the current locale prefix. In-page `#anchor`
+  and relative links get a plain `<a>` in the same tab; only `http(s)://`
+  links open a new tab.
 
 ## i18n
 
