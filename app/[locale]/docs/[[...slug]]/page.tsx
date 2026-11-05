@@ -15,6 +15,7 @@ import {
 import type { PrevNextEntry } from "@/components/ui/PrevNextNav";
 import { getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { PACKAGES } from "@/lib/packages";
 import { JsonLd, techArticleJsonLd } from "@/lib/json-ld";
 
 /** A prev/next card, naming the page's section when it isn't `current`. */
@@ -68,9 +69,11 @@ export async function generateMetadata({
   const entry = tree.bySlug.get(path);
   if (!entry) return {};
 
+  // A package overview is a hub page, with a search snippet written for it.
+  const overview = PACKAGES.find((pkg) => pkg.slug === path);
   return buildMetadata({
     title: entry.page.title,
-    description: entry.page.description,
+    description: overview?.description ?? entry.page.description,
     path: `docs/${path}`,
     locale,
   });
