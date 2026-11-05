@@ -101,7 +101,7 @@ export async function generateMetadata({
       package: resolved.section.title,
       version: resolved.version.version,
     }),
-    path,
+    path: `changelog/${path}`,
     locale,
     image: `og/changelog/${path}`,
   });
@@ -229,7 +229,7 @@ export default async function ChangelogSlugPage({
       <JsonLd
         data={techArticleJsonLd({
           locale,
-          path,
+          path: `changelog/${path}`,
           title,
           description,
           dateModified: lastUpdated,
