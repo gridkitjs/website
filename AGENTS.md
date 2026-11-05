@@ -22,7 +22,7 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 | `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                                                                                        |
 | `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                                                                                   |
 | `app/api/search-index`                      | The docs search index as JSON (`lib/docs/search-index.ts`), prerendered and revalidated with the docs.                                                                                        |
-| `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                                                                                                                 |
+| `components/live-examples/`                 | `DataGrid` demos, one `<area>/<Name>.example.tsx` each, and their fixtures; registered via `lib/docs/examples.ts` (see **Live examples**).                                                    |
 | `components/search/`                        | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).              |
 | `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`. |
 | `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                                                                                                    |
@@ -201,12 +201,15 @@ runs; add a new published package to the script when `gridkit` ships one.
   class, `...props` spread last so a caller can still override anything.
   See `components/ui/Button.tsx` and `components/ui/Kbd.tsx` as the
   reference shape for new `ui/` components.
-- **New MDX-exposed components** (a new live example, a new doc-content
-  primitive like `<Kbd>`) are registered in exactly one place —
-  `mdxComponents` in `lib/docs/mdx.tsx`. Adding the component file without
-  registering it there means `.mdx` content using it 404s silently into
-  literal text. `npm run build` first runs `scripts/export-mdx-tags.mjs`
-  (`prebuild`), which reads that object's capitalised keys and writes
+- **New MDX-exposed components** (a new doc-content primitive like
+  `<Kbd>`) are registered in exactly one place — `mdxComponents` in
+  `lib/docs/mdx.tsx`. Adding the component file without registering it
+  there means `.mdx` content using it 404s silently into literal text. Live
+  examples are the exception: they reach `mdxComponents` through
+  `...exampleTags`, generated from their files (see **Live examples**).
+  `npm run build` first runs `scripts/export-mdx-tags.mjs` (`prebuild`),
+  which reads that object's capitalised keys, plus the example tags from
+  `lib/docs/example-sources.generated.ts`, and writes
   `public/mdx-tags.json`, served at `/mdx-tags.json`. `gridkit`'s docs check
   fetches it from the deployed site and fails on any tag the docs use that
   isn't listed. It is a build output, so it is gitignored; run the script by
@@ -237,14 +240,58 @@ runs; add a new published package to the script when `gridkit` ships one.
   also leaves out removed diff lines. `CodeFrame` adds a wrap toggle beside
   the copy button whenever a line overflows. The line styles live in
   `globals.css` under `.code-block`.
-- **Live examples** (`components/live-examples/`) are `"use client"`
-  components that mount a real `DataGrid` against shared fixtures
-  (`fixtures.ts`). Keep one example per interaction being demonstrated
-  (sorting, resizing, selection, …) rather than one large kitchen-sink grid
-  — the doc page picks the example that matches the section it's in.
-  Register a grid example as `clientOnly(Example)` in `mdxComponents`:
-  `@gridkitjs/react`'s `DataGrid` has no server snapshot for its stores, so
-  prerendering it fails the build.
+- **Live examples** mount a real `DataGrid` inside a frame with Preview and
+  Code tabs, Reset and "Open in StackBlitz". Keep one example per
+  interaction being demonstrated (sorting, resizing, selection, …) rather
+  than one large kitchen-sink grid; the doc page picks the example that
+  matches the section it's in.
+  - **One file each**: `components/live-examples/<area>/<Name>.example.tsx`,
+    `<area>` one of `grid`, `columns`, `rows`, `selection`, `data`. It
+    starts with `"use client"`, exports a component named `<Name>`
+    (PascalCase, by convention ending in `Example`), and exports
+    `meta: ExampleMeta`
+    (`components/live-examples/meta.ts`): `id` (unique kebab-case),
+    `title`, `description` (one sentence on what to try), optional
+    `minHeight` (px, the example's rendered height, reserved until it
+    mounts) and optional `stackblitz` (an `examples/<path>` project in
+    `gridkit` to open instead of one built from the source). `meta` values
+    must be literals: the generator reads them from the source text. Data
+    comes from `fixtures.ts` (`deploymentRows`, five rows; `makeRows(n)`,
+    any number of deterministic rows; `mockLoadMore(page, size)`, a paged
+    loader with a fixed delay); never `Math.random` or `Date`, so server
+    and client agree. Controls live inside the example (`blockJS` allows no
+    props).
+  - **Generated sources**: `scripts/gen-example-sources.mjs` (run by
+    `predev` and `prebuild`) writes `lib/docs/example-sources.generated.ts`,
+    which is committed so `tsc` works without it: per tag, the component,
+    `meta`, the source the Code tab shows, and the local files and package
+    versions a StackBlitz project needs. The shown source drops
+    `"use client"`, `meta` and its import, and rewrites local imports
+    (`../fixtures`, `@/components/ui/cn`) to `./<file>`, as they sit in the
+    project. It fails on a missing `meta` field, a duplicate `id`, a file
+    without its named component, or a package `package.json` lacks. Rerun
+    it (or restart `npm run dev`) after editing an example, and commit the
+    result.
+  - **Registry**: `lib/docs/examples.ts` exposes the generated entries by
+    tag, and `mdx.tsx` turns each into an MDX tag that renders the example
+    in its own `LiveExampleFrame`, inside `ClientOnly`:
+    `@gridkitjs/react`'s `DataGrid` has no server snapshot for its stores,
+    so prerendering it fails the build. A doc page writes `<Name />`, or
+    `<Name title="…" />` to override `meta.title`. A bare
+    `<LiveExampleFrame title="…">` around a registered example passes its
+    title on rather than framing it twice; around anything else (such as
+    `<StackblitzExample>`) it is a plain frame.
+  - **Frame**: `LiveExampleFrame` (server) highlights the source with
+    `CodeBlock` and hands it to `ExampleTabs` (client), which owns the
+    tabs (arrow keys, Home and End), Reset (a `key` remount) and
+    StackBlitz: `components/live-examples/stackblitz.ts` builds a Vite
+    project from the source with `@stackblitz/sdk` `openProject`, or links
+    to `meta.stackblitz`. Its strings are `content.example` in
+    `messages/en/docs.json`.
+  - **Adding one**: write the file, run
+    `node scripts/gen-example-sources.mjs`, commit both, and use `<Name />`
+    in a `gridkit` doc page (preview it with `DOCS_MANIFEST_FILE`, above).
+    Nothing else registers it.
 - **Internal links inside MDX** must go through `next-intl`'s `Link` (see
   `DocLink` in `components/docs/`, behind both the `A` override and
   `LinkCard`) so they carry the current locale prefix. In-page `#anchor`
