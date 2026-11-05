@@ -102,8 +102,29 @@ runs; add a new published package to the script when `gridkit` ships one.
   `text-site-ink`, `border-site-line`, …) — **use the token utilities, not
   raw Tailwind palette classes** (`bg-slate-50`), so a palette change is a
   one-line edit in `globals.css` rather than a repo-wide find/replace.
-  `-inverted` variants exist for dark surfaces (e.g. the footer); reach for
+  The set: surfaces `bg`, `surface`, `surface-raised`; text `ink`,
+  `ink-muted`, `ink-faint` (decorative only, below AA); lines `line`,
+  `line-strong`; `accent`, `accent-hover`, `accent-soft` and `accent-ink`
+  (text on an accent fill — never `text-white`); states `success`,
+  `warning`, `danger`, `info`, each with a `-soft` background; code
+  `code-bg`, `code-border`, `code-inline-bg`; `focus-ring`; and radii
+  `rounded-site-sm`/`rounded-site` (4px/6px). Inverted surfaces — hero, CTA,
+  footer — use the `-inverted` tokens (`bg-`, `surface-`, `ink-`,
+  `ink-muted-`, `line-inverted`), which stay dark in both themes; reach for
   them instead of hand-picking a dark color.
+- **Dark mode** is the `.dark` class on `<html>`. Every token above is
+  redefined under `@variant dark` in `globals.css`, so a new token needs a
+  dark value there too. An inline script in the locale layout's `<head>`
+  (`ThemeScript`, built from `lib/theme.ts`) sets `.dark` or `.light` before
+  first paint from `localStorage["gk-theme"]` (`light`, `dark` or `system`;
+  missing means `system`), and `ThemeToggle` in the header writes that key.
+  The `dark` custom variant falls back to `prefers-color-scheme` while
+  neither class is set, so visitors without JavaScript still get dark. The
+  grid stylesheet follows the same variant, so the site toggle themes every
+  embedded grid; code blocks carry both Shiki themes and `globals.css` picks
+  one. Only the toggle touches `<html>`: a live example that demonstrates a
+  theme (`DarkModeExample`) pins its own wrapper with the grid's
+  `.gridkit-light`/`.gridkit-dark` classes instead.
 - The grid itself is styled by `@gridkitjs/theme-tailwind`, imported once in
   `globals.css`. Never hand-style `DataGrid` internals with
   site-local utility classes — that's the same "utility classes obliging
