@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Container } from "@/components/ui/Container";
 import { BackToTop } from "@/components/docs/BackToTop";
 import { DocsMobileNav } from "@/components/docs/DocsMobileNav";
@@ -10,9 +10,13 @@ import { getLatestReleases } from "@/lib/packages/npm";
 
 export default async function DocsLayout({
   children,
+  params,
 }: {
   children: ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const [tree, releases, t] = await Promise.all([
     getDocsTree(),
     getLatestReleases(),

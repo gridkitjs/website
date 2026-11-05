@@ -1,3 +1,5 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import { cn } from "@/components/ui/cn";
 
@@ -7,7 +9,9 @@ function Bar({ className }: { className?: string }) {
 
 // The docs layout keeps the sidebar on screen while a page loads, so this
 // stands in for the page itself: the article column and, from `xl` up, the
-// "On this page" column beside it.
+// "On this page" column beside it. A client component on purpose: a loading
+// boundary gets no `params` to call `setRequestLocale` with, so reading
+// translations on the server would render every docs page on demand.
 export default function DocsLoading() {
   const t = useTranslations("docs");
 
