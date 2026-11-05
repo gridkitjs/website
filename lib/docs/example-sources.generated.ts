@@ -6,6 +6,8 @@ import { ColumnResizingExample } from "@/components/live-examples/columns/Column
 import { ColumnSortingExample } from "@/components/live-examples/columns/ColumnSortingExample.example";
 import { ColumnTemplatesExample } from "@/components/live-examples/columns/ColumnTemplatesExample.example";
 import { FilterMenuExample } from "@/components/live-examples/columns/FilterMenuExample.example";
+import { ClipboardExample } from "@/components/live-examples/data/ClipboardExample.example";
+import { ExportExample } from "@/components/live-examples/data/ExportExample.example";
 import { ContextMenuExample } from "@/components/live-examples/grid/ContextMenuExample.example";
 import { DarkModeExample } from "@/components/live-examples/grid/DarkModeExample.example";
 import { DataGridBasicExample } from "@/components/live-examples/grid/DataGridBasicExample.example";
@@ -447,6 +449,173 @@ export function FilterMenuExample() {
     localFiles: ["fixtures.ts"],
     dependencies: {
       "@gridkitjs/core": "^0.13.0",
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
+  ClipboardExample: {
+    Component: ClipboardExample,
+    meta: {
+      id: "clipboard",
+      title: "Clipboard",
+      description:
+        "Select rows and press Ctrl+C, or right-click a cell for Copy cell, Copy row and Copy selection, then paste into the box below or a spreadsheet.",
+      minHeight: 564,
+    },
+    fileName: "ClipboardExample.tsx",
+    source: `import { useRef } from "react";
+import {
+  DataGrid,
+  type ColumnDefinition,
+  type DataGridApi,
+} from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+
+const rows = makeRows(8);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency", format: { currency: "USD" } },
+];
+
+export function ClipboardExample() {
+  const gridRef = useRef<DataGridApi<TicketRow>>(null);
+
+  return (
+    <div>
+      <DataGrid
+        ref={gridRef}
+        columns={columns}
+        dataSource={rows}
+        getRowId={(row) => String(row.Id)}
+        label="Tickets"
+        borders="all"
+        selectable={{ rows: "multiple" }}
+        contextMenu
+      />
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+        <button
+          type="button"
+          onClick={() => {
+            // The clipboard is only open during a user's gesture, as here.
+            gridRef.current?.runCommand("copy.selection");
+          }}
+          className="border-site-line text-site-ink hover:bg-site-surface-raised rounded-site border px-3 py-1"
+        >
+          Copy selection
+        </button>
+      </div>
+      <label className="text-site-ink-muted mt-4 block text-xs">
+        Paste here
+        <textarea
+          rows={4}
+          spellCheck={false}
+          placeholder="Tab-separated text, one row per line"
+          className="border-site-line bg-site-bg text-site-ink rounded-site mt-1 block w-full border p-2 font-mono text-xs"
+        />
+      </label>
+    </div>
+  );
+}
+`,
+    localFiles: ["fixtures.ts"],
+    dependencies: {
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
+  ExportExample: {
+    Component: ExportExample,
+    meta: {
+      id: "export",
+      title: "Export",
+      description:
+        "Download CSV, JSON or Excel from the Export dropdown, or preview a file below; sort, search or select rows first and the export follows.",
+      minHeight: 650,
+    },
+    fileName: "ExportExample.tsx",
+    source: `import { useRef, useState } from "react";
+import { xlsxWriter } from "@gridkitjs/export-xlsx";
+import {
+  DataGrid,
+  type ColumnDefinition,
+  type DataGridApi,
+} from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+
+const rows = makeRows(20);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency", format: { currency: "USD" } },
+];
+
+// Registering the Excel writer adds "Export to Excel" to the dropdown.
+const exportWriters = [xlsxWriter({ sheetName: "Tickets" })];
+
+const previews = ["csv", "json"] as const;
+
+export function ExportExample() {
+  const gridRef = useRef<DataGridApi<TicketRow>>(null);
+  const [preview, setPreview] = useState("");
+
+  async function showPreview(format: (typeof previews)[number]) {
+    // exportData builds the same file the dropdown downloads, as a Blob.
+    const file = await gridRef.current?.exportData(format);
+    if (file) setPreview(await file.text());
+  }
+
+  return (
+    <div>
+      <DataGrid
+        ref={gridRef}
+        columns={columns}
+        dataSource={rows}
+        getRowId={(row) => String(row.Id)}
+        label="Tickets"
+        borders="all"
+        height={280}
+        sortableColumns
+        selectable={{ rows: "multiple" }}
+        toolbar={{ items: ["search", "spacer", "export"] }}
+        export={{ fileName: "tickets" }}
+        exportWriters={exportWriters}
+      />
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-site-ink-muted">Preview</span>
+        {previews.map((format) => (
+          <button
+            key={format}
+            type="button"
+            onClick={() => {
+              void showPreview(format);
+            }}
+            className="border-site-line text-site-ink hover:bg-site-surface-raised rounded-site border px-3 py-1 uppercase"
+          >
+            {format}
+          </button>
+        ))}
+      </div>
+      <pre className="border-site-code-border bg-site-code-bg text-site-ink rounded-site mt-3 h-48 overflow-auto border p-3 text-xs">
+        <code>{preview || "Choose a format to see the file it exports."}</code>
+      </pre>
+    </div>
+  );
+}
+`,
+    localFiles: ["fixtures.ts"],
+    dependencies: {
+      "@gridkitjs/export-xlsx": "^0.1.0",
       "@gridkitjs/react": "^0.12.0",
       "@gridkitjs/theme-tailwind": "^0.9.0",
       react: "19.2.4",
