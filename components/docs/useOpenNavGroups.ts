@@ -48,6 +48,14 @@ function getServerSnapshot(): OpenGroups {
   return NONE;
 }
 
+function isClient(): boolean {
+  return true;
+}
+
+function isServer(): boolean {
+  return false;
+}
+
 function setOpenGroups(changes: OpenGroups) {
   const current = getSnapshot();
   if (Object.entries(changes).every(([key, open]) => current[key] === open)) {
@@ -67,6 +75,9 @@ function setOpenGroups(changes: OpenGroups) {
  * "react/columns"). The ones holding the current page open on every
  * navigation into them; whatever else the reader opens or closes stays that
  * way for the session.
+ *
+ * `restored` turns true once the stored set applies, which is after
+ * hydration: anything measuring the sidebar should wait for it.
  */
 export function useOpenNavGroups(sections: DocsNavSection[], pathname: string) {
   const stored = useSyncExternalStore(
@@ -74,6 +85,7 @@ export function useOpenNavGroups(sections: DocsNavSection[], pathname: string) {
     getSnapshot,
     getServerSnapshot,
   );
+  const restored = useSyncExternalStore(subscribe, isClient, isServer);
   const activeKeys = useMemo(
     () => activeNavKeys(sections, pathname),
     [sections, pathname],
@@ -91,5 +103,5 @@ export function useOpenNavGroups(sections: DocsNavSection[], pathname: string) {
     setOpenGroups({ [key]: !isOpen(key) });
   }
 
-  return { isOpen, toggle };
+  return { isOpen, toggle, restored };
 }

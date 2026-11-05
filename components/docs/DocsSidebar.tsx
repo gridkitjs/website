@@ -1,11 +1,12 @@
 "use client";
 
-import { useId, type ComponentProps } from "react";
+import { useEffect, useId, useRef, type ComponentProps } from "react";
 import { useTranslations } from "next-intl";
 import { usePathname, Link } from "@/i18n/navigation";
 import type { DocsNavPage, DocsNavSection } from "@/lib/docs/nav";
 import { cn } from "@/components/ui/cn";
 import { SidebarGroup, SidebarSection } from "./SidebarGroup";
+import { revealInScrollParent } from "./revealInScrollParent";
 import { useOpenNavGroups } from "./useOpenNavGroups";
 
 interface DocsSidebarProps extends ComponentProps<"nav"> {
@@ -22,10 +23,17 @@ export function DocsSidebar({
 }: DocsSidebarProps) {
   const t = useTranslations("docs.nav");
   const pathname = usePathname();
-  const { isOpen, toggle } = useOpenNavGroups(sections, pathname);
+  const { isOpen, toggle, restored } = useOpenNavGroups(sections, pathname);
   // The drawer and the inline sidebar can both be on the page; their list
   // ids must not collide.
   const idPrefix = useId();
+  const activeLinkRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    if (restored && activeLinkRef.current) {
+      revealInScrollParent(activeLinkRef.current);
+    }
+  }, [pathname, restored]);
 
   function pageLink(page: DocsNavPage, section: DocsNavSection) {
     const href = `/docs/${page.slug}`;
@@ -33,6 +41,7 @@ export function DocsSidebar({
     return (
       <li key={page.slug}>
         <Link
+          ref={active ? activeLinkRef : undefined}
           href={href}
           aria-current={active ? "page" : undefined}
           className={cn(
