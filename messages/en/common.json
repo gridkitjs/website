@@ -18,5 +18,11 @@
   "editOnGithub": "Edit this page on GitHub",
   "prevPage": "Previous",
   "nextPage": "Next",
-  "onThisPage": "On this page"
+  "onThisPage": "On this page",
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist, or was moved.",
+    "backHome": "Back home",
+    "readDocs": "Read the docs"
+  }
 }

@@ -19,6 +19,7 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 | Path                                        | What belongs in it                                                                                          |
 | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | `app/[locale]/`                             | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`.       |
+| `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.      |
 | `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after a docs push, to bust the fetch cache without a redeploy.             |
 | `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                               |
 | `components/docs/`, `components/changelog/` | Page chrome for the docs/changelog readers — sidebar, prev/next, breadcrumbs.                               |
