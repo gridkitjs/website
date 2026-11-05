@@ -1,7 +1,7 @@
 "use client";
 
 import { defineColumnsFromRows } from "@gridkitjs/core";
-import { DataGridComponent, type ColumnDefinition } from "@gridkitjs/react";
+import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
 import { deploymentRows, type DeploymentRow } from "./fixtures";
 
 const currency = new Intl.NumberFormat("en-US", {
@@ -26,7 +26,7 @@ const columns: readonly ColumnDefinition<DeploymentRow>[] = [
 
 export function ColumnTemplatesExample() {
   return (
-    <DataGridComponent
+    <DataGrid
       columns={columns}
       dataSource={deploymentRows}
       borders="horizontal"

@@ -1,7 +1,7 @@
 "use client";
 
 import { defineColumnsFromRows } from "@gridkitjs/core";
-import { DataGridComponent, type ColumnDefinition } from "@gridkitjs/react";
+import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
 import { deploymentRows, type DeploymentRow } from "./fixtures";
 import { EventLog, useEventLog } from "./EventLog";
 
@@ -15,7 +15,7 @@ export function CombinedSelectionExample() {
 
   return (
     <div>
-      <DataGridComponent
+      <DataGrid
         columns={columns}
         dataSource={deploymentRows}
         getRowId={(row) => String(row.Id)}

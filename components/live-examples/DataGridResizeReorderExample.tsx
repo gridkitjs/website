@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { defineColumnsFromRows } from "@gridkitjs/core";
 import {
-  DataGridComponent,
+  DataGrid,
   type ColumnDefinition,
   type ResizeMode,
 } from "@gridkitjs/react";
@@ -58,7 +58,7 @@ export function DataGridResizeReorderExample() {
           </label>
         ))}
       </fieldset>
-      <DataGridComponent
+      <DataGrid
         columns={columns}
         dataSource={deploymentRows}
         borders="all"

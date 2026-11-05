@@ -20,7 +20,7 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | `app/[locale]/`          | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`.       |
 | `app/api/revalidate-docs`| Webhook the `gridkit` repo calls after a docs push, to bust the fetch cache without a redeploy.             |
-| `components/live-examples/` | Interactive `DataGridComponent` demos embedded in doc pages via the MDX component map.                  |
+| `components/live-examples/` | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                  |
 | `components/docs/`, `components/changelog/` | Page chrome for the docs/changelog readers — sidebar, prev/next, breadcrumbs.             |
 | `components/marketing/`  | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                   |
 | `components/ui/`         | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.  |
@@ -83,6 +83,13 @@ Requires `.env` (copy from `.env.example`) for the GitHub-fetch config.
 Without `GITHUB_TOKEN`, GitHub's unauthenticated rate limit (60 req/hr) is
 easy to hit while iterating on `lib/docs/`; set it for local dev.
 
+`npm run update-gridkit` moves all five `@gridkitjs/*` packages (`core`,
+`dom`, `react`, `theme-tailwind`, `export-xlsx`) to their `latest` releases.
+It is the only way they move: on `0.x` a caret range never crosses a minor,
+so `npm update` leaves them where they are. Docs are fetched from `gridkit`'s
+`main`, so a page can describe a feature the pinned packages lack until this
+runs; add a new published package to the script when `gridkit` ships one.
+
 ## Styling and custom components
 
 - **Tailwind CSS 4**, configured via `@theme inline` in `app/globals.css`.
@@ -94,7 +101,7 @@ easy to hit while iterating on `lib/docs/`; set it for local dev.
   `-inverted` variants exist for dark surfaces (e.g. the footer); reach for
   them instead of hand-picking a dark color.
 - The grid itself is styled by `@gridkitjs/theme-tailwind`, imported once in
-  `globals.css`. Never hand-style `DataGridComponent` internals with
+  `globals.css`. Never hand-style `DataGrid` internals with
   site-local utility classes — that's the same "utility classes obliging
   every consumer to scan our source" problem the `gridkit` repo's `AGENTS.md`
   calls out for its own `packages/react`; this site is a consumer of that
@@ -113,7 +120,7 @@ easy to hit while iterating on `lib/docs/`; set it for local dev.
   registering it there means `.mdx` content using it 404s silently into
   literal text.
 - **Live examples** (`components/live-examples/`) are `"use client"`
-  components that mount a real `DataGridComponent` against shared fixtures
+  components that mount a real `DataGrid` against shared fixtures
   (`fixtures.ts`). Keep one example per interaction being demonstrated
   (sorting, resizing, selection, …) rather than one large kitchen-sink grid
   — the doc page picks the example that matches the section it's in.

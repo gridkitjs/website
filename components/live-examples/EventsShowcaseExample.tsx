@@ -1,7 +1,7 @@
 "use client";
 
 import { defineColumnsFromRows } from "@gridkitjs/core";
-import { DataGridComponent, type ColumnDefinition } from "@gridkitjs/react";
+import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
 import { deploymentRows, type DeploymentRow } from "./fixtures";
 import { EventLog, useEventLog } from "./EventLog";
 
@@ -9,13 +9,13 @@ const columns: readonly ColumnDefinition<DeploymentRow>[] = [
   ...defineColumnsFromRows(deploymentRows),
 ];
 
-/** Every callback DataGridComponent exposes, each logging its own line. */
+/** Every callback DataGrid exposes, each logging its own line. */
 export function EventsShowcaseExample() {
   const { entries, record } = useEventLog(10);
 
   return (
     <div>
-      <DataGridComponent
+      <DataGrid
         columns={columns}
         dataSource={deploymentRows}
         getRowId={(row) => String(row.Id)}
