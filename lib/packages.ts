@@ -12,7 +12,7 @@ export interface PackageInfo {
 export const PACKAGES: PackageInfo[] = [
   { slug: "react" },
   { slug: "core" },
-  { slug: "dom" },
+  { slug: "dom", title: "DOM" },
   { slug: "theme-tailwind" },
   { slug: "export-xlsx", title: "Export XLSX" },
 ];
