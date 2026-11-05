@@ -4,7 +4,14 @@ import { usePathname, Link } from "@/i18n/navigation";
 import type { DocSectionNode } from "@/lib/docs/source";
 import { cn } from "@/components/ui/cn";
 
-export function DocsSidebar({ sections }: { sections: DocSectionNode[] }) {
+export function DocsSidebar({
+  sections,
+  latestVersions,
+}: {
+  sections: DocSectionNode[];
+  /** Each package's latest version on npm, keyed by section slug. */
+  latestVersions: Record<string, string>;
+}) {
   const pathname = usePathname();
 
   function pageLink(page: { slug: string; title: string }) {
@@ -32,8 +39,13 @@ export function DocsSidebar({ sections }: { sections: DocSectionNode[] }) {
     <nav aria-label="Docs" className="space-y-8">
       {sections.map((section) => (
         <div key={section.slug}>
-          <p className="text-site-ink-muted text-xs font-semibold tracking-wide uppercase">
+          <p className="text-site-ink-muted flex items-baseline justify-between gap-2 text-xs font-semibold tracking-wide uppercase">
             {section.title}
+            {latestVersions[section.slug] && (
+              <span className="font-mono font-normal tracking-normal normal-case">
+                v{latestVersions[section.slug]}
+              </span>
+            )}
           </p>
           <ul className="mt-3 space-y-1">
             {section.pages.map((page) => pageLink(page))}

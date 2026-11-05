@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import {
+  getFormatter,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 import { ChangelogPage } from "@/components/changelog/ChangelogPage";
 import { OnThisPage } from "@/components/docs/OnThisPage";
 import { DocContent } from "@/lib/docs/mdx";
@@ -11,6 +15,13 @@ import {
   type ChangelogSection,
 } from "@/lib/changelog/source";
 import { getEditUrl } from "@/lib/docs/github";
+import {
+  getLatestRelease,
+  getLatestReleases,
+  getReleaseDate,
+  npmPackageUrl,
+} from "@/lib/packages/npm";
+import { NpmIcon } from "@/components/ui/icons";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { JsonLd, techArticleJsonLd } from "@/lib/json-ld";
 
@@ -106,7 +117,10 @@ export default async function ChangelogSlugPage({
 
   if (!path) {
     const t = await getTranslations("changelog.index");
+    const tChangelog = await getTranslations("changelog");
     const tCommon = await getTranslations("common");
+    const format = await getFormatter();
+    const releases = await getLatestReleases();
     return (
       <div>
         <h1 className="text-site-ink text-3xl font-semibold tracking-tight">
@@ -116,22 +130,44 @@ export default async function ChangelogSlugPage({
           {t("intro")}
         </p>
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {tree.sections.map((section) => (
-            <Link
-              key={section.slug}
-              href={`/changelog/${section.slug}`}
-              className="border-site-line hover:border-site-accent block rounded-2xl border p-6 transition-colors"
-            >
-              <p className="text-site-ink font-mono text-sm font-medium">
-                {section.title}
-              </p>
-              {section.versions[0] && (
+          {tree.sections.map((section) => {
+            const release = releases[section.slug];
+            return (
+              // The card's link stretches over it; the npm link sits above.
+              <div
+                key={section.slug}
+                className="border-site-line hover:border-site-accent relative rounded-2xl border p-6 transition-colors"
+              >
+                <Link
+                  href={`/changelog/${section.slug}`}
+                  className="text-site-ink font-mono text-sm font-medium after:absolute after:inset-0 after:rounded-2xl"
+                >
+                  {section.title}
+                </Link>
                 <p className="text-site-ink-muted mt-2 text-sm leading-relaxed">
-                  v{section.versions[0].version}
+                  {release
+                    ? tChangelog("latestRelease", {
+                        version: release.version,
+                        date: format.dateTime(release.releasedAt, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        }),
+                      })
+                    : `v${section.versions[0].version}`}
                 </p>
-              )}
-            </Link>
-          ))}
+                <a
+                  href={npmPackageUrl(section.slug)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-site-ink-muted hover:text-site-accent relative mt-3 inline-flex items-center gap-1.5 text-xs transition-colors"
+                >
+                  <NpmIcon className="h-4 w-4" />
+                  {tChangelog("viewOnNpm")}
+                </a>
+              </div>
+            );
+          })}
         </div>
         <p className="text-site-ink-muted mt-10 text-sm">
           {t("backToDocs")}{" "}
@@ -156,6 +192,10 @@ export default async function ChangelogSlugPage({
   // The file's last commit is the latest version's; an older version's page
   // would otherwise claim a date that isn't its own.
   const lastUpdated = isLatest ? section.lastModified : null;
+  const [releasedAt, latestRelease] = await Promise.all([
+    getReleaseDate(section.slug, version.version),
+    getLatestRelease(section.slug),
+  ]);
   const toc = extractToc(version.content);
 
   const crumbs = [
@@ -197,7 +237,9 @@ export default async function ChangelogSlugPage({
           crumbs={crumbs}
           packageTitle={section.title}
           version={version.version}
-          lastUpdated={lastUpdated}
+          releasedAt={releasedAt}
+          isLatestRelease={latestRelease?.version === version.version}
+          npmUrl={npmPackageUrl(section.slug, version.version)}
           editUrl={getEditUrl(section.repoPath)}
           docsHref={`/docs/${section.slug}`}
           prev={

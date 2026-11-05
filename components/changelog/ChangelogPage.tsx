@@ -3,14 +3,16 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { Breadcrumbs, type Crumb } from "@/components/ui/Breadcrumbs";
 import { PrevNextNav, type PrevNextEntry } from "@/components/ui/PrevNextNav";
 import { Prose } from "@/components/ui/Prose";
-import { GitHubIcon } from "@/components/ui/icons";
+import { GitHubIcon, NpmIcon } from "@/components/ui/icons";
 import { Link } from "@/i18n/navigation";
 
 export async function ChangelogPage({
   crumbs,
   packageTitle,
   version,
-  lastUpdated,
+  releasedAt,
+  isLatestRelease,
+  npmUrl,
   editUrl,
   docsHref,
   prev,
@@ -20,8 +22,12 @@ export async function ChangelogPage({
   crumbs: Crumb[];
   packageTitle: string;
   version: string;
-  /** Only meaningful for the latest version — an older version's page would otherwise show the file's most recent commit date, which isn't its own. */
-  lastUpdated: Date | null;
+  /** When this version was published to npm; `null` before it is. */
+  releasedAt: Date | null;
+  /** Whether this version is the one npm installs by default. */
+  isLatestRelease: boolean;
+  /** This version's page on npmjs.com. */
+  npmUrl: string;
   editUrl: string;
   docsHref: string;
   prev?: PrevNextEntry;
@@ -41,15 +47,20 @@ export async function ChangelogPage({
       <h1 className="text-site-ink text-3xl font-semibold tracking-tight">
         {tChangelog("versionHeading", { package: packageTitle, version })}
       </h1>
-      {lastUpdated != null && (
-        <p className="text-site-ink-muted mt-2 text-xs">
-          {t("lastUpdated", {
-            date: format.dateTime(lastUpdated, {
+      {releasedAt != null && (
+        <p className="text-site-ink-muted mt-2 flex flex-wrap items-center gap-x-2 text-xs">
+          {tChangelog("released", {
+            date: format.dateTime(releasedAt, {
               year: "numeric",
               month: "long",
               day: "numeric",
             }),
           })}
+          {isLatestRelease && (
+            <span className="bg-site-accent-soft text-site-accent rounded-site-sm px-1.5 py-0.5 font-medium">
+              {tChangelog("latest")}
+            </span>
+          )}
         </p>
       )}
       <Prose className="mt-8">{children}</Prose>
@@ -62,6 +73,15 @@ export async function ChangelogPage({
         >
           <GitHubIcon className="h-4 w-4" />
           {t("editOnGithub")}
+        </a>
+        <a
+          href={npmUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="text-site-ink-muted hover:text-site-accent inline-flex items-center gap-1.5 transition-colors"
+        >
+          <NpmIcon className="h-4 w-4" />
+          {tChangelog("viewOnNpm")}
         </a>
         <Link
           href={docsHref}
