@@ -11,10 +11,13 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import { Link } from "@/i18n/navigation";
 import { bundledLanguages, type BundledLanguage } from "shiki";
 import { CodeBlock, type CodeLanguage } from "@/components/code/CodeBlock";
+import { Callout } from "@/components/docs/Callout";
+import { DocLink } from "@/components/docs/DocLink";
+import { LinkCard, LinkCards } from "@/components/docs/LinkCards";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
+import { Since } from "@/components/docs/Since";
 import { ClientOnly } from "@/components/ui/ClientOnly";
 import { cn } from "@/components/ui/cn";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
@@ -60,27 +63,8 @@ async function Pre({
 const LINK_CLASS =
   "text-site-ink decoration-site-accent hover:text-site-accent underline underline-offset-4 transition-colors";
 
-// Site-absolute links (docs content links to other /docs/... pages) go through
-// next-intl's Link so they pick up the current locale prefix. Only http(s)
-// links leave the site, so only they open a new tab; in-page `#anchor` and
-// relative links stay in this one.
-function A({ href = "", className, ...props }: ComponentProps<"a">) {
-  const linkClass = cn(LINK_CLASS, className);
-  if (href.startsWith("/")) {
-    return <Link href={href} className={linkClass} {...props} />;
-  }
-  if (/^https?:\/\//.test(href)) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className={linkClass}
-        {...props}
-      />
-    );
-  }
-  return <a href={href} className={linkClass} {...props} />;
+function A({ className, ...props }: ComponentProps<"a">) {
+  return <DocLink className={cn(LINK_CLASS, className)} {...props} />;
 }
 
 // GFM tables (e.g. props reference tables) styled to match the site's
@@ -199,9 +183,13 @@ const mdxComponents = {
   th: Th,
   td: Td,
   tr: Tr,
+  Callout,
   Kbd,
   KbdGroup,
+  LinkCard,
+  LinkCards,
   LiveExampleFrame,
+  Since,
   StackblitzExample,
   DataGridBasicExample: clientOnly(DataGridBasicExample),
   DataGridResizeReorderExample: clientOnly(DataGridResizeReorderExample),

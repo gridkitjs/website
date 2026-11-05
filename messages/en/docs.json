@@ -24,5 +24,15 @@
   "landmarks": {
     "sidebar": "Docs sidebar",
     "toc": "Page contents"
+  },
+  "content": {
+    "callout": {
+      "note": "Note",
+      "tip": "Tip",
+      "warning": "Warning",
+      "breaking": "Breaking change"
+    },
+    "since": "Since {version}",
+    "sinceInPackage": "Since {pkg} {version}"
   }
 }
