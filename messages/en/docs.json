@@ -33,6 +33,7 @@
       "breaking": "Breaking change"
     },
     "since": "Since {version}",
-    "sinceInPackage": "Since {pkg} {version}"
+    "sinceInPackage": "Since {pkg} {version}",
+    "packageManager": "Package manager"
   }
 }

@@ -17,6 +17,7 @@ import { Callout } from "@/components/docs/Callout";
 import { DocLink } from "@/components/docs/DocLink";
 import { LinkCard, LinkCards } from "@/components/docs/LinkCards";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
+import { PackageInstall } from "@/components/docs/PackageInstall";
 import { Since } from "@/components/docs/Since";
 import { ClientOnly } from "@/components/ui/ClientOnly";
 import { cn } from "@/components/ui/cn";
@@ -189,6 +190,7 @@ const mdxComponents = {
   LinkCard,
   LinkCards,
   LiveExampleFrame,
+  PackageInstall,
   Since,
   StackblitzExample,
   DataGridBasicExample: clientOnly(DataGridBasicExample),
