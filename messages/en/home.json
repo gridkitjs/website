@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "GridKit: headless data grid for TypeScript and React",
+    "description": "GridKit is a headless data grid for TypeScript and React: sorting, filtering, grouping, selection, virtualization and Excel export, with a Tailwind theme."
+  },
   "hero": {
     "titleLead": "Grid logic in TypeScript.",
     "titleTail": "Rendered natively in React.",

@@ -14,11 +14,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "home.hero" });
+  const t = await getTranslations({ locale, namespace: "home.meta" });
 
   return buildMetadata({
-    title: "GridKit — a headless data-grid toolkit",
-    description: t("subtitle"),
+    title: t("title"),
+    description: t("description"),
     path: "",
     locale,
   });

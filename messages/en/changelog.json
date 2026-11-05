@@ -1,7 +1,7 @@
 {
   "index": {
     "title": "Changelog",
-    "description": "Release notes and version history for @gridkitjs/core, @gridkitjs/react, and @gridkitjs/theme-tailwind.",
+    "description": "Release notes for every GridKit package: what changed, version by version, in core, dom, react, theme-tailwind and export-xlsx.",
     "intro": "What shipped and when, straight from each package's CHANGELOG.md.",
     "backToDocs": "Looking for reference docs?"
   },

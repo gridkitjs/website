@@ -24,6 +24,8 @@ export function websiteJsonLd(locale: string) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
+    // The npm scope and GitHub org, which people search for too.
+    alternateName: "gridkitjs",
     url: `${siteConfig.baseUrl}/${locale}`,
     inLanguage: locale,
   };
