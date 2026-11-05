@@ -10,6 +10,7 @@ import { ColumnTemplatesExample } from "@/components/live-examples/columns/Colum
 import { FilterMenuExample } from "@/components/live-examples/columns/FilterMenuExample.example";
 import { ClipboardExample } from "@/components/live-examples/data/ClipboardExample.example";
 import { ExportExample } from "@/components/live-examples/data/ExportExample.example";
+import { StatePersistenceExample } from "@/components/live-examples/data/StatePersistenceExample.example";
 import { ContextMenuExample } from "@/components/live-examples/grid/ContextMenuExample.example";
 import { DarkModeExample } from "@/components/live-examples/grid/DarkModeExample.example";
 import { DataGridBasicExample } from "@/components/live-examples/grid/DataGridBasicExample.example";
@@ -754,6 +755,108 @@ export function ExportExample() {
     localFiles: ["fixtures.ts"],
     dependencies: {
       "@gridkitjs/export-xlsx": "^0.1.0",
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
+  StatePersistenceExample: {
+    Component: StatePersistenceExample,
+    meta: {
+      id: "state-persistence",
+      title: "Saving and restoring state",
+      description:
+        "Sort, filter, resize, move or page the grid and save it; change it again, then restore to put the saved layout back.",
+      minHeight: 601,
+    },
+    fileName: "StatePersistenceExample.tsx",
+    source: `import { useRef, useState } from "react";
+import {
+  DataGrid,
+  excelFilter,
+  serializeGridState,
+  type ColumnDefinition,
+  type DataGridApi,
+  type SerializedGridState,
+} from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+
+const rows = makeRows(40);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency" },
+];
+
+const buttonClass =
+  "border-site-line text-site-ink hover:bg-site-surface-raised rounded-site border px-3 py-1 disabled:opacity-50";
+
+export function StatePersistenceExample() {
+  const gridRef = useRef<DataGridApi<TicketRow>>(null);
+  // An app would keep this in localStorage, a URL or its own backend.
+  const [saved, setSaved] = useState<SerializedGridState<TicketRow> | null>(
+    null,
+  );
+
+  function save(): void {
+    const state = gridRef.current?.getState();
+    if (state !== undefined) setSaved(serializeGridState(state));
+  }
+
+  function restore(): void {
+    if (saved !== null) gridRef.current?.restoreState(saved);
+  }
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2 text-sm">
+        <button type="button" onClick={save} className={buttonClass}>
+          Save state
+        </button>
+        <button
+          type="button"
+          onClick={restore}
+          disabled={saved === null}
+          className={buttonClass}
+        >
+          Restore state
+        </button>
+      </div>
+      <div className="mt-4">
+        <DataGrid
+          {...excelFilter}
+          ref={gridRef}
+          columns={columns}
+          dataSource={rows}
+          getRowId={(row) => String(row.Id)}
+          label="Tickets"
+          borders="all"
+          sortableColumns
+          resizableColumns
+          reorderableColumns
+          selectable={{ rows: "multiple" }}
+          paginated
+          defaultPagination={{ pageIndex: 0, pageSize: 5 }}
+        />
+      </div>
+      <p className="text-site-ink-muted mt-4 text-xs">The saved state:</p>
+      <pre className="border-site-code-border bg-site-code-bg text-site-ink rounded-site mt-1 h-48 overflow-auto border p-3 text-xs">
+        <code>
+          {saved === null
+            ? "Nothing saved yet."
+            : JSON.stringify(saved, null, 2)}
+        </code>
+      </pre>
+    </div>
+  );
+}
+`,
+    localFiles: ["fixtures.ts"],
+    dependencies: {
       "@gridkitjs/react": "^0.12.0",
       "@gridkitjs/theme-tailwind": "^0.9.0",
       react: "19.2.4",
