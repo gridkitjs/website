@@ -17,7 +17,6 @@ export async function SiteHeader() {
         <nav className="flex h-14 items-center justify-between">
           <Link
             href="/"
-            aria-label={t("home")}
             className="flex items-center gap-2 transition-opacity hover:opacity-70"
           >
             <GridKitMark className="size-6" />
