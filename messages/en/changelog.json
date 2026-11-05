@@ -5,6 +5,10 @@
     "intro": "What shipped and when, straight from each package's CHANGELOG.md.",
     "backToDocs": "Looking for reference docs?"
   },
+  "nav": {
+    "label": "Changelog",
+    "toggle": "{title} versions"
+  },
   "page": {
     "title": "{package} v{version}",
     "description": "Release notes for {package} v{version}."

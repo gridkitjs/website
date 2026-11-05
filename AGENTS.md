@@ -179,13 +179,17 @@ runs; add a new published package to the script when `gridkit` ships one.
   one. Only the toggle touches `<html>`: a live example that demonstrates a
   theme (`DarkModeExample`) pins its own wrapper with the grid's
   `.gridkit-light`/`.gridkit-dark` classes instead.
-- **Docs sidebar state** is `sessionStorage["gk-docs-nav"]`, beside
+- **Sidebar state** is `sessionStorage["gk-docs-nav"]` for the docs and
+  `sessionStorage["gk-changelog-nav"]` for the changelog, beside
   `gk-theme`: a JSON map of which sections and groups are open (`react`,
-  `react/columns`), kept by `useOpenNavGroups` and shared by the inline
-  sidebar and the mobile drawer. Both render `lib/docs/nav.ts`'s cut of the
-  docs tree, titles and slugs only, so no page body reaches the client.
-  The server renders only the current page's section and group open; the
-  stored set applies after hydration.
+  `react/columns`), kept by `useOpenNavGroups` (one store per storage key)
+  and shared by the inline docs sidebar and the mobile drawer. Both docs
+  sidebars render `lib/docs/nav.ts`'s cut of the docs tree, titles and
+  slugs only, so no page body reaches the client. The server renders only
+  the current page's section and group open; the stored set applies after
+  hydration. `SidebarSection` and `SidebarGroup` in `components/docs/` are
+  the disclosure pieces every sidebar, the changelog's included, is built
+  from.
 - **Search** fetches `/api/search-index` only when a reader hovers or
   focuses a search trigger or opens the palette, then builds a MiniSearch
   index in the browser (`useSearchIndex`), once per visit. Ranking: fields
