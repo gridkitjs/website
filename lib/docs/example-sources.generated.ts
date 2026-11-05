@@ -10,8 +10,10 @@ import { DarkModeExample } from "@/components/live-examples/grid/DarkModeExample
 import { DataGridBasicExample } from "@/components/live-examples/grid/DataGridBasicExample.example";
 import { DataGridResizeReorderExample } from "@/components/live-examples/grid/DataGridResizeReorderExample.example";
 import { EventsShowcaseExample } from "@/components/live-examples/grid/EventsShowcaseExample.example";
+import { AggregatesExample } from "@/components/live-examples/rows/AggregatesExample.example";
 import { InfiniteScrollExample } from "@/components/live-examples/rows/InfiniteScrollExample.example";
 import { PaginationExample } from "@/components/live-examples/rows/PaginationExample.example";
+import { RowGroupingExample } from "@/components/live-examples/rows/RowGroupingExample.example";
 import { RowVirtualizationExample } from "@/components/live-examples/rows/RowVirtualizationExample.example";
 import { CombinedSelectionExample } from "@/components/live-examples/selection/CombinedSelectionExample.example";
 
@@ -805,6 +807,97 @@ export function EventsShowcaseExample() {
       "react-dom": "19.2.4",
     },
   },
+  AggregatesExample: {
+    Component: AggregatesExample,
+    meta: {
+      id: "aggregate-functions",
+      title: "Aggregate functions",
+      description:
+        "Each region shows its own count, total and average, the footer totals every row, and the radio buttons move the subtotals into rows of their own.",
+      minHeight: 579,
+    },
+    fileName: "AggregatesExample.tsx",
+    source: `import { useState } from "react";
+import type { AggregateState, GroupAggregateDisplay } from "@gridkitjs/core";
+import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+
+const rows = makeRows(30);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80 },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  // With a currency to show, the column's sum and average read as currency too.
+  { field: "Amount", type: "currency", format: { currency: "USD" } },
+];
+
+const aggregates: AggregateState<TicketRow> = [
+  { columnId: "Id", fn: "count", id: "Tickets" },
+  { columnId: "Status", fn: "countDistinct", id: "Statuses" },
+  { columnId: "Amount", fn: "sum", id: "Total" },
+  // A second spec on the same column needs an id of its own.
+  { columnId: "Amount", fn: "avg", id: "Average" },
+];
+
+const displays: readonly { value: GroupAggregateDisplay; label: string }[] = [
+  { value: "inline", label: "inline — in the group row" },
+  { value: "row", label: "row — a summary row per group" },
+];
+
+export function AggregatesExample() {
+  const [display, setDisplay] = useState<GroupAggregateDisplay>("inline");
+
+  return (
+    <div>
+      <fieldset className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+        <legend className="sr-only">Group subtotal display</legend>
+        {displays.map((option) => (
+          <label
+            key={option.value}
+            className="text-site-ink-muted flex items-center gap-1.5"
+          >
+            <input
+              type="radio"
+              name="aggregate-functions-display"
+              checked={display === option.value}
+              onChange={() => {
+                setDisplay(option.value);
+              }}
+            />
+            {option.label}
+          </label>
+        ))}
+      </fieldset>
+      <div className="mt-4">
+        <DataGrid
+          columns={columns}
+          dataSource={rows}
+          getRowId={(row) => String(row.Id)}
+          label="Tickets, with subtotals per region"
+          borders="all"
+          height={360}
+          sortableColumns
+          groupableColumns
+          defaultGroupBy={[{ columnId: "Region" }]}
+          aggregates={aggregates}
+          groupAggregateDisplay={display}
+        />
+      </div>
+    </div>
+  );
+}
+`,
+    localFiles: ["fixtures.ts"],
+    dependencies: {
+      "@gridkitjs/core": "^0.13.0",
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
   InfiniteScrollExample: {
     Component: InfiniteScrollExample,
     meta: {
@@ -918,6 +1011,73 @@ export function PaginationExample() {
         onPaginationChange={({ pagination, pageCount }) => {
           record(
             \`onPaginationChange — page \${String(pagination.pageIndex + 1)} of \${String(pageCount)}, \${String(pagination.pageSize)} per page\`,
+          );
+        }}
+      />
+      <EventLog entries={entries} />
+    </div>
+  );
+}
+`,
+    localFiles: ["EventLog.tsx", "fixtures.ts"],
+    dependencies: {
+      "@gridkitjs/react": "^0.12.0",
+      "@gridkitjs/theme-tailwind": "^0.9.0",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    },
+  },
+  RowGroupingExample: {
+    Component: RowGroupingExample,
+    meta: {
+      id: "row-grouping",
+      title: "Row grouping",
+      description:
+        "Drag a header into the group-by bar or click its group icon, drag the chips to reorder the levels, and click a group row to collapse it.",
+      minHeight: 590,
+    },
+    fileName: "RowGroupingExample.tsx",
+    source: `import { DataGrid, type ColumnDefinition } from "@gridkitjs/react";
+import { makeRows, type TicketRow } from "./fixtures";
+import { EventLog, useEventLog } from "./EventLog";
+
+const rows = makeRows(40);
+
+const columns: readonly ColumnDefinition<TicketRow>[] = [
+  { field: "Id", type: "number", width: 80, groupable: false },
+  { field: "Name" },
+  { field: "Region" },
+  { field: "Status" },
+  { field: "Amount", type: "currency", groupable: false },
+];
+
+export function RowGroupingExample() {
+  const { entries, record } = useEventLog();
+
+  return (
+    <div>
+      <DataGrid
+        columns={columns}
+        dataSource={rows}
+        getRowId={(row) => String(row.Id)}
+        label="Tickets, grouped"
+        borders="all"
+        height={360}
+        sortableColumns
+        groupableColumns
+        groupByDraggableColumns
+        // Keeps the bar on screen as a drop target once every level is removed.
+        groupByBarVisibility="always"
+        defaultGroupBy={[{ columnId: "Region" }]}
+        onGroupByChange={({ groupBy }) => {
+          const levels = groupBy.map((level) => level.columnId);
+          record(
+            \`onGroupByChange — \${levels.length > 0 ? levels.join(" → ") : "ungrouped"}\`,
+          );
+        }}
+        onGroupExpansionChange={({ expansion }) => {
+          record(
+            \`onGroupExpansionChange — \${String(expansion.length)} collapsed\`,
           );
         }}
       />
