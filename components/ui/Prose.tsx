@@ -15,7 +15,10 @@ export function Prose({
         "[&_p]:text-site-ink-muted [&_p]:leading-relaxed [&_p+p]:mt-4",
         "[&_h2]:text-site-ink [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:scroll-mt-20 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight",
         "[&_h3]:text-site-ink [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:scroll-mt-20 [&_h3]:text-lg [&_h3]:font-semibold",
-        "[&_.anchor-link]:text-site-ink-muted [&_.anchor-link]:ml-2 [&_.anchor-link]:no-underline [&_.anchor-link]:opacity-0 [&_h2:hover_.anchor-link]:opacity-100 [&_h3:hover_.anchor-link]:opacity-100",
+        // Anchors show on hover and keyboard focus; touch screens get no
+        // hover, so there they stay faintly visible.
+        "[&_.anchor-link]:text-site-ink-muted [&_.anchor-link]:ml-2 [&_.anchor-link]:no-underline [&_.anchor-link]:opacity-0 [&_.anchor-link]:transition-opacity",
+        "[&_h2:focus-within_.anchor-link]:opacity-100 [&_h2:hover_.anchor-link]:opacity-100 [&_h3:focus-within_.anchor-link]:opacity-100 [&_h3:hover_.anchor-link]:opacity-100 [@media(hover:none)]:[&_.anchor-link]:opacity-50",
         "[&_ul]:mt-4 [&_ul]:list-disc [&_ul]:space-y-3 [&_ul]:pl-6",
         "[&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:space-y-3 [&_ol]:pl-6",
         "[&_li]:text-site-ink-muted [&_li::marker]:text-site-ink-muted [&_li]:pl-1 [&_li]:leading-relaxed [&_li_p]:inline",
