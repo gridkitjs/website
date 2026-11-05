@@ -4,6 +4,17 @@ import { getTranslations } from "next-intl/server";
 export interface PrevNextEntry {
   href: string;
   title: string;
+  /** Named on the card when the link leaves the current section. */
+  section?: string;
+}
+
+function CardLabel({ label, section }: { label: string; section?: string }) {
+  return (
+    <p className="text-site-ink-muted text-xs">
+      {label}
+      {section && <> · {section}</>}
+    </p>
+  );
 }
 
 export async function PrevNextNav({
@@ -32,7 +43,7 @@ export async function PrevNextNav({
           href={prev.href}
           className="border-site-line hover:border-site-accent rounded-xl border p-4 transition-colors"
         >
-          <p className="text-site-ink-muted text-xs">{prevLabel}</p>
+          <CardLabel label={prevLabel} section={prev.section} />
           <p className="text-site-ink mt-1 text-sm font-medium">{prev.title}</p>
         </Link>
       ) : (
@@ -43,7 +54,7 @@ export async function PrevNextNav({
           href={next.href}
           className="border-site-line hover:border-site-accent rounded-xl border p-4 text-right transition-colors"
         >
-          <p className="text-site-ink-muted text-xs">{nextLabel}</p>
+          <CardLabel label={nextLabel} section={next.section} />
           <p className="text-site-ink mt-1 text-sm font-medium">{next.title}</p>
         </Link>
       )}
