@@ -41,13 +41,13 @@ export interface DocsTree {
 
 interface PackageConfig {
   slug: string;
-  title: string | undefined;
+  title: string;
   docsPath: string;
 }
 
 const PACKAGES: PackageConfig[] = PACKAGE_REGISTRY.map(({ slug, title }) => ({
   slug,
-  title,
+  title: title ?? titleCase(slug),
   docsPath: `packages/${slug}/docs`,
 }));
 
@@ -136,11 +136,16 @@ async function buildSection(
   const pageEntries = await Promise.all(
     topLevelFiles.map(async (entry) => {
       const fileName = entry.path.slice(prefix.length).replace(/\.mdx$/, "");
+      const isOverview = fileName === "overview";
       // The package's overview page is the section's own root, e.g. /docs/core
-      // rather than /docs/core/overview.
-      const slug =
-        fileName === "overview" ? pkg.slug : `${pkg.slug}/${fileName}`;
-      return { key: fileName, page: await readDocPage(entry.path, slug) };
+      // rather than /docs/core/overview. Every package titles it "Overview",
+      // so name the package to keep the overview pages' titles distinct.
+      const slug = isOverview ? pkg.slug : `${pkg.slug}/${fileName}`;
+      const page = await readDocPage(entry.path, slug);
+      return {
+        key: fileName,
+        page: isOverview ? { ...page, title: `${pkg.title} overview` } : page,
+      };
     }),
   );
   const pages = sortByMeta(pageEntries, rootMeta?.order).map(
@@ -183,7 +188,7 @@ async function buildSection(
   const overview = pages.find((page) => page.slug === pkg.slug);
   return {
     slug: pkg.slug,
-    title: pkg.title ?? titleCase(pkg.slug),
+    title: pkg.title,
     description: overview?.description ?? "",
     pages,
     groups,

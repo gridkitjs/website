@@ -50,7 +50,9 @@ the changelog comes from that repo's per-package `CHANGELOG.md` files
   section per package, ordered by that package's `docs/_meta.json`
   (`order` array), with subfolders becoming groups. A package's
   `docs/overview.mdx` becomes the section root (`/docs/react`, not
-  `/docs/react/overview`).
+  `/docs/react/overview`), and its title is composed here as
+  `"<Section title> overview"` ("React overview") whatever its frontmatter
+  says, since every package titles that file "Overview".
 
 **A doc page never gets bundled here.** If a page is missing or stale, the
 fix is in `gridkit`'s `packages/*/docs/`, or in the cache config here — never
