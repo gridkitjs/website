@@ -15,6 +15,7 @@ import { Link } from "@/i18n/navigation";
 import { CodeBlock } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
 import { ClientOnly } from "@/components/ui/ClientOnly";
+import { cn } from "@/components/ui/cn";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
 import { DataGridBasicExample } from "@/components/live-examples/DataGridBasicExample";
 import { StackblitzExample } from "@/components/live-examples/StackblitzExample";
@@ -40,13 +41,30 @@ async function Pre({
   return <CodeBlock code={code} lang={lang} className="mt-4" />;
 }
 
-// Internal links (docs content links to other /docs/... pages) go through
-// next-intl's Link so they pick up the current locale prefix.
-function A({ href = "", ...props }: ComponentProps<"a">) {
+const LINK_CLASS =
+  "text-site-ink decoration-site-accent hover:text-site-accent underline underline-offset-4 transition-colors";
+
+// Site-absolute links (docs content links to other /docs/... pages) go through
+// next-intl's Link so they pick up the current locale prefix. Only http(s)
+// links leave the site, so only they open a new tab; in-page `#anchor` and
+// relative links stay in this one.
+function A({ href = "", className, ...props }: ComponentProps<"a">) {
+  const linkClass = cn(LINK_CLASS, className);
   if (href.startsWith("/")) {
-    return <Link href={href} className="text-site-accent" {...props} />;
+    return <Link href={href} className={linkClass} {...props} />;
   }
-  return <a href={href} target="_blank" rel="noreferrer noopener" {...props} />;
+  if (/^https?:\/\//.test(href)) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={linkClass}
+        {...props}
+      />
+    );
+  }
+  return <a href={href} className={linkClass} {...props} />;
 }
 
 // GFM tables (e.g. props reference tables) styled to match the site's

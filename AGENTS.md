@@ -129,7 +129,8 @@ runs; add a new published package to the script when `gridkit` ships one.
   prerendering it fails the build.
 - **Internal links inside MDX** must go through `next-intl`'s `Link` (see
   the `A` override in `lib/docs/mdx.tsx`) so they carry the current locale
-  prefix; only external links get a plain `<a>`.
+  prefix. In-page `#anchor` and relative links get a plain `<a>` in the same
+  tab; only `http(s)://` links open a new tab.
 
 ## i18n
 
