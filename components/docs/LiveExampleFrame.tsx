@@ -1,12 +1,34 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
-import type { ExampleDetails } from "@/lib/docs/examples";
+import { CodeBlock } from "@/components/code/CodeBlock";
+import { localSourcesOf, type ExampleDetails } from "@/lib/docs/examples";
+import { ExampleTabs, type StackblitzTarget } from "./ExampleTabs";
 
 interface LiveExampleFrameProps {
   title: string;
-  /** A registered example: adds its description and reserves its height. */
+  /**
+   * A registered example: adds its description, Preview and Code tabs,
+   * Reset and "Open in StackBlitz". Without one the frame just holds
+   * `children`.
+   */
   example?: ExampleDetails;
   children: ReactNode;
+}
+
+function stackblitzTarget(example: ExampleDetails): StackblitzTarget {
+  const { meta } = example;
+  if (meta.stackblitz) return { path: meta.stackblitz };
+  return {
+    project: {
+      id: meta.id,
+      title: meta.title,
+      description: meta.description,
+      fileName: example.fileName,
+      source: example.source,
+      localSources: localSourcesOf(example),
+      dependencies: example.dependencies,
+    },
+  };
 }
 
 // The accent-tinted border and header bar set a running example apart from
@@ -37,12 +59,23 @@ export async function LiveExampleFrame({
           {t("liveExample")}
         </span>
       </div>
-      <div
-        className="overflow-x-auto p-4"
-        style={{ minHeight: example?.meta.minHeight }}
-      >
-        {children}
-      </div>
+      {example ? (
+        <ExampleTabs
+          code={
+            <CodeBlock
+              code={example.source}
+              title={example.fileName}
+              className="rounded-t-none rounded-b-2xl border-0"
+            />
+          }
+          stackblitz={stackblitzTarget(example)}
+          minHeight={example.meta.minHeight}
+        >
+          {children}
+        </ExampleTabs>
+      ) : (
+        <div className="overflow-x-auto p-4">{children}</div>
+      )}
     </div>
   );
 }

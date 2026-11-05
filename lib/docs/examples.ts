@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { ExampleMeta } from "@/components/live-examples/meta";
-import { generatedExamples } from "./example-sources.generated";
+import { generatedExamples, sharedSources } from "./example-sources.generated";
 
 /** One `*.example.tsx`, as `scripts/gen-example-sources.mjs` writes it. */
 export interface GeneratedExample {
@@ -22,3 +22,12 @@ export const examples: Readonly<Record<string, GeneratedExample>> =
 
 /** An example without its component: what its frame shows about it. */
 export type ExampleDetails = Omit<GeneratedExample, "Component">;
+
+/** The shared files an example imports, by the name its source imports them as. */
+export function localSourcesOf(
+  example: ExampleDetails,
+): Record<string, string> {
+  return Object.fromEntries(
+    example.localFiles.map((name) => [name, sharedSources[name]]),
+  );
+}
