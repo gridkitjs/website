@@ -10,7 +10,7 @@ export const meta: ExampleMeta = {
   title: "Column templates",
   description:
     "A header template and a cell template format the cost column as currency.",
-  minHeight: 260,
+  minHeight: 277,
 };
 
 const currency = new Intl.NumberFormat("en-US", {

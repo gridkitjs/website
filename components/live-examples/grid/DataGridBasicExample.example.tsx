@@ -10,7 +10,7 @@ export const meta: ExampleMeta = {
   title: "Columns inferred from rows",
   description:
     "defineColumnsFromRows builds the columns from the data; hover a row to highlight it.",
-  minHeight: 260,
+  minHeight: 277,
 };
 
 export function DataGridBasicExample() {

@@ -15,7 +15,7 @@ export const meta: ExampleMeta = {
   title: "Resizable, reorderable columns",
   description:
     "Drag a header edge to resize, drag a header to reorder, and switch between fit and fixed sizing.",
-  minHeight: 300,
+  minHeight: 313,
 };
 
 const currency = new Intl.NumberFormat("en-US", {

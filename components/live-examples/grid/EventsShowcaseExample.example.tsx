@@ -11,7 +11,7 @@ export const meta: ExampleMeta = {
   title: "Every DataGrid callback",
   description:
     "Resize, reorder or select anything in the grid; each callback logs a line below it.",
-  minHeight: 460,
+  minHeight: 389,
 };
 
 const columns: readonly ColumnDefinition<DeploymentRow>[] = [

@@ -16,7 +16,7 @@ export const meta: ExampleMeta = {
   title: "Column resizing",
   description:
     "Drag a header edge to resize a column; in fit mode the others give way, in fixed mode the grid scrolls.",
-  minHeight: 420,
+  minHeight: 425,
 };
 
 const columns: readonly ColumnDefinition<DeploymentRow>[] = [

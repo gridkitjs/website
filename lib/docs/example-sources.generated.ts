@@ -17,7 +17,7 @@ export const generatedExamples = {
       title: "Column resizing",
       description:
         "Drag a header edge to resize a column; in fit mode the others give way, in fixed mode the grid scrolls.",
-      minHeight: 420,
+      minHeight: 425,
     },
     fileName: "ColumnResizingExample.tsx",
     source: `import { useState } from "react";
@@ -101,7 +101,7 @@ export function ColumnResizingExample() {
       title: "Column templates",
       description:
         "A header template and a cell template format the cost column as currency.",
-      minHeight: 260,
+      minHeight: 277,
     },
     fileName: "ColumnTemplatesExample.tsx",
     source: `import { defineColumnsFromRows } from "@gridkitjs/core";
@@ -155,7 +155,7 @@ export function ColumnTemplatesExample() {
       title: ".gridkit-light / .gridkit-dark",
       description:
         "Switch the app theme: only the first grid follows it, the other two stay pinned.",
-      minHeight: 260,
+      minHeight: 287,
     },
     fileName: "DarkModeExample.tsx",
     source: `import { useState } from "react";
@@ -280,7 +280,7 @@ export function DarkModeExample() {
       title: "Columns inferred from rows",
       description:
         "defineColumnsFromRows builds the columns from the data; hover a row to highlight it.",
-      minHeight: 260,
+      minHeight: 277,
     },
     fileName: "DataGridBasicExample.tsx",
     source: `import { defineColumnsFromRows } from "@gridkitjs/core";
@@ -316,7 +316,7 @@ export function DataGridBasicExample() {
       title: "Resizable, reorderable columns",
       description:
         "Drag a header edge to resize, drag a header to reorder, and switch between fit and fixed sizing.",
-      minHeight: 300,
+      minHeight: 313,
     },
     fileName: "DataGridResizeReorderExample.tsx",
     source: `import { useState } from "react";
@@ -405,7 +405,7 @@ export function DataGridResizeReorderExample() {
       title: "Every DataGrid callback",
       description:
         "Resize, reorder or select anything in the grid; each callback logs a line below it.",
-      minHeight: 460,
+      minHeight: 389,
     },
     fileName: "EventsShowcaseExample.tsx",
     source: `import { defineColumnsFromRows } from "@gridkitjs/core";
@@ -511,7 +511,7 @@ export function EventsShowcaseExample() {
       title: "Row, column and cell selection",
       description:
         "Click a row, a header or a cell; each selection change logs a line below the grid.",
-      minHeight: 400,
+      minHeight: 389,
     },
     fileName: "CombinedSelectionExample.tsx",
     source: `import { defineColumnsFromRows } from "@gridkitjs/core";
