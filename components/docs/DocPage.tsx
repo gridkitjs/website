@@ -13,6 +13,7 @@ export async function DocPage({
   editUrl,
   prev,
   next,
+  toc,
   children,
 }: {
   crumbs: Crumb[];
@@ -22,6 +23,8 @@ export async function DocPage({
   editUrl: string;
   prev?: PrevNextEntry;
   next?: PrevNextEntry;
+  /** Rendered between the page header and the content. */
+  toc?: ReactNode;
   children: ReactNode;
 }) {
   const t = await getTranslations("common");
@@ -48,6 +51,7 @@ export async function DocPage({
           })}
         </p>
       )}
+      {toc}
       <Prose className="mt-8">{children}</Prose>
       <a
         href={editUrl}
