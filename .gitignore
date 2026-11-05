@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Claude Code (plans, local state) - never committed, same as the gridkit repo
 .claude/
+
+# generated at prebuild from lib/docs/mdx.tsx
+/public/mdx-tags.json
