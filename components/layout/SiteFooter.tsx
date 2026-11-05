@@ -1,4 +1,5 @@
 import { getFormatter, getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/Container";
 import { RelativeTime } from "@/components/ui/RelativeTime";
 import { GitHubIcon, NpmIcon } from "@/components/ui/icons";
@@ -30,15 +31,23 @@ export async function SiteFooter() {
           <p className="text-site-ink-muted-inverted mt-2 max-w-sm text-sm">
             {t("tagline")}
           </p>
-          <a
-            href={siteConfig.github}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="text-site-ink-inverted mt-4 inline-flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
-          >
-            <GitHubIcon className="size-4" />
-            {t("githubHeading")}
-          </a>
+          <div className="mt-4 flex flex-col items-start gap-2">
+            <a
+              href={siteConfig.github}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-site-ink-inverted inline-flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-70"
+            >
+              <GitHubIcon className="size-4" />
+              {t("githubHeading")}
+            </a>
+            <Link
+              href="/about"
+              className="text-site-ink-inverted text-sm font-medium transition-opacity hover:opacity-70"
+            >
+              {t("about")}
+            </Link>
+          </div>
         </div>
         <div>
           <p className="text-site-ink-inverted text-sm font-semibold">
