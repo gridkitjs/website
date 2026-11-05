@@ -128,6 +128,25 @@ body {
   overflow-x: hidden;
 }
 
+@layer base {
+  /* The grid draws its own ring inside cells; its selectors outrank this. */
+  :focus-visible {
+    outline: 2px solid var(--site-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /*
  * Code blocks are highlighted with both Shiki themes at once (CodeBlock);
  * each token carries its colour for each as a variable. The block's own

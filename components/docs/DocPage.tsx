@@ -53,7 +53,7 @@ export async function DocPage({
         href={editUrl}
         target="_blank"
         rel="noreferrer"
-        className="text-site-ink-muted hover:text-site-accent mt-8 inline-flex items-center gap-1.5 text-sm"
+        className="text-site-ink-muted hover:text-site-accent mt-8 inline-flex items-center gap-1.5 text-sm transition-colors"
       >
         <GitHubIcon className="h-4 w-4" />
         {t("editOnGithub")}

@@ -22,7 +22,10 @@ export async function Breadcrumbs({
       <JsonLd data={breadcrumbListJsonLd(locale, [root, ...crumbs])} />
       <ol className="flex flex-wrap items-center gap-1.5">
         <li>
-          <Link href={`/${root.path}`} className="hover:text-site-ink">
+          <Link
+            href={`/${root.path}`}
+            className="hover:text-site-ink transition-colors"
+          >
             {root.name}
           </Link>
         </li>
@@ -36,7 +39,10 @@ export async function Breadcrumbs({
                   {crumb.name}
                 </span>
               ) : (
-                <Link href={`/${crumb.path}`} className="hover:text-site-ink">
+                <Link
+                  href={`/${crumb.path}`}
+                  className="hover:text-site-ink transition-colors"
+                >
                   {crumb.name}
                 </Link>
               )}
