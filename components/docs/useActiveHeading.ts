@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 
 /**
- * The band of the viewport a heading counts as current in: below the sticky
- * header, down to 30% of the height. The observer only says when a heading
- * crosses one of its edges; which one is current is then read off the page.
+ * How far down the viewport, as a fraction of its height, a heading has to
+ * scroll before its section counts as the one being read.
  */
-const ROOT_MARGIN = "-80px 0px -70% 0px";
-const BAND_BOTTOM = 0.3;
+const READING_LINE = 0.3;
 
 /**
  * The id of the heading the reader is in: the last of `ids` whose heading
- * has scrolled above the band's bottom edge, or `undefined` above the first.
+ * has scrolled above the reading line, or `undefined` above the first. At
+ * the bottom of the page it is the last heading on screen, since the
+ * sections there may be too short to reach the line.
  */
 export function useActiveHeading(ids: readonly string[]) {
   const [activeId, setActiveId] = useState<string>();
@@ -24,20 +24,36 @@ export function useActiveHeading(ids: readonly string[]) {
       .filter((heading) => heading !== null);
     if (headings.length === 0) return;
 
+    // Read on scroll rather than through an IntersectionObserver: a jump
+    // (End, a scrollbar drag, find in page) can carry a heading straight
+    // past any band an observer watches without it ever intersecting.
+    let frame = 0;
+
     function update() {
-      const bandBottom = window.innerHeight * BAND_BOTTOM;
+      frame = 0;
+      const root = document.documentElement;
+      const atBottom =
+        window.innerHeight + window.scrollY >= root.scrollHeight - 1;
+      const line = atBottom
+        ? window.innerHeight
+        : window.innerHeight * READING_LINE;
       const passed = headings.filter(
-        (heading) => heading.getBoundingClientRect().top <= bandBottom,
+        (heading) => heading.getBoundingClientRect().top <= line,
       );
       setActiveId(passed.at(-1)?.id);
     }
 
-    const observer = new IntersectionObserver(update, {
-      rootMargin: ROOT_MARGIN,
-    });
-    for (const heading of headings) observer.observe(heading);
+    function scheduleUpdate() {
+      if (frame === 0) frame = requestAnimationFrame(update);
+    }
+
+    scheduleUpdate();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
     return () => {
-      observer.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
     };
   }, [idList]);
 
