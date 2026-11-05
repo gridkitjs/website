@@ -12,7 +12,8 @@ import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { Link } from "@/i18n/navigation";
-import { CodeBlock } from "@/components/code/CodeBlock";
+import { bundledLanguages, type BundledLanguage } from "shiki";
+import { CodeBlock, type CodeLanguage } from "@/components/code/CodeBlock";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
 import { ClientOnly } from "@/components/ui/ClientOnly";
 import { cn } from "@/components/ui/cn";
@@ -26,7 +27,18 @@ import { EventsShowcaseExample } from "@/components/live-examples/EventsShowcase
 import { DarkModeExample } from "@/components/live-examples/DarkModeExample";
 import { CombinedSelectionExample } from "@/components/live-examples/CombinedSelectionExample";
 
-type CodeLang = "tsx" | "ts" | "css";
+function isBundledLanguage(lang: string): lang is BundledLanguage {
+  return Object.hasOwn(bundledLanguages, lang);
+}
+
+// Many `ts` fences in the gridkit docs hold JSX, which Shiki's `ts` grammar
+// mis-highlights; `tsx` is a superset, so plain TypeScript loses nothing.
+// A fence naming a language Shiki doesn't bundle renders as plain text.
+function fenceLanguage(className = ""): CodeLanguage {
+  const lang = /language-([\w-]+)/.exec(className)?.[1] ?? "tsx";
+  if (lang === "ts") return "tsx";
+  return isBundledLanguage(lang) ? lang : "text";
+}
 
 // MDX compiles fenced code blocks to <pre><code className="language-x">...</code></pre>;
 // route that through the site's Shiki-highlighted, copy-button CodeBlock instead.
@@ -35,10 +47,14 @@ async function Pre({
 }: {
   children: ReactElement<{ className?: string; children?: unknown }>;
 }) {
-  const lang = (/language-(\w+)/.exec(children.props.className ?? "")?.[1] ??
-    "ts") as CodeLang;
   const code = String(children.props.children).replace(/\n$/, "");
-  return <CodeBlock code={code} lang={lang} className="mt-4" />;
+  return (
+    <CodeBlock
+      code={code}
+      lang={fenceLanguage(children.props.className)}
+      className="mt-4"
+    />
+  );
 }
 
 const LINK_CLASS =

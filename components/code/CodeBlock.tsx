@@ -1,10 +1,13 @@
-import { codeToHtml } from "shiki";
+import { codeToHtml, type BundledLanguage } from "shiki";
 import { cn } from "@/components/ui/cn";
 import { CopyButton } from "./CopyButton";
 
+/** Any language Shiki bundles, or `"text"` for unhighlighted plain text. */
+export type CodeLanguage = BundledLanguage | "text";
+
 interface CodeBlockProps {
   code: string;
-  lang?: "tsx" | "ts" | "css";
+  lang?: CodeLanguage;
   className?: string;
 }
 
