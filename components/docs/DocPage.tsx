@@ -52,7 +52,11 @@ export async function DocPage({
         </p>
       )}
       {toc}
-      <Prose className="mt-8">{children}</Prose>
+      {/* Below lg the docs bar sits under the site header, so a heading
+          jumped to has to clear both. */}
+      <Prose className="mt-8 [&_h2]:scroll-mt-28 lg:[&_h2]:scroll-mt-20 [&_h3]:scroll-mt-28 lg:[&_h3]:scroll-mt-20">
+        {children}
+      </Prose>
       <a
         href={editUrl}
         target="_blank"
