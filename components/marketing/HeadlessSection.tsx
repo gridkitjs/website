@@ -15,9 +15,10 @@ const grid = createGridController({
   defaultGroupBy: [{ columnId: "Region" }],
 });
 
-// Draw the view with anything. Here: a table in the console.
+// Draw the view with anything; here, the console.
 grid.subscribe(() => {
-  console.table(grid.getView().rows.map((entry) => entry.row));
+  const { rows } = grid.getView();
+  console.table(rows.map((entry) => entry.row));
 });
 
 grid.toggleColumnSort("Amount");
