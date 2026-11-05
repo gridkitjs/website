@@ -4,6 +4,7 @@ import { Geist } from "next/font/google";
 import { getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { buttonClasses } from "@/components/ui/Button";
+import { ThemeScript } from "@/components/layout/ThemeScript";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -32,7 +33,11 @@ export default async function GlobalNotFound() {
     <html
       lang={routing.defaultLocale}
       className={`${geistSans.variable} antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <ThemeScript />
+      </head>
       <body className="bg-site-bg text-site-ink flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
         <p className="text-site-accent text-sm font-medium">404</p>
         <h1 className="text-3xl font-semibold tracking-tight">{t("title")}</h1>
