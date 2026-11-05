@@ -158,13 +158,17 @@ runs; add a new published package to the script when `gridkit` ships one.
   footer — use the `-inverted` tokens (`bg-`, `surface-`, `ink-`,
   `ink-muted-`, `line-inverted`), which stay dark in both themes; reach for
   them instead of hand-picking a dark color.
-- **Identity** is dense and rectilinear, like the grid it sells: buttons,
-  controls and cards take `rounded-site`/`rounded-site-sm`, never pills
-  (`rounded-full`) or `rounded-xl`+; groups of items are 1px hairline
-  lattices in `line`/`line-strong` rather than gapped card grids; versions
-  and counts are `font-mono tabular-nums`; a section label, when one earns
-  its place, is a small uppercase header-cell style line, at most one per
-  three sections. No gradients, gradient-clipped text or radial
+- **Identity** is dense and rectilinear, like the grid it sells: every bordered
+  container (card, panel, frame, lattice, button, control) uses `rounded-site`;
+  small inline chips (badges, `<Kbd>`) use `rounded-site-sm`; never pills
+  (`rounded-full`), `rounded-lg`+ or square corners. Groups of items are 1px
+  hairline lattices in `line`/`line-strong` rather than gapped card grids,
+  framed by a bordered wrapper with `rounded-site` and `overflow-hidden`: each
+  cell draws its right and bottom edge and the inner grid takes `-mr-px -mb-px`,
+  so the outermost cell borders sit under the frame's and none pokes through a
+  corner; versions and counts are `font-mono tabular-nums`; a section label,
+  when one earns its place, is a small uppercase header-cell style line, at most
+  one per three sections. No gradients, gradient-clipped text or radial
   backgrounds.
 - **Dark mode** is the `.dark` class on `<html>`. Every token above is
   redefined under `@variant dark` in `globals.css`, so a new token needs a
@@ -179,13 +183,17 @@ runs; add a new published package to the script when `gridkit` ships one.
   one. Only the toggle touches `<html>`: a live example that demonstrates a
   theme (`DarkModeExample`) pins its own wrapper with the grid's
   `.gridkit-light`/`.gridkit-dark` classes instead.
-- **Docs sidebar state** is `sessionStorage["gk-docs-nav"]`, beside
+- **Sidebar state** is `sessionStorage["gk-docs-nav"]` for the docs and
+  `sessionStorage["gk-changelog-nav"]` for the changelog, beside
   `gk-theme`: a JSON map of which sections and groups are open (`react`,
-  `react/columns`), kept by `useOpenNavGroups` and shared by the inline
-  sidebar and the mobile drawer. Both render `lib/docs/nav.ts`'s cut of the
-  docs tree, titles and slugs only, so no page body reaches the client.
-  The server renders only the current page's section and group open; the
-  stored set applies after hydration.
+  `react/columns`), kept by `useOpenNavGroups` (one store per storage key)
+  and shared by the inline docs sidebar and the mobile drawer. Both docs
+  sidebars render `lib/docs/nav.ts`'s cut of the docs tree, titles and
+  slugs only, so no page body reaches the client. The server renders only
+  the current page's section and group open; the stored set applies after
+  hydration. `SidebarSection` and `SidebarGroup` in `components/docs/` are
+  the disclosure pieces every sidebar, the changelog's included, is built
+  from.
 - **Search** fetches `/api/search-index` only when a reader hovers or
   focuses a search trigger or opens the palette, then builds a MiniSearch
   index in the browser (`useSearchIndex`), once per visit. Ranking: fields

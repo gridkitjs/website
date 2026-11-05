@@ -132,45 +132,47 @@ export default async function ChangelogSlugPage({
           {t("intro")}
         </p>
         {/* A hairline lattice, as on the docs index. */}
-        <div className="border-site-line mt-10 grid border-t border-l sm:grid-cols-2 lg:grid-cols-3">
-          {tree.sections.map((section) => {
-            const release = releases[section.slug];
-            return (
-              // The cell's link stretches over it; the npm link sits above.
-              <div
-                key={section.slug}
-                className="border-site-line hover:bg-site-surface relative border-r border-b p-6 transition-colors"
-              >
-                <Link
-                  href={`/changelog/${section.slug}`}
-                  className="text-site-ink font-mono text-sm font-medium after:absolute after:inset-0"
+        <div className="border-site-line rounded-site mt-10 overflow-hidden border">
+          <div className="-mr-px -mb-px grid sm:grid-cols-2 lg:grid-cols-3">
+            {tree.sections.map((section) => {
+              const release = releases[section.slug];
+              return (
+                // The cell's link stretches over it; the npm link sits above.
+                <div
+                  key={section.slug}
+                  className="border-site-line hover:bg-site-surface relative border-r border-b p-6 transition-colors"
                 >
-                  {section.title}
-                </Link>
-                <p className="text-site-ink-muted mt-2 text-sm leading-relaxed">
-                  {release
-                    ? tChangelog("latestRelease", {
-                        version: release.version,
-                        date: format.dateTime(release.releasedAt, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        }),
-                      })
-                    : `v${section.versions[0].version}`}
-                </p>
-                <a
-                  href={npmPackageUrl(section.slug)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-site-ink-muted hover:text-site-accent relative mt-3 inline-flex items-center gap-1.5 text-xs transition-colors"
-                >
-                  <NpmIcon className="h-4 w-4" />
-                  {tChangelog("viewOnNpm")}
-                </a>
-              </div>
-            );
-          })}
+                  <Link
+                    href={`/changelog/${section.slug}`}
+                    className="text-site-ink font-mono text-sm font-medium after:absolute after:inset-0"
+                  >
+                    {section.title}
+                  </Link>
+                  <p className="text-site-ink-muted mt-2 text-sm leading-relaxed">
+                    {release
+                      ? tChangelog("latestRelease", {
+                          version: release.version,
+                          date: format.dateTime(release.releasedAt, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }),
+                        })
+                      : `v${section.versions[0].version}`}
+                  </p>
+                  <a
+                    href={npmPackageUrl(section.slug)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-site-ink-muted hover:text-site-accent relative mt-3 inline-flex items-center gap-1.5 text-xs transition-colors"
+                  >
+                    <NpmIcon className="h-4 w-4" />
+                    {tChangelog("viewOnNpm")}
+                  </a>
+                </div>
+              );
+            })}
+          </div>
         </div>
         <p className="text-site-ink-muted mt-10 text-sm">
           {t("backToDocs")}{" "}

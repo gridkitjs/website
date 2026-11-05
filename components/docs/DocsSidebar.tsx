@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useId, useRef, type ComponentProps } from "react";
+import { useEffect, useId, useMemo, useRef, type ComponentProps } from "react";
 import { useTranslations } from "next-intl";
 import { usePathname, Link } from "@/i18n/navigation";
-import type { DocsNavPage, DocsNavSection } from "@/lib/docs/nav";
+import {
+  activeNavKeys,
+  type DocsNavPage,
+  type DocsNavSection,
+} from "@/lib/docs/nav";
 import { cn } from "@/components/ui/cn";
 import { SidebarGroup, SidebarSection } from "./SidebarGroup";
 import { revealInScrollParent } from "./revealInScrollParent";
-import { useOpenNavGroups } from "./useOpenNavGroups";
+import { DOCS_NAV_STORAGE_KEY, useOpenNavGroups } from "./useOpenNavGroups";
 
 interface DocsSidebarProps extends ComponentProps<"nav"> {
   sections: DocsNavSection[];
@@ -23,7 +27,14 @@ export function DocsSidebar({
 }: DocsSidebarProps) {
   const t = useTranslations("docs.nav");
   const pathname = usePathname();
-  const { isOpen, toggle, restored } = useOpenNavGroups(sections, pathname);
+  const activeKeys = useMemo(
+    () => activeNavKeys(sections, pathname),
+    [sections, pathname],
+  );
+  const { isOpen, toggle, restored } = useOpenNavGroups(
+    DOCS_NAV_STORAGE_KEY,
+    activeKeys,
+  );
   // The drawer and the inline sidebar can both be on the page; their list
   // ids must not collide.
   const idPrefix = useId();
