@@ -19,5 +19,9 @@
     "close": "Close menu",
     "overview": "Overview",
     "toggle": "{title} pages"
+  },
+  "landmarks": {
+    "sidebar": "Docs sidebar",
+    "toc": "Page contents"
   }
 }

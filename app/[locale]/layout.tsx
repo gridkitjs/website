@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -92,6 +92,7 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale);
+  const t = await getTranslations("common");
 
   // The theme script adds `.dark` or `.light` to `<html>` before hydration.
   return (
@@ -107,8 +108,17 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <JsonLd data={organizationJsonLd()} />
           <JsonLd data={websiteJsonLd(locale)} />
+          <a
+            href="#main"
+            className="bg-site-surface-raised text-site-ink border-site-line rounded-site sr-only z-50 border px-4 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+          >
+            {t("skipToContent")}
+          </a>
           <SiteHeader />
-          <main className="flex-1">{children}</main>
+          {/* Focusable so the skip link moves focus, not just the scroll. */}
+          <main id="main" tabIndex={-1} className="flex-1 outline-none">
+            {children}
+          </main>
           <SiteFooter />
         </NextIntlClientProvider>
         <Analytics />
