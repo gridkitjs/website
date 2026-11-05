@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { fetchRawFile, isNotFound } from "@/lib/docs/github";
+import { getDocsManifest } from "@/lib/docs/manifest";
 import { PACKAGES } from "@/lib/packages";
 
 export interface ChangelogVersion {
@@ -39,20 +40,37 @@ function npmName(slug: string): string {
   return `@gridkitjs/${slug}`;
 }
 
+/**
+ * The fallback for when no manifest is published: one package's
+ * `CHANGELOG.md` from raw.githubusercontent.com, or `null` for a package that
+ * has never been released and so has none yet. Any other failure is rethrown
+ * so a GitHub blip isn't cached as a missing changelog.
+ */
+async function fetchChangelogFile(repoPath: string): Promise<string | null> {
+  try {
+    return await fetchRawFile(repoPath);
+  } catch (error) {
+    if (isNotFound(error)) return null;
+    throw error;
+  }
+}
+
+/** A package's whole `CHANGELOG.md`, or `null` when it has none. */
+async function readChangelog(
+  slug: string,
+  repoPath: string,
+): Promise<string | null> {
+  const manifest = await getDocsManifest();
+  if (!manifest) return fetchChangelogFile(repoPath);
+  return manifest.packages[slug]?.changelog?.body ?? null;
+}
+
 async function buildSection(
   pkg: (typeof PACKAGES)[number],
 ): Promise<ChangelogSection | undefined> {
   const repoPath = `packages/${pkg.slug}/CHANGELOG.md`;
-  let content: string;
-  try {
-    content = await fetchRawFile(repoPath);
-  } catch (error) {
-    // A package that has never been released has no CHANGELOG.md yet. Any
-    // other failure is rethrown so a GitHub blip isn't cached as a missing
-    // changelog.
-    if (isNotFound(error)) return undefined;
-    throw error;
-  }
+  const content = await readChangelog(pkg.slug, repoPath);
+  if (content === null) return undefined;
 
   const versions = parseVersions(content);
   if (versions.length === 0) return undefined;
