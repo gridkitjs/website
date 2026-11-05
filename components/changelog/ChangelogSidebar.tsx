@@ -35,7 +35,7 @@ export function ChangelogSidebar({
                     href={href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "block rounded-md px-3 py-1.5 text-sm transition-colors",
+                      "rounded-site block px-3 py-1.5 text-sm transition-colors",
                       active
                         ? "bg-site-surface text-site-ink font-medium"
                         : "text-site-ink-muted hover:text-site-ink",

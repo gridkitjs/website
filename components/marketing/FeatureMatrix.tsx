@@ -25,11 +25,22 @@ export async function FeatureMatrix() {
     >
       <Container className="py-20">
         <div className="max-w-2xl">
+          {/* The page's one eyebrow, styled like the lattice's header cells. */}
+          <p className="text-site-ink-muted mb-3 text-xs font-semibold tracking-wide uppercase">
+            {t("eyebrow")}
+          </p>
           <h2 className="text-site-ink text-3xl font-semibold tracking-tight">
             {t("title")}
           </h2>
           <p className="text-site-ink-muted mt-3 text-lg">
-            {t("subtitle", { count: featureCount })}
+            {t.rich("subtitle", {
+              count: featureCount,
+              number: (chunks) => (
+                <span className="text-site-ink font-mono tabular-nums">
+                  {chunks}
+                </span>
+              ),
+            })}
           </p>
         </div>
 

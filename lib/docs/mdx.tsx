@@ -142,7 +142,7 @@ function Table({ children, ...props }: ComponentProps<"table">) {
   const head = sections.find((section) => section.type === Thead);
   const monoColumns = monoColumnsOf(head);
   return (
-    <div className="border-site-line my-6 w-full overflow-x-auto rounded-xl border">
+    <div className="border-site-line rounded-site my-6 w-full overflow-x-auto border">
       <table className="w-full min-w-160 border-collapse text-sm" {...props}>
         {sections.map((section) =>
           section === head ? section : withMonoCells(section, monoColumns),
@@ -159,7 +159,7 @@ function Thead(props: ComponentProps<"thead">) {
 function Th(props: ComponentProps<"th">) {
   return (
     <th
-      className="border-site-line text-site-ink border-b px-3 py-3 text-left text-xs font-semibold first:rounded-tl-xl last:rounded-tr-xl"
+      className="border-site-line text-site-ink first:rounded-tl-site last:rounded-tr-site border-b px-3 py-3 text-left text-xs font-semibold"
       {...props}
     />
   );

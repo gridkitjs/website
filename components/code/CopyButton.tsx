@@ -25,7 +25,7 @@ export function CopyButton({
       onClick={handleCopy}
       aria-label={copied ? "Copied" : "Copy code"}
       className={cn(
-        "border-site-line bg-site-surface text-site-ink-muted hover:text-site-ink absolute top-2.5 right-2.5 inline-flex h-7 w-7 items-center justify-center rounded-md border transition-colors",
+        "border-site-line bg-site-surface text-site-ink-muted hover:text-site-ink rounded-site absolute top-2.5 right-2.5 inline-flex h-7 w-7 items-center justify-center border transition-colors",
         className,
       )}
     >

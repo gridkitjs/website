@@ -154,10 +154,18 @@ runs; add a new published package to the script when `gridkit` ships one.
   (text on an accent fill — never `text-white`); states `success`,
   `warning`, `danger`, `info`, each with a `-soft` background; code
   `code-bg`, `code-border`, `code-inline-bg`; `focus-ring`; and radii
-  `rounded-site-sm`/`rounded-site` (4px/6px). Inverted surfaces — hero, CTA,
+  `rounded-site-sm`/`rounded-site` (4px/6px). Inverted surfaces — the
   footer — use the `-inverted` tokens (`bg-`, `surface-`, `ink-`,
   `ink-muted-`, `line-inverted`), which stay dark in both themes; reach for
   them instead of hand-picking a dark color.
+- **Identity** is dense and rectilinear, like the grid it sells: buttons,
+  controls and cards take `rounded-site`/`rounded-site-sm`, never pills
+  (`rounded-full`) or `rounded-xl`+; groups of items are 1px hairline
+  lattices in `line`/`line-strong` rather than gapped card grids; versions
+  and counts are `font-mono tabular-nums`; a section label, when one earns
+  its place, is a small uppercase header-cell style line, at most one per
+  three sections. No gradients, gradient-clipped text or radial
+  backgrounds.
 - **Dark mode** is the `.dark` class on `<html>`. Every token above is
   redefined under `@variant dark` in `globals.css`, so a new token needs a
   dark value there too. An inline script in the locale layout's `<head>`

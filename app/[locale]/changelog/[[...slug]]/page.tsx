@@ -129,18 +129,19 @@ export default async function ChangelogSlugPage({
         <p className="text-site-ink-muted mt-3 max-w-2xl text-lg">
           {t("intro")}
         </p>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* A hairline lattice, as on the docs index. */}
+        <div className="border-site-line mt-10 grid border-t border-l sm:grid-cols-2 lg:grid-cols-3">
           {tree.sections.map((section) => {
             const release = releases[section.slug];
             return (
-              // The card's link stretches over it; the npm link sits above.
+              // The cell's link stretches over it; the npm link sits above.
               <div
                 key={section.slug}
-                className="border-site-line hover:border-site-accent relative rounded-2xl border p-6 transition-colors"
+                className="border-site-line hover:bg-site-surface relative border-r border-b p-6 transition-colors"
               >
                 <Link
                   href={`/changelog/${section.slug}`}
-                  className="text-site-ink font-mono text-sm font-medium after:absolute after:inset-0 after:rounded-2xl"
+                  className="text-site-ink font-mono text-sm font-medium after:absolute after:inset-0"
                 >
                   {section.title}
                 </Link>
