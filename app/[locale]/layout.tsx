@@ -51,7 +51,7 @@ export async function generateMetadata({
     metadataBase: new URL(siteConfig.baseUrl),
     title: {
       template: "%s · GridKit",
-      default: "GridKit — a headless data-grid toolkit",
+      default: "GridKit: a headless data grid for TypeScript and React",
     },
     description:
       "GridKit is a headless, framework-agnostic data-grid toolkit for TypeScript and React.",
