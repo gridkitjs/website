@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import MiniSearch from "minisearch";
+import type MiniSearch from "minisearch";
 import type { SearchIndex, SearchRecord } from "@/lib/docs/search-index";
 
 const INDEX_URL = "/api/search-index";
@@ -24,8 +24,6 @@ export type SearchIndexState =
 
 const IDLE: SearchIndexState = { status: "idle" };
 
-const tokenize: (text: string) => string[] = MiniSearch.getDefault("tokenize");
-
 function fieldText(record: SearchRecord, field: string): string {
   switch (field) {
     case "id":
@@ -41,9 +39,14 @@ function fieldText(record: SearchRecord, field: string): string {
   }
 }
 
-function createSearch(records: SearchRecord[]): (query: string) => SearchHit[] {
+function createSearch(
+  MiniSearchClass: typeof MiniSearch,
+  records: SearchRecord[],
+): (query: string) => SearchHit[] {
   const byId = new Map(records.map((record) => [record.id, record]));
-  const miniSearch = new MiniSearch<SearchRecord>({
+  const tokenize: (text: string) => string[] =
+    MiniSearchClass.getDefault("tokenize");
+  const miniSearch = new MiniSearchClass<SearchRecord>({
     fields: ["page", "heading", "terms", "snippet"],
     extractField: fieldText,
     // A props table names its prop family over and over (`filterMenuLabel`,
@@ -89,12 +92,25 @@ function subscribe(listener: () => void) {
   };
 }
 
+async function fetchRecords(): Promise<SearchRecord[]> {
+  const res = await fetch(INDEX_URL);
+  if (!res.ok) throw new Error(`${INDEX_URL} answered ${res.status}`);
+  const { records } = (await res.json()) as SearchIndex;
+  return records;
+}
+
 async function loadIndex() {
   try {
-    const res = await fetch(INDEX_URL);
-    if (!res.ok) throw new Error(`${INDEX_URL} answered ${res.status}`);
-    const { records } = (await res.json()) as SearchIndex;
-    setState({ status: "ready", search: createSearch(records) });
+    // MiniSearch comes with the index, so pages pay nothing for search
+    // until a reader reaches for it.
+    const [{ default: MiniSearchClass }, records] = await Promise.all([
+      import("minisearch"),
+      fetchRecords(),
+    ]);
+    setState({
+      status: "ready",
+      search: createSearch(MiniSearchClass, records),
+    });
   } catch (error) {
     console.error(`[search] Couldn't load the index: ${String(error)}`);
     setState({ status: "error" });
