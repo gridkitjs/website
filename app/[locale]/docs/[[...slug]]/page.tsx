@@ -2,14 +2,36 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DocPage } from "@/components/docs/DocPage";
-import { OnThisPage } from "@/components/docs/OnThisPage";
+import { OnThisPage, OnThisPageDisclosure } from "@/components/docs/OnThisPage";
 import { DocContent } from "@/lib/docs/mdx";
 import { extractToc } from "@/lib/docs/toc";
 import { Link, redirect } from "@/i18n/navigation";
-import { getDocsTree } from "@/lib/docs/source";
+import {
+  getDocsTree,
+  type DocPageNode,
+  type DocSectionNode,
+  type DocsTree,
+} from "@/lib/docs/source";
+import type { PrevNextEntry } from "@/components/ui/PrevNextNav";
 import { getEditUrl } from "@/lib/docs/github";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { JsonLd, techArticleJsonLd } from "@/lib/json-ld";
+
+/** A prev/next card, naming the page's section when it isn't `current`. */
+function pageCard(
+  tree: DocsTree,
+  current: DocSectionNode,
+  target: DocPageNode | undefined,
+): PrevNextEntry | undefined {
+  if (!target) return undefined;
+  const section = tree.bySlug.get(target.slug)?.section;
+  return {
+    href: `/docs/${target.slug}`,
+    title: target.title,
+    section:
+      section && section.slug !== current.slug ? section.title : undefined,
+  };
+}
 
 interface PageParams {
   locale: string;
@@ -110,7 +132,7 @@ export default async function DocsSlugPage({
     notFound();
   }
 
-  const { page, section } = entry;
+  const { page, section, group } = entry;
   const index = tree.flat.findIndex((candidate) => candidate.slug === path);
   const prev = index > 0 ? tree.flat[index - 1] : undefined;
   const next =
@@ -122,6 +144,8 @@ export default async function DocsSlugPage({
 
   const crumbs = [
     { name: section.title, path: `docs/${section.slug}` },
+    // A group is a folder, with no page of its own to link to.
+    ...(group ? [{ name: group.title }] : []),
     ...(page.slug !== section.slug
       ? [{ name: page.title, path: `docs/${page.slug}` }]
       : []),
@@ -145,12 +169,9 @@ export default async function DocsSlugPage({
           description={page.description}
           lastUpdated={page.lastModified}
           editUrl={getEditUrl(page.repoPath)}
-          prev={
-            prev ? { href: `/docs/${prev.slug}`, title: prev.title } : undefined
-          }
-          next={
-            next ? { href: `/docs/${next.slug}`, title: next.title } : undefined
-          }
+          prev={pageCard(tree, section, prev)}
+          next={pageCard(tree, section, next)}
+          toc={<OnThisPageDisclosure toc={toc} label={t("onThisPage")} />}
         >
           <DocContent source={page.content} />
         </DocPage>

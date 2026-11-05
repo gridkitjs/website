@@ -16,21 +16,21 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 
 ## Structure
 
-| Path                                        | What belongs in it                                                                                                                  |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `app/[locale]/`                             | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`.                               |
-| `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                              |
-| `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                         |
-| `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                                                       |
-| `components/docs/`, `components/changelog/` | Page chrome for the docs/changelog readers — sidebar, prev/next, breadcrumbs.                                                       |
-| `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                                          |
-| `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                         |
-| `components/code/`                          | `CodeBlock` (Shiki highlighting) and `CopyButton`, used by the MDX `pre` override.                                                  |
-| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), docs manifest reader (`manifest.ts`), docs tree builder (`source.ts`), MDX renderer (`mdx.tsx`). |
-| `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                                        |
-| `lib/packages/`                             | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                            |
-| `lib/seo/`                                  | Metadata builders and site-wide constants (canonical URL, social image, etc).                                                       |
-| `i18n/`                                     | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                         |
+| Path                                        | What belongs in it                                                                                                                                                                            |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/[locale]/`                             | Routes: marketing home, `docs/[[...slug]]`, `changelog/[[...slug]]`. Locale-prefixed via `next-intl`. The layout's skip link targets `<main id="main">`.                                      |
+| `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                                                                                        |
+| `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                                                                                   |
+| `components/live-examples/`                 | Interactive `DataGrid` demos embedded in doc pages via the MDX component map.                                                                                                                 |
+| `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`. |
+| `components/marketing/`                     | Homepage sections (Hero, FeaturesSection, StorySection, CtaSection). Not used inside docs.                                                                                                    |
+| `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                   |
+| `components/code/`                          | `CodeBlock` (Shiki highlighting) and `CopyButton`, used by the MDX `pre` override.                                                                                                            |
+| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), MDX renderer (`mdx.tsx`).                                                           |
+| `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                                                                                                  |
+| `lib/packages/`                             | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                      |
+| `lib/seo/`                                  | Metadata builders and site-wide constants (canonical URL, social image, etc).                                                                                                                 |
+| `i18n/`                                     | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                                                                                   |
 
 ## Relationship to the `gridkit` repo
 
@@ -160,6 +160,13 @@ runs; add a new published package to the script when `gridkit` ships one.
   one. Only the toggle touches `<html>`: a live example that demonstrates a
   theme (`DarkModeExample`) pins its own wrapper with the grid's
   `.gridkit-light`/`.gridkit-dark` classes instead.
+- **Docs sidebar state** is `sessionStorage["gk-docs-nav"]`, beside
+  `gk-theme`: a JSON map of which sections and groups are open (`react`,
+  `react/columns`), kept by `useOpenNavGroups` and shared by the inline
+  sidebar and the mobile drawer. Both render `lib/docs/nav.ts`'s cut of the
+  docs tree, titles and slugs only, so no page body reaches the client.
+  The server renders only the current page's section and group open; the
+  stored set applies after hydration.
 - The grid itself is styled by `@gridkitjs/theme-tailwind`, imported once in
   `globals.css`. Never hand-style `DataGrid` internals with
   site-local utility classes — that's the same "utility classes obliging

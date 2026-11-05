@@ -13,6 +13,7 @@ export async function DocPage({
   editUrl,
   prev,
   next,
+  toc,
   children,
 }: {
   crumbs: Crumb[];
@@ -22,6 +23,8 @@ export async function DocPage({
   editUrl: string;
   prev?: PrevNextEntry;
   next?: PrevNextEntry;
+  /** Rendered between the page header and the content. */
+  toc?: ReactNode;
   children: ReactNode;
 }) {
   const t = await getTranslations("common");
@@ -48,7 +51,12 @@ export async function DocPage({
           })}
         </p>
       )}
-      <Prose className="mt-8">{children}</Prose>
+      {toc}
+      {/* Below lg the docs bar sits under the site header, so a heading
+          jumped to has to clear both. */}
+      <Prose className="mt-8 [&_h2]:scroll-mt-28 lg:[&_h2]:scroll-mt-20 [&_h3]:scroll-mt-28 lg:[&_h3]:scroll-mt-20">
+        {children}
+      </Prose>
       <a
         href={editUrl}
         target="_blank"

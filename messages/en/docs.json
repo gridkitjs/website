@@ -12,5 +12,17 @@
     "viewOnGithub": "Read on GitHub",
     "digest": "Error ID: {digest}"
   },
-  "loading": "Loading page"
+  "loading": "Loading page",
+  "backToTop": "Back to top",
+  "nav": {
+    "label": "Docs",
+    "menu": "Menu",
+    "close": "Close menu",
+    "overview": "Overview",
+    "toggle": "{title} pages"
+  },
+  "landmarks": {
+    "sidebar": "Docs sidebar",
+    "toc": "Page contents"
+  }
 }
