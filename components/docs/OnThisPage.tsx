@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type RefObject } from "react";
+import { useTranslations } from "next-intl";
 import type { TocEntry } from "@/lib/docs/toc";
 import { cn } from "@/components/ui/cn";
 import { ChevronRightIcon } from "@/components/ui/icons";
@@ -67,6 +68,7 @@ function headingIds(toc: TocEntry[]): string[] {
  * the one being read highlighted.
  */
 export function OnThisPage({ toc, label }: OnThisPageProps) {
+  const t = useTranslations("docs.landmarks");
   const activeId = useActiveHeading(headingIds(toc));
   const activeLinkRef = useRef<HTMLAnchorElement>(null);
 
@@ -79,7 +81,10 @@ export function OnThisPage({ toc, label }: OnThisPageProps) {
   // Scrolls on its own once taller than the viewport below the header; the
   // negative margin keeps link focus rings clear of its clipping.
   return (
-    <aside className="hidden xl:sticky xl:top-24 xl:-m-2 xl:block xl:max-h-[calc(100vh-7.5rem)] xl:self-start xl:overflow-y-auto xl:p-2">
+    <aside
+      aria-label={t("toc")}
+      className="hidden xl:sticky xl:top-24 xl:-m-2 xl:block xl:max-h-[calc(100vh-7.5rem)] xl:self-start xl:overflow-y-auto xl:p-2"
+    >
       <nav aria-label={label}>
         <p className="text-site-ink-muted mb-3 text-xs font-semibold tracking-wide uppercase">
           {label}

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { getTranslations } from "next-intl/server";
 import { Container } from "@/components/ui/Container";
 import { DocsMobileNav } from "@/components/docs/DocsMobileNav";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
@@ -11,9 +12,10 @@ export default async function DocsLayout({
 }: {
   children: ReactNode;
 }) {
-  const [tree, releases] = await Promise.all([
+  const [tree, releases, t] = await Promise.all([
     getDocsTree(),
     getLatestReleases(),
+    getTranslations("docs.landmarks"),
   ]);
   const sections = toDocsNav(tree.sections);
   const latestVersions = Object.fromEntries(
@@ -26,7 +28,10 @@ export default async function DocsLayout({
       <Container className="grid max-w-7xl gap-10 py-8 lg:grid-cols-[220px_1fr] lg:gap-16 lg:py-16">
         {/* Scrolls on its own once taller than the viewport below the header;
             the negative margin keeps link focus rings clear of its clipping. */}
-        <aside className="hidden lg:sticky lg:top-24 lg:-m-2 lg:block lg:max-h-[calc(100vh-7.5rem)] lg:self-start lg:overflow-y-auto lg:p-2">
+        <aside
+          aria-label={t("sidebar")}
+          className="hidden lg:sticky lg:top-24 lg:-m-2 lg:block lg:max-h-[calc(100vh-7.5rem)] lg:self-start lg:overflow-y-auto lg:p-2"
+        >
           <DocsSidebar sections={sections} latestVersions={latestVersions} />
         </aside>
         <div className="min-w-0">{children}</div>
