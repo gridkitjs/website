@@ -11,7 +11,7 @@ export const meta: ExampleMeta = {
   title: "Row, column and cell selection",
   description:
     "Click a row, a header or a cell; each selection change logs a line below the grid.",
-  minHeight: 400,
+  minHeight: 389,
 };
 
 const columns: readonly ColumnDefinition<DeploymentRow>[] = [

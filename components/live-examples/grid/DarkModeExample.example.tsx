@@ -11,7 +11,7 @@ export const meta: ExampleMeta = {
   title: ".gridkit-light / .gridkit-dark",
   description:
     "Switch the app theme: only the first grid follows it, the other two stay pinned.",
-  minHeight: 260,
+  minHeight: 287,
 };
 
 const rows = [
