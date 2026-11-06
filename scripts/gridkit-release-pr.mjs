@@ -29,9 +29,12 @@ import {
   gridkitDependencies,
   parseReleasePayload,
 } from "./lib/gridkit-payload.mjs";
+import {
+  RELEASE_BASE as BASE,
+  RELEASE_HEAD as HEAD,
+  openReleasePullRequest,
+} from "./lib/release-pull-request.mjs";
 
-const BASE = "main";
-const HEAD = "development";
 const GRIDKIT = `https://github.com/${OWNER}/${REPO}`;
 
 /** How a fix made on `development` reaches the release pull request. */
@@ -195,25 +198,8 @@ const body = [
   "</details>",
 ].join("\n");
 
-const existing = /** @type {{ number: number, url: string }[]} */ (
-  JSON.parse(
-    ghRead([
-      "pr",
-      "list",
-      "--base",
-      BASE,
-      "--head",
-      HEAD,
-      "--state",
-      "open",
-      "--json",
-      "number,url",
-    ]),
-  )
-);
-
-/** @type {{ number: number, url: string } | undefined} */
-let pr = existing[0];
+/** @type {import("./lib/release-pull-request.mjs").PullRequest | undefined} */
+let pr = openReleasePullRequest();
 if (pr) {
   ghWrite(
     ["pr", "edit", String(pr.number), "--title", title, "--body-file", "-"],
