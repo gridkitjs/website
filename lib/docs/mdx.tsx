@@ -12,6 +12,10 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { examples, type GeneratedExample } from "./examples";
 import { rehypeCodeMeta } from "./rehype-code-meta";
+import {
+  remarkUnregisteredTags,
+  UNREGISTERED_TAG,
+} from "./remark-unregistered-tags";
 import { bundledLanguages, type BundledLanguage } from "shiki";
 import { parseMetaHighlightString } from "@shikijs/transformers";
 import { CodeBlock, type CodeLanguage } from "@/components/code/CodeBlock";
@@ -20,6 +24,7 @@ import { DocLink } from "@/components/docs/DocLink";
 import { LinkCard, LinkCards } from "@/components/docs/LinkCards";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
 import { PackageInstall } from "@/components/docs/PackageInstall";
+import { PendingExample } from "@/components/docs/PendingExample";
 import { Since } from "@/components/docs/Since";
 import { cn } from "@/components/ui/cn";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
@@ -304,15 +309,26 @@ const mdxComponents = {
   ...exampleTags,
 };
 
+const registeredTags = new Set(Object.keys(mdxComponents));
+
+/** `mdxComponents` plus the placeholder unregistered tags are renamed to. */
+const renderComponents = {
+  ...mdxComponents,
+  [UNREGISTERED_TAG]: PendingExample,
+};
+
 /** Renders a doc page's MDX body (frontmatter already stripped by `gray-matter` in `lib/docs/source.ts`). */
 export function DocContent({ source }: { source: string }) {
   return (
     <MDXRemote
       source={source}
-      components={mdxComponents}
+      components={renderComponents}
       options={{
         mdxOptions: {
-          remarkPlugins: [remarkGfm],
+          remarkPlugins: [
+            remarkGfm,
+            [remarkUnregisteredTags, { registered: registeredTags }],
+          ],
           rehypePlugins: [
             rehypeCodeMeta,
             rehypeSlug,
