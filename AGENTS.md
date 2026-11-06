@@ -76,6 +76,19 @@ CI-equivalent local check, in order:
 npm run format:check && npm run lint && npx tsc --noEmit && npm run build
 ```
 
+The `ci` job in `.github/workflows/ci.yml` runs this same sequence on every
+pull request and every push to `main` and `development`; the `ci` check must
+pass before a merge. After the build it also runs two guards:
+
+- `node scripts/check-prerendered-routes.mjs <build-log>` fails when the docs
+  or changelog route is `ƒ` instead of `●` in the build's route table (see
+  [app/[locale]/AGENTS.md](app/[locale]/AGENTS.md#keep-the-routes-prerendered)).
+- `git diff --exit-code lib/docs/example-sources.generated.ts` fails when the
+  committed file no longer matches what `prebuild` generates, so an example
+  changed without its regenerated sources being committed.
+
+Vercel still builds the previews and production on its own.
+
 - **TypeScript** — `strict` (see `tsconfig.json`). Fix the type rather than
   reaching for `any` or a non-null assertion.
 - **ESLint** — `eslint-config-next`'s core-web-vitals + typescript configs.

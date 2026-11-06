@@ -19,7 +19,8 @@ The docs pages themselves are not in this repo: they are written in the
 
 Branch off `main`, one branch per change, and open a pull request. Branch
 names and commit messages are under
-[Branches and commits](AGENTS.md#branches-and-commits).
+[Branches and commits](AGENTS.md#branches-and-commits). The `ci` check runs
+the same checks on every pull request and must pass before a merge.
 
 ## Before you open a pull request
 

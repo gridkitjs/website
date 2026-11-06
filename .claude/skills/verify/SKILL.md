@@ -5,10 +5,10 @@ description: Run the website's local check sequence, in order, before pushing or
 
 # Run the local checks
 
-This repo has no CI workflow of its own: Vercel builds every push, and a
-broken build fails the deploy. Run the same checks here first. What each one
-enforces is under [Standards](../../../AGENTS.md#standards) in the root
-`AGENTS.md`.
+The `ci` job (`.github/workflows/ci.yml`) runs these same checks on every pull
+request, and Vercel builds every push. Run them here first rather than
+finding a failure there. What each one enforces is under
+[Standards](../../../AGENTS.md#standards) in the root `AGENTS.md`.
 
 ## 1. The sequence
 
@@ -32,7 +32,10 @@ When the build passes, check its route table: `/[locale]/docs/[[...slug]]`
 and `/[locale]/changelog/[[...slug]]` must be marked `●` (prerendered). A
 `ƒ` there means a layout or page reads request headers, so every visit
 renders on demand behind the loading skeleton. The build still succeeds, so
-this is the step most often missed. The fix is in
+this is the step most often missed. CI fails on it through
+`scripts/check-prerendered-routes.mjs`, which reads a saved build log; to run
+it here, build with `npm run build 2>&1 | tee <log outside the repo>` and pass
+that path to the script. The fix is in
 [app/[locale]/AGENTS.md](../../../app/[locale]/AGENTS.md#keep-the-routes-prerendered).
 
 ## 3. Reading a failure
@@ -51,7 +54,10 @@ this is the step most often missed. The fix is in
 `npm run build` and `npm run dev` both regenerate
 `lib/docs/example-sources.generated.ts`. If it shows up changed and no
 example changed, restore it with
-`git checkout -- lib/docs/example-sources.generated.ts`.
+`git checkout -- lib/docs/example-sources.generated.ts`. If you changed an
+example, commit the regenerated file: CI fails when
+`git diff --exit-code lib/docs/example-sources.generated.ts` finds it stale
+after the build.
 
 Report each step as passed or failed with its real output. Don't call a step
 passed that you didn't run.
