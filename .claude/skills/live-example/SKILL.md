@@ -12,6 +12,12 @@ Read both first; this is the procedure.
 
 ## 1. Write the file
 
+First look in `components/live-examples/` for an example of the same
+interaction (`ColumnChooserExample` is under `columns/`, for one). If it
+exists, skip to step 5 and hand over its tag. If the feature is newer than
+the installed `@gridkitjs/*` versions in `package.json`, run
+`npm run update-gridkit` first, or the example won't compile.
+
 Pick the area (`grid`, `columns`, `rows`, `selection` or `data`) and a name
 ending in `Example`. Start from the smallest existing example,
 `components/live-examples/grid/DataGridBasicExample.example.tsx`, and copy

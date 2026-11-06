@@ -6,6 +6,13 @@ The look they share (the lattices, the tokens) is in
 carries the site's one radial accent glow (`--site-accent` mixed into
 `--site-bg`, fading to transparent).
 
+A new section is a server component in this folder, shaped like
+`CtaSection.tsx`: `Section` (`variant` `default`, `muted` or `inverted`) and
+`Container` from `components/ui/`, copy from a new key in
+`messages/en/home.json` read with `getTranslations("home.<key>")`, and a line
+in `page.tsx`, which already calls `setRequestLocale`. Build a card from the
+token utilities in the styling rule and it needs no `dark:` classes.
+
 Two of them need care:
 
 - **`HeroGrid`** is a live `DataGrid` (200 rows from `makeRows`, grouped

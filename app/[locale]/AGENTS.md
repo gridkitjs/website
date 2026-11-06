@@ -20,6 +20,10 @@ parallel, so the call in one doesn't cover another:
   and calls `setRequestLocale(locale)` before it reads translations
   (`getTranslations`, `getFormatter`, …). Server components they render
   below that call are covered.
+  `app/[locale]/docs/layout.tsx` is the shape to copy: `params` typed as a
+  `Promise<{ locale: string }>`, awaited, then `setRequestLocale(locale)`.
+  Reading `cookies()`, `headers()` or a page's `searchParams` also opts a
+  route out of prerendering.
 - `loading.tsx` files are `"use client"` and translate with
   `useTranslations`: a loading boundary gets no `params`, so it can't call
   `setRequestLocale`. Client hooks read the provider's messages and don't

@@ -52,8 +52,9 @@ nothing uses gradients, radial backgrounds or gradient-clipped text.
 ## Dark mode
 
 Dark mode is the `.dark` class on `<html>`. Every token above is
-redefined under `@variant dark` in `globals.css`, so a new token needs a
-dark value there too. An inline script in the locale layout's `<head>`
+redefined under `@variant dark` in `globals.css`, so a component built from
+token utilities is correct in both themes without any `dark:` classes, and a
+new token needs a dark value there too. An inline script in the locale layout's `<head>`
 (`ThemeScript`, built from `lib/theme.ts`) sets `.dark` or `.light` before
 first paint from `localStorage["gk-theme"]` (`light`, `dark` or `system`;
 missing means `system`), and `ThemeToggle` in the header writes that key.
