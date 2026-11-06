@@ -41,6 +41,15 @@ jobs:
       - name: Check docs routes are prerendered
         run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
 
+      # The two repos couple by tag name only. A pinned docs manifest using a
+      # live example or component this site doesn't register would render a
+      # placeholder, so the PR that pins it fails until the example lands.
+      # Reads the public/mdx-tags.json that `prebuild` wrote.
+      - name: Check manifest tags are registered
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/check-manifest-tags.mjs
+
       # `prebuild` regenerates the live examples' sources from
       # components/live-examples. A committed copy that no longer matches means
       # an example changed without the regeneration being committed.
