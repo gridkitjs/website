@@ -1,0 +1,66 @@
+name: Site checks
+description: >
+  Format, lint, types, the build, and the guards that read the build:
+  prerendered docs routes and registered manifest tags. Expects the repo
+  checked out and its dependencies installed.
+
+inputs:
+  github-token:
+    description: >
+      Token for the GitHub API. The build fetches the docs manifest from the
+      public gridkitjs/gridkitjs repo, and a token lifts the unauthenticated
+      rate limit.
+    required: true
+  manifest-ref:
+    description: >
+      Branch of gridkitjs/gridkitjs whose docs manifest the build reads, such
+      as docs-meta-next. Empty reads the pin in gridkit.json.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    # Before gridkit first publishes the ref, the build falls back to the pin
+    # (with a warning) rather than failing every run on that branch.
+    - name: Read the docs manifest at ${{ inputs.manifest-ref }}
+      if: inputs.manifest-ref != ''
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        MANIFEST_REF: ${{ inputs.manifest-ref }}
+      run: node scripts/use-manifest-ref.mjs "$MANIFEST_REF"
+
+    - shell: bash
+      run: npm run format:check
+    - shell: bash
+      run: npm run lint
+    - shell: bash
+      run: npx tsc --noEmit
+
+    # The log is kept for the route check below, and `pipefail` keeps a failed
+    # build from being hidden by `tee`.
+    - name: Build
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        set -o pipefail
+        npm run build 2>&1 | tee "$RUNNER_TEMP/build.log"
+
+    # A route that reads request headers renders on demand (`ƒ`): the build
+    # still succeeds, but every docs and changelog visit would then show the
+    # loading skeleton. Fails unless both routes are prerendered (`●`).
+    - name: Check docs routes are prerendered
+      shell: bash
+      run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
+
+    # The two repos couple by tag name only. A docs manifest using a live
+    # example or component this site doesn't register would render a
+    # placeholder, so the PR that pins it fails until the example lands.
+    # Reads the public/mdx-tags.json that `prebuild` wrote.
+    - name: Check manifest tags are registered
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: node scripts/check-manifest-tags.mjs

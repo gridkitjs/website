@@ -20,6 +20,9 @@ export const REPO = process.env.DOCS_GITHUB_REPO ?? "gridkitjs";
 
 const PIN = new URL("../../gridkit.json", import.meta.url);
 
+/** A git ref safe to pass to the GitHub API and to a workflow's env file. */
+export const MANIFEST_REF = /^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._/-]*$/;
+
 /**
  * @typedef {object} ManifestDoc
  * @property {string} repoPath e.g. "packages/react/docs/columns/column-sorting.mdx".
@@ -65,6 +68,26 @@ export function githubApi(path, accept) {
   return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/${path}`, {
     headers,
   });
+}
+
+/**
+ * Whether a branch, tag or commit named `ref` exists in the docs repo. Throws
+ * on any answer but found or not found.
+ *
+ * @param {string} ref
+ * @returns {Promise<boolean>}
+ */
+export async function refExists(ref) {
+  const path = ref.split("/").map(encodeURIComponent).join("/");
+  const response = await githubApi(
+    `commits/${path}`,
+    "application/vnd.github.sha",
+  );
+  await response.body?.cancel();
+  if (response.ok) return true;
+  // 422 is GitHub's answer for a name that resolves to no commit.
+  if (response.status === 404 || response.status === 422) return false;
+  throw new Error(`GitHub returned ${response.status} for the ref ${ref}`);
 }
 
 /**
