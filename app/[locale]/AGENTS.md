@@ -5,8 +5,8 @@ listed in the root [Structure](../../AGENTS.md#structure) table. The home
 page's sections are covered in
 [components/marketing/AGENTS.md](../../components/marketing/AGENTS.md), the
 Open Graph images under `og/` and `opengraph-image.tsx` in
-[lib/seo/AGENTS.md](../../lib/seo/AGENTS.md), and UI copy in the root
-[i18n](../../AGENTS.md#i18n) section.
+[lib/seo/AGENTS.md](../../lib/seo/AGENTS.md), and UI copy in
+[.claude/rules/i18n.md](../../.claude/rules/i18n.md).
 
 ## Keep the routes prerendered
 

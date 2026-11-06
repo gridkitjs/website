@@ -1,10 +1,10 @@
 # Home page sections (`components/marketing/`)
 
 `app/[locale]/page.tsx` stacks the sections in `components/marketing/`.
-The look they share (the lattices, the one
-radial glow on the hero) is in the root
-[Styling and custom components](../../AGENTS.md#styling-and-custom-components)
-section.
+The look they share (the lattices, the tokens) is in
+[.claude/rules/styling.md](../../.claude/rules/styling.md). The home hero
+carries the site's one radial accent glow (`--site-accent` mixed into
+`--site-bg`, fading to transparent).
 
 Two of them need care:
 

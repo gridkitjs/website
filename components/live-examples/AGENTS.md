@@ -7,9 +7,10 @@ than one large kitchen-sink grid; the doc page picks the example that
 matches the section it's in.
 
 How the grid is styled, and why its internals are never hand-styled, is in
-the root
-[Styling and custom components](../../AGENTS.md#styling-and-custom-components)
-section.
+[.claude/rules/styling.md](../../.claude/rules/styling.md). A live example
+that demonstrates a theme (`DarkModeExample`) leaves `<html>` to the site's
+theme toggle and pins its own wrapper with the grid's
+`.gridkit-light`/`.gridkit-dark` classes instead.
 
 ## One file each
 
