@@ -21,7 +21,6 @@ import { LinkCard, LinkCards } from "@/components/docs/LinkCards";
 import { LiveExampleFrame } from "@/components/docs/LiveExampleFrame";
 import { PackageInstall } from "@/components/docs/PackageInstall";
 import { Since } from "@/components/docs/Since";
-import { ClientOnly } from "@/components/ui/ClientOnly";
 import { cn } from "@/components/ui/cn";
 import { Kbd, KbdGroup } from "@/components/ui/Kbd";
 import { StackblitzExample } from "@/components/live-examples/StackblitzExample";
@@ -243,17 +242,11 @@ function Tr(props: ComponentProps<"tr">) {
   return <tr className="last:[&>td]:border-b-0" {...props} />;
 }
 
-// @gridkitjs/react's DataGrid reads its stores through useSyncExternalStore
-// without a server snapshot, so prerendering it throws. Each example mounts
-// in the browser only, inside a frame that reserves its height, until the
-// package gives it one.
 function framedExample({ Component, ...example }: GeneratedExample) {
   function FramedExample({ title = example.meta.title }: { title?: string }) {
     return (
       <LiveExampleFrame title={title} example={example}>
-        <ClientOnly>
-          <Component />
-        </ClientOnly>
+        <Component />
       </LiveExampleFrame>
     );
   }
