@@ -5,7 +5,8 @@ import "server-only";
  * fetched from GitHub rather than bundled into this site, so editors can
  * update docs without a website redeploy. Every request here goes through
  * Next's fetch cache — see `DOCS_CACHE_TAG` for the on-demand revalidation
- * hook and `DOCS_CACHE_SECONDS` for the time-based fallback.
+ * hook and `DOCS_CACHE_SECONDS` for the time-based fallback, which a file
+ * read at a commit SHA goes without because its content can never change.
  */
 
 export const DOCS_CACHE_TAG = "docs-content";
@@ -53,6 +54,19 @@ export interface GithubFetchOptions {
   notFoundExpected?: boolean;
 }
 
+interface CacheOptions {
+  /**
+   * The response can never change, so it's cached without the time-based
+   * fallback. Next caches only 200 responses, so a failure is still retried.
+   */
+  immutable?: boolean;
+}
+
+/** Whether `ref` is a full 40-character commit SHA rather than a branch or tag. */
+function isCommitSha(ref: string): boolean {
+  return /^[0-9a-f]{40}$/i.test(ref);
+}
+
 /**
  * A cached GET against GitHub; throws `GithubFetchError` on a non-OK response
  * so no failure is cached as content.
@@ -61,11 +75,17 @@ async function fetchFromGithub(
   url: string,
   resource: string,
   accept: string,
-  { notFoundExpected = false }: GithubFetchOptions = {},
+  {
+    notFoundExpected = false,
+    immutable = false,
+  }: GithubFetchOptions & CacheOptions = {},
 ): Promise<Response> {
   const res = await fetch(url, {
     headers: githubHeaders(accept),
-    next: { revalidate: DOCS_CACHE_SECONDS, tags: [DOCS_CACHE_TAG] },
+    next: {
+      revalidate: immutable ? false : DOCS_CACHE_SECONDS,
+      tags: [DOCS_CACHE_TAG],
+    },
   });
   if (res.status === 404 && notFoundExpected) {
     throw new GithubFetchError(resource, res.status);
@@ -113,6 +133,8 @@ export async function fetchRawFile(repoPath: string): Promise<string> {
  * raw.githubusercontent.com, the API isn't behind a CDN, so it serves a push
  * the moment it lands; it costs one call against the rate limit. The raw
  * media type is what lets it return files over the JSON response's 1 MB cap.
+ * At a commit SHA the file can't change, so it's cached without expiry; it
+ * still carries `DOCS_CACHE_TAG`, like every other fetch here.
  */
 export async function fetchFileFromApi(
   repoPath: string,
@@ -123,7 +145,7 @@ export async function fetchFileFromApi(
     `https://api.github.com/repos/${OWNER}/${REPO}/contents/${repoPath}?ref=${encodeURIComponent(ref)}`,
     `${repoPath}@${ref}`,
     "application/vnd.github.raw+json",
-    options,
+    { ...options, immutable: isCommitSha(ref) },
   );
   return res.text();
 }

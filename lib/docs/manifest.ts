@@ -1,6 +1,7 @@
 import "server-only";
 import { readFile } from "node:fs/promises";
 import { cache } from "react";
+import pin from "@/gridkit.json";
 import { fetchFileFromApi, isNotFound } from "./github";
 
 /**
@@ -49,12 +50,35 @@ export interface ManifestMeta {
 
 const MANIFEST_PATH = "docs-manifest.json";
 const SCHEMA_VERSION = 1;
-const MANIFEST_REF = process.env.DOCS_MANIFEST_REF ?? "docs-meta";
+/**
+ * The gridkit ref the manifest is read at: `DOCS_MANIFEST_REF` when set (the
+ * next site and previews name a branch), else the `docs-meta` commit pinned
+ * in `gridkit.json`, which production reads so its docs move only when that
+ * file does.
+ */
+const MANIFEST_REF = process.env.DOCS_MANIFEST_REF || pin.docsManifest;
 /** A manifest on disk to read instead, for previewing gridkit docs before they're pushed. */
 const MANIFEST_FILE = process.env.DOCS_MANIFEST_FILE;
 
+/**
+ * Whether the manifest's source has been logged: once per server process, so
+ * a build log says which docs it rendered.
+ */
+let loggedSource = false;
+
+function logSourceOnce(): void {
+  if (loggedSource) return;
+  loggedSource = true;
+  console.info(
+    MANIFEST_FILE
+      ? `[docs] Reading ${MANIFEST_PATH} from ${MANIFEST_FILE}`
+      : `[docs] Reading ${MANIFEST_PATH} at ${MANIFEST_REF}`,
+  );
+}
+
 /** The manifest's text, or `null` when none is published at `MANIFEST_REF`. */
 async function readManifest(): Promise<string | null> {
+  logSourceOnce();
   if (MANIFEST_FILE) return readFile(MANIFEST_FILE, "utf8");
   try {
     return await fetchFileFromApi(MANIFEST_PATH, MANIFEST_REF, {
