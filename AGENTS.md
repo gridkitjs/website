@@ -88,6 +88,25 @@ npm run format:check && npm run lint && npx tsc --noEmit && npm run build
   to any new module that reads `GITHUB_TOKEN`/`DOCS_REVALIDATE_SECRET` or
   otherwise must never end up in a client bundle.
 
+### Comments
+
+A comment describes the code as it is now, for a reader who never saw an
+earlier version. The history of a change belongs in git and the PR, not in
+the file.
+
+- Comment only what the code can't say: a reason that isn't obvious, a
+  workaround and what it works around, a constraint from outside the file.
+  Don't restate what the next line does.
+- Never narrate the change: "was x, now y", "changed to fix #12",
+  "instead of the old approach", "new:", "updated to". If a comment only
+  makes sense next to the diff, it belongs in the PR or nowhere.
+- Code you delete takes its comments with it. Leave no "removed X" note and
+  no commented-out code.
+- Code you change: fix or delete the comments it makes wrong.
+
+The test: would this comment still read correctly to someone opening the
+file cold, a year from now?
+
 ## Branches and commits
 
 [Conventional Commits](https://www.conventionalcommits.org):
@@ -115,6 +134,10 @@ npm run format:check && npm run lint && npx tsc --noEmit && npm run build
 
 Branch names take the commit type as prefix, then a short kebab-case
 subject: `feat/prev-next-nav`, `fix/kbd-registration`.
+
+A PR description describes the end state and why it's needed, not how the
+branch got there (what was tried, what was reverted, "addressed review
+feedback").
 
 ## Where the rest lives
 
