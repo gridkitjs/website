@@ -8,7 +8,6 @@ import {
 } from "@gridkitjs/react";
 import type { GroupByState } from "@gridkitjs/core";
 import { makeRows, type TicketRow } from "@/components/live-examples/fixtures";
-import { ClientOnly } from "@/components/ui/ClientOnly";
 import { cn } from "@/components/ui/cn";
 
 const rows = makeRows(200);
@@ -42,38 +41,31 @@ interface HeroGridProps {
 
 /**
  * The home page's live grid: 200 seeded rows grouped by region, with a
- * search box, sortable headers and a group-by bar. It mounts in the browser
- * only (`DataGrid` can't prerender), so its wrapper reserves the grid's
- * height and the page doesn't move when it appears.
+ * search box, sortable headers and a group-by bar. It prerenders with the
+ * page; the wrapper pins its height so nothing below it moves.
  */
 export function HeroGrid({ className }: HeroGridProps) {
   const t = useTranslations("home.hero");
 
   return (
     <div className={cn("h-[432px]", className)}>
-      <ClientOnly
-        fallback={
-          <div className="border-site-line bg-site-surface rounded-site h-full border" />
-        }
-      >
-        <DataGrid
-          columns={columns}
-          dataSource={rows}
-          getRowId={(row) => String(row.Id)}
-          label={t("gridLabel")}
-          borders="horizontal"
-          height={BODY_HEIGHT}
-          virtualized
-          sortableColumns
-          groupableColumns
-          groupByDraggableColumns
-          // A fixed drop target, so the grid's height doesn't change when
-          // the last level is removed.
-          groupByBarVisibility="always"
-          defaultGroupBy={defaultGroupBy}
-          toolbar={{ label: t("gridToolbarLabel"), items: toolbarItems }}
-        />
-      </ClientOnly>
+      <DataGrid
+        columns={columns}
+        dataSource={rows}
+        getRowId={(row) => String(row.Id)}
+        label={t("gridLabel")}
+        borders="horizontal"
+        height={BODY_HEIGHT}
+        virtualized
+        sortableColumns
+        groupableColumns
+        groupByDraggableColumns
+        // A fixed drop target, so the grid's height doesn't change when
+        // the last level is removed.
+        groupByBarVisibility="always"
+        defaultGroupBy={defaultGroupBy}
+        toolbar={{ label: t("gridToolbarLabel"), items: toolbarItems }}
+      />
     </div>
   );
 }

@@ -292,9 +292,8 @@ runs; add a new published package to the script when `gridkit` ships one.
     result.
   - **Registry**: `lib/docs/examples.ts` exposes the generated entries by
     tag, and `mdx.tsx` turns each into an MDX tag that renders the example
-    in its own `LiveExampleFrame`, inside `ClientOnly`:
-    `@gridkitjs/react`'s `DataGrid` has no server snapshot for its stores,
-    so prerendering it fails the build. A doc page writes `<Name />`, or
+    in its own `LiveExampleFrame`, prerendered with the page. A doc page
+    writes `<Name />`, or
     `<Name title="…" />` to override `meta.title`. A bare
     `<LiveExampleFrame title="…">` around a registered example passes its
     title on rather than framing it twice; around anything else (such as
@@ -322,9 +321,8 @@ runs; add a new published package to the script when `gridkit` ships one.
 Two of them need care:
 
 - **`HeroGrid`** is a live `DataGrid` (200 rows from `makeRows`, grouped
-  by region). Like a live example it mounts in the browser only, inside
-  `ClientOnly`, so its wrapper reserves the grid's whole height
-  (`h-[432px]`) and the page doesn't move when it appears. The grid's
+  by region), prerendered with the page. Its wrapper pins the grid's whole
+  height (`h-[432px]`) so nothing below it moves. The grid's
   `height` bounds only the rows area, so after changing it, the toolbar or
   the group-by bar, measure the mounted grid and update the wrapper.
 - **`FeatureMatrix`** renders `FEATURE_GROUPS` from
