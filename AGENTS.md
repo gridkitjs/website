@@ -26,7 +26,7 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 | `components/live-examples/`                 | `DataGrid` demos, one `<area>/<Name>.example.tsx` each, and their fixtures; registered via `lib/docs/examples.ts` (see [components/live-examples/AGENTS.md](components/live-examples/AGENTS.md)).                                                                                           |
 | `components/search/`                        | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).                                                                                                            |
 | `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`.                                                                                               |
-| `components/marketing/`                     | Homepage sections: `Hero` (with `HeroGrid`, the live grid), `FeatureMatrix`, `HeadlessSection`, `PackagesSection`, `StorySection`, `CtaSection`. Not used inside docs (see **Home page**).                                                                                                  |
+| `components/marketing/`                     | Homepage sections: `Hero` (with `HeroGrid`, the live grid), `FeatureMatrix`, `HeadlessSection`, `PackagesSection`, `StorySection`, `CtaSection`. Not used inside docs (see [components/marketing/AGENTS.md](components/marketing/AGENTS.md)).                                               |
 | `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                                                                                                                 |
 | `components/code/`                          | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override.                                                                                                                                                                    |
 | `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`).                                                                                                |
@@ -190,26 +190,6 @@ runs; add a new published package to the script when `gridkit` ships one.
   `LinkCard`) so they carry the current locale prefix. In-page `#anchor`
   and relative links get a plain `<a>` in the same tab; only `http(s)://`
   links open a new tab.
-
-## Home page
-
-`app/[locale]/page.tsx` stacks the sections in `components/marketing/`.
-Two of them need care:
-
-- **`HeroGrid`** is a live `DataGrid` (200 rows from `makeRows`, grouped
-  by region), prerendered with the page. Its wrapper pins the grid's whole
-  height (`h-[432px]`) so nothing below it moves. The grid's
-  `height` bounds only the rows area, so after changing it, the toolbar or
-  the group-by bar, measure the mounted grid and update the wrapper.
-- **`FeatureMatrix`** renders `FEATURE_GROUPS` from
-  `lib/marketing/features.ts`: each feature is a `key`, its label under
-  `features.items` in `messages/<locale>/home.json`, and the `slug` of
-  its doc page. `prebuild` runs `scripts/check-feature-slugs.mjs`, which
-  fails the build when a slug isn't a page of the docs tree (read as the
-  site reads it: `DOCS_MANIFEST_FILE`, the manifest, or the repo tree) or a
-  key has no label; run it by hand with
-  `node scripts/check-feature-slugs.mjs`. A doc page gridkit renames or
-  removes fails the next build here; a new feature page is added by hand.
 
 ## Brand assets and social images
 
