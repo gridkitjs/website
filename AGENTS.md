@@ -195,8 +195,10 @@ feedback").
   body says how to resolve it on a branch; merge that fix with a merge
   commit, not a squash. `gridkit-snapshot.yml` installs the exact `dev`
   snapshot versions gridkit sends after each snapshot publish, runs the
-  site checks and commits `chore(deps): use gridkit snapshot <sha>`. Both
-  push as the release bot (a GitHub App), so CI and the Vercel deploy run.
+  site checks and commits `chore(deps): use gridkit snapshot <sha>`,
+  except while a release pull request is open (see
+  [How production moves](#how-production-moves)). Both push as the release
+  bot (a GitHub App), so CI and the Vercel deploy run.
 - **Never merge `development` into `main` by hand**, and never push to it
   except through a pull request. It carries prerelease packages, which CI
   refuses on pull requests into `main`. It reaches `main` only through the
@@ -250,6 +252,14 @@ the pull request's description:
 Versions must be releases; it refuses a prerelease. What is already on
 `development` it leaves alone, and with nothing on `development` that
 `main` lacks it opens no pull request.
+
+**Snapshots wait while a release pull request is open.** A snapshot's
+prerelease versions would replace the release's on `development` and fail
+the pull request, so `gridkit-snapshot.yml` skips any snapshot that would
+change the installed versions while a pull request `development` → `main`
+is open, with a notice and a line in the run's summary. Nothing queues it:
+the first snapshot gridkit sends after the release merges installs as
+usual. A live example that needs a skipped snapshot's API waits for that.
 
 ## Where the rest lives
 
