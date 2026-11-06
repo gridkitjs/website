@@ -199,24 +199,8 @@ not translated through this system — it is whatever `gridkit`'s `.mdx`/
 `CHANGELOG.md` files contain, in whatever language they're written in.
 Don't add docs strings to `messages/`; that's only for site chrome.
 
-Keep the routes prerendered. `next-intl` finds the locale of a server render
-from request headers unless the segment has called `setRequestLocale`, and
-reading headers renders the whole route on demand: the build's route table
-shows `ƒ` instead of `●`, and every visit shows the loading skeleton.
-Layouts and pages render in parallel, so the call in one doesn't cover
-another:
-
-- Every `layout.tsx` and `page.tsx` under `app/[locale]/` takes `params`
-  and calls `setRequestLocale(locale)` before it reads translations
-  (`getTranslations`, `getFormatter`, …). Server components they render
-  below that call are covered.
-- `loading.tsx` files are `"use client"` and translate with
-  `useTranslations`: a loading boundary gets no `params`, so it can't call
-  `setRequestLocale`. Client hooks read the provider's messages and don't
-  touch headers.
-
-After a change under `app/[locale]/`, check the build output still marks
-`/[locale]/docs/[[...slug]]` and `/[locale]/changelog/[[...slug]]` with `●`.
+Keeping the routes prerendered (`setRequestLocale`, client `loading.tsx`) is
+covered in [app/[locale]/AGENTS.md](app/[locale]/AGENTS.md).
 
 ## Standards
 
