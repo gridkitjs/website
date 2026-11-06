@@ -26,7 +26,17 @@ jobs:
 
       # The build fetches the docs manifest from the public gridkitjs/gridkitjs
       # repo through the GitHub API; the built-in token lifts the
-      # unauthenticated rate limit.
-      - run: npm run build
+      # unauthenticated rate limit. The log is kept for the route check below,
+      # and `pipefail` keeps a failed build from being hidden by `tee`.
+      - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee "$RUNNER_TEMP/build.log"
+
+      # A route that reads request headers renders on demand (`ƒ`): the build
+      # still succeeds, but every docs and changelog visit would then show the
+      # loading skeleton. Fails unless both routes are prerendered (`●`).
+      - name: Check docs routes are prerendered
+        run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
