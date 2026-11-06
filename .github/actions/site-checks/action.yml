@@ -2,7 +2,9 @@ name: Site checks
 description: >
   Format, lint, types, the build, and the guards that read the build:
   prerendered docs routes and registered manifest tags. Expects the repo
-  checked out and its dependencies installed.
+  checked out and its dependencies installed. On a failure, it writes the
+  failed check's name (format, lint, types, build, routes or tags) to
+  $RUNNER_TEMP/failed-check.
 
 inputs:
   github-token:
@@ -31,16 +33,20 @@ runs:
         MANIFEST_REF: ${{ inputs.manifest-ref }}
       run: node scripts/use-manifest-ref.mjs "$MANIFEST_REF"
 
-    - shell: bash
+    - id: format
+      shell: bash
       run: npm run format:check
-    - shell: bash
+    - id: lint
+      shell: bash
       run: npm run lint
-    - shell: bash
+    - id: types
+      shell: bash
       run: npx tsc --noEmit
 
     # The log is kept for the route check below, and `pipefail` keeps a failed
     # build from being hidden by `tee`.
     - name: Build
+      id: build
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
@@ -52,6 +58,7 @@ runs:
     # still succeeds, but every docs and changelog visit would then show the
     # loading skeleton. Fails unless both routes are prerendered (`●`).
     - name: Check docs routes are prerendered
+      id: routes
       shell: bash
       run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
 
@@ -60,7 +67,30 @@ runs:
     # placeholder, so the PR that pins it fails until the example lands.
     # Reads the public/mdx-tags.json that `prebuild` wrote.
     - name: Check manifest tags are registered
+      id: tags
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       run: node scripts/check-manifest-tags.mjs
+
+    # The release workflow comments the failed check on its pull request. A
+    # composite action's outputs can't be relied on once it has failed, so
+    # the name goes through a file in the job's temp directory.
+    - name: Name the failed check
+      if: failure()
+      shell: bash
+      env:
+        OUTCOMES: >-
+          format=${{ steps.format.outcome }}
+          lint=${{ steps.lint.outcome }}
+          types=${{ steps.types.outcome }}
+          build=${{ steps.build.outcome }}
+          routes=${{ steps.routes.outcome }}
+          tags=${{ steps.tags.outcome }}
+      run: |
+        for outcome in $OUTCOMES; do
+          if [ "${outcome#*=}" = failure ]; then
+            echo "${outcome%%=*}" > "$RUNNER_TEMP/failed-check"
+            break
+          fi
+        done
