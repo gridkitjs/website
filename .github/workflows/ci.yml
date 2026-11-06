@@ -20,6 +20,13 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      # Production renders released packages only; `development` tracks the
+      # `dev` snapshots, so only pull requests into `main` must be free of them.
+      # `base_ref` is set on pull_request events alone.
+      - name: Check gridkit versions are releases
+        if: github.base_ref == 'main'
+        run: node scripts/check-release-deps.mjs
       - run: npm run format:check
       - run: npm run lint
       - run: npx tsc --noEmit
