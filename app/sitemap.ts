@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
 import { getDocsTree } from "@/lib/docs/source";
 import { getChangelogTree } from "@/lib/changelog/source";
+import { isNextChannel } from "@/lib/seo/channel";
 import { siteConfig } from "@/lib/seo/site-config";
 
 function urlFor(locale: string, path: string): string {
@@ -17,6 +18,8 @@ function languagesFor(path: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (isNextChannel) return [];
+
   const [docsTree, changelogTree] = await Promise.all([
     getDocsTree(),
     getChangelogTree(),

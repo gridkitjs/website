@@ -4,6 +4,28 @@ Page metadata (`metadata.ts`, `buildMetadata`), the Open Graph renderer
 (`og-image.tsx`) and site constants (`site-config.ts`). This file also
 covers the brand mark, which is drawn outside this folder.
 
+## The next channel
+
+next.gridkitjs.com, the deployment of the `development` branch, is built
+with `SITE_CHANNEL=next`, which `channel.ts` reads (`isNextChannel`). It
+previews unreleased GridKit and must stay out of search engines, so on that
+channel alone:
+
+- `app/robots.ts` disallows everything and names no sitemap;
+  `app/sitemap.ts` is empty.
+- The locale layout's metadata sets `robots: { index: false, follow: false }`,
+  which every page inherits. A page that sets `robots` itself replaces it,
+  so don't.
+- Canonical and alternate-language URLs (`canonicalBaseUrl`, used by
+  `buildMetadata` and the layout) point at gridkitjs.com, the original of
+  every page. `metadataBase`, Open Graph images and JSON-LD keep
+  `siteConfig.baseUrl`, the host that serves them.
+- `components/layout/ChannelBanner.tsx` draws one line above the header,
+  linking to production.
+
+Without `SITE_CHANNEL`, production's output is unchanged. Reading an env var
+doesn't touch the request, so the routes stay prerendered.
+
 ## The mark
 
 The mark is a four-by-four lattice with one blue cell, drawn twice:
