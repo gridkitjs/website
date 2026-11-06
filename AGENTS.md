@@ -156,3 +156,4 @@ open the one the work touches.
 | [lib/seo/AGENTS.md](lib/seo/AGENTS.md)                                   | Metadata, Open Graph images, and the brand mark (`components/ui/icons.tsx`, `app/icon.svg`)           |
 | [.claude/rules/styling.md](.claude/rules/styling.md)                     | Styling: tokens, identity, dark mode, the grid's theme, `cn()`, component shape                       |
 | [.claude/rules/i18n.md](.claude/rules/i18n.md)                           | UI copy in `messages/`, and what stays untranslated                                                   |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                                       | Setup, the workflow and the PR checklist, on one screen                                               |
