@@ -40,7 +40,8 @@
       "preview": "Preview",
       "code": "Code",
       "reset": "Reset",
-      "openInStackblitz": "Open in StackBlitz"
+      "openInStackblitz": "Open in StackBlitz",
+      "pending": "This example is on its way."
     }
   }
 }

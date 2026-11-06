@@ -31,11 +31,12 @@ A linked folder has rules of its own in its `AGENTS.md`.
 | [`components/marketing/`](components/marketing/AGENTS.md)                | Homepage sections: `Hero` (with `HeroGrid`, the live grid), `FeatureMatrix`, `HeadlessSection`, `PackagesSection`, `StorySection`, `CtaSection`. Not used inside docs.                                                                                                                                            |
 | `components/ui/`                                                         | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                                                                                                                                       |
 | `components/code/`                                                       | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override.                                                                                                                                                                                          |
-| [`lib/docs/`](lib/docs/AGENTS.md)                                        | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`).                                                                                                                      |
+| [`lib/docs/`](lib/docs/AGENTS.md)                                        | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`, `remark-unregistered-tags.ts`).                                                                                       |
 | `lib/changelog/`                                                         | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`; covered by `lib/docs/AGENTS.md`.                                                                                                                                                                                                     |
 | `lib/packages/`                                                          | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                                                                                                                                          |
 | `lib/marketing/`                                                         | Home page data: `features.ts`, the feature matrix (`FEATURE_GROUPS`).                                                                                                                                                                                                                                             |
 | [`lib/seo/`](lib/seo/AGENTS.md)                                          | Metadata (`metadata.ts`), the Open Graph renderer (`og-image.tsx`), site constants.                                                                                                                                                                                                                               |
+| `gridkit.json`                                                           | `docsManifest`: the `gridkit` `docs-meta` commit whose docs manifest production renders. The release workflow updates it; see [lib/docs/AGENTS.md](lib/docs/AGENTS.md#the-manifest).                                                                                                                              |
 | `i18n/`                                                                  | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                                                                                                                                                                                                       |
 
 ## Relationship to the `gridkit` repo
@@ -47,6 +48,12 @@ the changelog comes from that repo's per-package `CHANGELOG.md` files
 Package versions and release dates come from the npm registry. This site only
 fetches, renders, and caches them: how is in
 [lib/docs/AGENTS.md](lib/docs/AGENTS.md).
+
+Production reads the manifest at a `docs-meta` commit pinned in
+`gridkit.json`, so gridkitjs.com's docs change only through a pull request,
+the one that also takes a gridkit release's packages. The next site
+(next.gridkitjs.com, from the `development` branch) reads a branch named by
+`DOCS_MANIFEST_REF` instead.
 
 ## Development
 
@@ -64,9 +71,9 @@ for local dev too.
 `npm run update-gridkit` moves all five `@gridkitjs/*` packages (`core`,
 `dom`, `react`, `theme-tailwind`, `export-xlsx`) to their `latest` releases.
 It is the only way they move: on `0.x` a caret range never crosses a minor,
-so `npm update` leaves them where they are. Docs are fetched from `gridkit`'s
-`main`, so a page can describe a feature the pinned packages lack until this
-runs; add a new published package to the script when `gridkit` ships one.
+so `npm update` leaves them where they are. Production's docs are pinned
+separately, in `gridkit.json`, and move to the same release with it; add a
+new published package to the script when `gridkit` ships one.
 
 ## Standards
 
@@ -78,11 +85,17 @@ npm run format:check && npm run lint && npx tsc --noEmit && npm run build
 
 The `ci` job in `.github/workflows/ci.yml` runs this same sequence on every
 pull request and every push to `main` and `development`; the `ci` check must
-pass before a merge. After the build it also runs two guards:
+pass before a merge. On pull requests into `main`, before the build,
+`node scripts/check-release-deps.mjs` fails on a prerelease `@gridkitjs/*`
+version in `package.json` or the lockfile. After the build it also runs
+three guards:
 
 - `node scripts/check-prerendered-routes.mjs <build-log>` fails when the docs
   or changelog route is `ƒ` instead of `●` in the build's route table (see
   [app/[locale]/AGENTS.md](app/[locale]/AGENTS.md#keep-the-routes-prerendered)).
+- `node scripts/check-manifest-tags.mjs` fails when a page of the docs
+  manifest the build read uses a tag missing from `public/mdx-tags.json`
+  (see [lib/docs/AGENTS.md](lib/docs/AGENTS.md#the-manifest)).
 - `git diff --exit-code lib/docs/example-sources.generated.ts` fails when the
   committed file no longer matches what `prebuild` generates, so an example
   changed without its regenerated sources being committed.

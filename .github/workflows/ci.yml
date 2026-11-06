@@ -20,6 +20,13 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      # Production renders released packages only; `development` tracks the
+      # `dev` snapshots, so only pull requests into `main` must be free of them.
+      # `base_ref` is set on pull_request events alone.
+      - name: Check gridkit versions are releases
+        if: github.base_ref == 'main'
+        run: node scripts/check-release-deps.mjs
       - run: npm run format:check
       - run: npm run lint
       - run: npx tsc --noEmit
@@ -40,6 +47,15 @@ jobs:
       # loading skeleton. Fails unless both routes are prerendered (`●`).
       - name: Check docs routes are prerendered
         run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
+
+      # The two repos couple by tag name only. A pinned docs manifest using a
+      # live example or component this site doesn't register would render a
+      # placeholder, so the PR that pins it fails until the example lands.
+      # Reads the public/mdx-tags.json that `prebuild` wrote.
+      - name: Check manifest tags are registered
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/check-manifest-tags.mjs
 
       # `prebuild` regenerates the live examples' sources from
       # components/live-examples. A committed copy that no longer matches means

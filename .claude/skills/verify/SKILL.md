@@ -38,7 +38,16 @@ it here, build with `npm run build 2>&1 | tee <log outside the repo>` and pass
 that path to the script. The fix is in
 [app/[locale]/AGENTS.md](../../../app/[locale]/AGENTS.md#keep-the-routes-prerendered).
 
-## 3. Reading a failure
+## 3. The manifest and version checks
+
+After the build, run `node scripts/check-manifest-tags.mjs`: it fails when
+the docs manifest the build read uses a tag this site doesn't register. On a
+branch headed for `main`, also run `node scripts/check-release-deps.mjs`,
+which fails on a prerelease `@gridkitjs/*` version. CI runs both (the second
+on pull requests into `main` only); see
+[lib/docs/AGENTS.md](../../../lib/docs/AGENTS.md#the-manifest).
+
+## 4. Reading a failure
 
 | Step                     | Fix                                                                                                                                                                                          |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -49,6 +58,8 @@ that path to the script. The fix is in
 | `check-feature-slugs`    | A feature-matrix link points at a doc page that doesn't exist, or a label is missing; see [components/marketing/AGENTS.md](../../../components/marketing/AGENTS.md).                         |
 | `next build`             | Read the first error; a fetch or rate-limit error usually means `GITHUB_TOKEN` is missing or expired.                                                                                        |
 | `ƒ` on a docs route      | See step 2.                                                                                                                                                                                  |
+| `check-manifest-tags`    | A doc page names a tag this site lacks, usually a live example not added yet: add it here first (the `live-example` skill), or pin a manifest that doesn't use it.                           |
+| `check-release-deps`     | Move the `@gridkitjs/*` packages to releases with `npm run update-gridkit`; snapshots belong on `development`.                                                                               |
 | `next build`, docs pages | A doc page that fails to compile is MDX from `gridkit`: fix it there, never with a local `.mdx` here (see [lib/docs/AGENTS.md](../../../lib/docs/AGENTS.md)).                                |
 
 `npm run build` and `npm run dev` both regenerate

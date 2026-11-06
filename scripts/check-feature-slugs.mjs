@@ -5,31 +5,20 @@
  * `messages/<locale>/home.json`. A doc renamed or removed in gridkit would
  * otherwise leave the matrix linking to a 404.
  *
- * The doc pages come from where the site reads them (see `lib/docs/`):
- * `DOCS_MANIFEST_FILE`, else the published `docs-manifest.json`, else the
- * repo tree of `DOCS_GITHUB_BRANCH`. Their slugs follow `lib/docs/source.ts`:
+ * The doc pages come from where the site reads them (see `lib/docs/`): the
+ * manifest the build reads (`scripts/lib/docs-manifest.mjs`), else, while
+ * none is published at its ref, the repo tree of `DOCS_GITHUB_BRANCH`. Their
+ * slugs follow `lib/docs/source.ts`:
  * `packages/<pkg>/docs/[<group>/]<name>.mdx` is `<pkg>/<name>`, and a
- * package's top-level `overview.mdx` is `<pkg>`. `.env.local` and `.env` are
- * read for the same variables, as `next build` reads them.
+ * package's top-level `overview.mdx` is `<pkg>`.
  *
  * Runs as `prebuild`. Usage: node scripts/check-feature-slugs.mjs
  */
 import { readdir, readFile } from "node:fs/promises";
 import ts from "typescript";
+import { githubApi, readDocsManifest } from "./lib/docs-manifest.mjs";
 
-for (const file of [".env.local", ".env"]) {
-  try {
-    process.loadEnvFile(new URL(`../${file}`, import.meta.url));
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
-}
-
-const OWNER = process.env.DOCS_GITHUB_OWNER ?? "gridkitjs";
-const REPO = process.env.DOCS_GITHUB_REPO ?? "gridkitjs";
 const BRANCH = process.env.DOCS_GITHUB_BRANCH ?? "main";
-const MANIFEST_REF = process.env.DOCS_MANIFEST_REF ?? "docs-meta";
-const MANIFEST_FILE = process.env.DOCS_MANIFEST_FILE;
 const MESSAGES = new URL("../messages/", import.meta.url);
 
 /** A TypeScript module without imports, transpiled and loaded as is. */
@@ -45,32 +34,10 @@ async function importTs(path) {
   return import(`data:text/javascript;base64,${encoded}`);
 }
 
-function githubApi(path, accept) {
-  const headers = { Accept: accept };
-  if (process.env.GITHUB_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  }
-  return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/${path}`, {
-    headers,
-  });
-}
-
 /** The repo path of every docs page, from the manifest or the repo tree. */
 async function docsRepoPaths() {
-  if (MANIFEST_FILE) {
-    const manifest = JSON.parse(await readFile(MANIFEST_FILE, "utf8"));
-    return manifest.docs.map((doc) => doc.repoPath);
-  }
-  const manifest = await githubApi(
-    `contents/docs-manifest.json?ref=${encodeURIComponent(MANIFEST_REF)}`,
-    "application/vnd.github.raw+json",
-  );
-  if (manifest.ok) {
-    return (await manifest.json()).docs.map((doc) => doc.repoPath);
-  }
-  if (manifest.status !== 404) {
-    throw new Error(`GitHub returned ${manifest.status} for the manifest`);
-  }
+  const manifest = await readDocsManifest();
+  if (manifest) return manifest.docs.map((doc) => doc.repoPath);
   const tree = await githubApi(
     `git/trees/${BRANCH}?recursive=1`,
     "application/vnd.github+json",

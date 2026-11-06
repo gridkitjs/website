@@ -15,14 +15,29 @@ section.
   frontmatter and body, every `_meta.json`, every changelog, and each file's
   last commit date) and commits it to the orphan `docs-meta` branch.
 - `lib/docs/manifest.ts` fetches that file in **one request**, through the
-  GitHub contents API (`lib/docs/github.ts`) with the raw media type, from
-  the ref in `DOCS_MANIFEST_REF` (default `docs-meta`; see `.env.example`).
-  The API isn't behind a CDN, unlike raw.githubusercontent.com, so a refetch
-  right after a push can't cache the previous revision. The fetch goes
-  through Next's `fetch` cache, tagged `docs-content`, with a 1-hour
-  time-based fallback; the docs tree, the changelog and the footer's "Docs
-  synced" line all read it. `cacheComponents` is off, so this is the
-  `fetch`-cache model, not `use cache`.
+  GitHub contents API (`lib/docs/github.ts`) with the raw media type. The
+  first of these that is set picks where it reads (see `.env.example`):
+
+  | Source               | Set by                  | Reads                                                                                                    |
+  | -------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------- |
+  | `DOCS_MANIFEST_FILE` | Local previews only     | A file on disk, see the last bullet.                                                                     |
+  | `DOCS_MANIFEST_REF`  | The next site, previews | A branch or any ref: `docs-meta-next` on next.gridkitjs.com, `docs-meta-<branch>` to preview a branch.   |
+  | `gridkit.json`       | Production, by default  | `docsManifest`, a `docs-meta` commit SHA. Docs on gridkitjs.com change only when a PR changes this file. |
+
+  The release workflow updates `gridkit.json` in the PR it opens when
+  gridkit releases, so production's docs move with its `@gridkitjs/*`
+  versions. Edit it by hand only to move production's docs to another
+  `docs-meta` commit. The build logs the source it read
+  (`[docs] Reading docs-manifest.json at <ref>`), once per worker.
+
+- The fetch goes through Next's `fetch` cache, tagged `docs-content`. At a
+  commit SHA it is cached without expiry, since that content can't change
+  and a new pin is a new URL; at a branch it has a 1-hour time-based
+  fallback. The API isn't behind a CDN, unlike raw.githubusercontent.com,
+  so a refetch right after a push can't cache the previous revision. The
+  docs tree, the changelog and the footer's "Docs synced" line all read
+  it. `cacheComponents` is off, so this is the `fetch`-cache model, not
+  `use cache`.
 - While no manifest is published (a 404), `lib/docs/source.ts` and
   `lib/changelog/source.ts` fall back, with a logged warning, to the old
   per-file path: the repo tree for `DOCS_GITHUB_BRANCH`, then each file from
@@ -37,7 +52,19 @@ section.
   request can't be replayed; the Action's retries resend the same `ts`, so
   they must land inside that window too. A valid one calls
   `revalidateTag("docs-content", { expire: 0 })`, so a doc or changelog
-  edit goes live without redeploying this site.
+  edit goes live without redeploying this site. That serves a site reading
+  a branch, the next site; production reads a pinned commit, whose content
+  only changes with a deploy of a new `gridkit.json`.
+- `scripts/check-manifest-tags.mjs` holds the manifest to the
+  [component map](#the-mdx-component-map). It reads the manifest the build
+  reads, by the same precedence (`scripts/lib/docs-manifest.mjs`, which
+  `check-feature-slugs.mjs` shares), collects every PascalCase tag in every
+  page body, ignoring fenced code, code spans and comments as `gridkit`'s
+  `scripts/check-mdx-tags.mjs` does, and fails with the page and tag of any
+  tag missing from `public/mdx-tags.json`. CI runs it after the build
+  ("Check manifest tags are registered"), so a release PR whose docs name a
+  live example this site lacks fails until the example lands. Run it by
+  hand after `npm run build` or `node scripts/export-mdx-tags.mjs`.
 - To preview gridkit docs before pushing them, build a manifest locally
   (`node scripts/build-docs-manifest.mjs <path>` in `gridkit`) and point
   `DOCS_MANIFEST_FILE` at it; this site then reads that file instead of
@@ -51,6 +78,12 @@ section.
   auth), tagged `pkg-freshness` with a 1-hour fallback, for the changelog
   pages, the changelog index and the docs sidebar. A registry failure is
   logged and the page renders without the version rather than failing.
+- `main` takes released `@gridkitjs/*` versions only; the `development`
+  branch, behind next.gridkitjs.com, tracks the `dev` snapshots.
+  `scripts/check-release-deps.mjs` fails on a prerelease version (one with
+  a `-` after `major.minor.patch`) in `package.json` or the lockfile, and
+  CI runs it on pull requests into `main` only ("Check gridkit versions are
+  releases").
 - Per-page "Last updated", JSON-LD `dateModified` and sitemap
   `lastModified` all come from the manifest's per-file commit dates; nothing
   calls GitHub's commits API.
@@ -91,8 +124,8 @@ before doing either.
 
 A new doc-content primitive like `<Kbd>` is registered in exactly one
 place — `mdxComponents` in `lib/docs/mdx.tsx`. Adding the component file
-without registering it there means `.mdx` content using it 404s silently
-into literal text. Live examples are the exception: they reach
+without registering it there means `.mdx` content using it renders the
+placeholder below instead. Live examples are the exception: they reach
 `mdxComponents` through `...exampleTags`, generated from their files (see
 [components/live-examples/AGENTS.md](../../components/live-examples/AGENTS.md)).
 
@@ -101,8 +134,25 @@ which reads that object's capitalised keys, plus the example tags from
 `lib/docs/example-sources.generated.ts`, and writes
 `public/mdx-tags.json`, served at `/mdx-tags.json`. `gridkit`'s docs check
 fetches it from the deployed site and fails on any tag the docs use that
-isn't listed. It is a build output, so it is gitignored; run the script by
-hand to see it locally.
+isn't listed; this repo's `scripts/check-manifest-tags.mjs` checks the
+manifest it renders against the same file (see
+[The manifest](#the-manifest)). It is a build output, so it is gitignored;
+run the script by hand to see it locally.
+
+### Unregistered tags
+
+MDX fails the whole page on a component it isn't given. So `DocContent`
+runs `remarkUnregisteredTags` (`lib/docs/remark-unregistered-tags.ts`),
+which renames every PascalCase tag missing from `mdxComponents` to
+`UnregisteredTag`, dropping its props and children, and logs
+`[mdx] <Tag> is not registered in the MDX component map` once per tag per
+server process. `UnregisteredTag` renders `PendingExample`
+(`components/docs/PendingExample.tsx`): a muted, dashed box reading "This
+example is on its way." (`docs.content.example.pending`), inline when the
+tag sat inside a paragraph. It is passed to MDX beside `mdxComponents`,
+not in it, so it never appears in `mdx-tags.json`. It is a safety net, for
+previews and the next site: the manifest tag check keeps an unregistered
+tag out of production.
 
 ### Doc-content primitives
 
