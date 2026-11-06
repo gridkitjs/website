@@ -24,7 +24,9 @@ names and commit messages are under
 ## Before you open a pull request
 
 - [ ] **Checks.** The local check sequence under
-      [Standards](AGENTS.md#standards) passes, in order.
+      [Standards](AGENTS.md#standards) passes, in order (the `verify` skill
+      under [Where the rest lives](AGENTS.md#where-the-rest-lives) walks
+      through it).
 - [ ] **Rules.** You read [AGENTS.md](AGENTS.md) and the `AGENTS.md` or rule
       file for the area you changed, listed under
       [Where the rest lives](AGENTS.md#where-the-rest-lives).

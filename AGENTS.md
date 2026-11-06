@@ -143,7 +143,8 @@ feedback").
 
 Rules for one folder sit next to its code; rules that cut across folders are
 in `.claude/rules/`. Claude Code loads each one by path; with another tool,
-open the one the work touches.
+open the one the work touches. Skills in `.claude/skills/` are step-by-step
+procedures for repeated tasks; with another tool, follow the `SKILL.md`.
 
 | File                                                                     | What it covers                                                                                        |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
@@ -157,3 +158,6 @@ open the one the work touches.
 | [.claude/rules/styling.md](.claude/rules/styling.md)                     | Styling: tokens, identity, dark mode, the grid's theme, `cn()`, component shape                       |
 | [.claude/rules/i18n.md](.claude/rules/i18n.md)                           | UI copy in `messages/`, and what stays untranslated                                                   |
 | [CONTRIBUTING.md](CONTRIBUTING.md)                                       | Setup, the workflow and the PR checklist, on one screen                                               |
+| [.claude/skills/live-example/](.claude/skills/live-example/SKILL.md)     | Skill: add a live example, check it renders, hand over its tag                                        |
+| [.claude/skills/preview-docs/](.claude/skills/preview-docs/SKILL.md)     | Skill: render unpublished `gridkit` docs from a local manifest                                        |
+| [.claude/skills/verify/](.claude/skills/verify/SKILL.md)                 | Skill: run the local check sequence in order and read a failure                                       |
