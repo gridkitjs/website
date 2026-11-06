@@ -3,7 +3,9 @@
 The sidebar, mobile drawer, table of contents and the doc-content
 primitives of the docs and changelog pages. The primitives' MDX contract
 (string props, registration in the component map) is in
-[lib/docs/AGENTS.md](../../lib/docs/AGENTS.md).
+[lib/docs/AGENTS.md](../../lib/docs/AGENTS.md), and the live example frame
+(`LiveExampleFrame`, `ExampleTabs`) in
+[components/live-examples/AGENTS.md](../live-examples/AGENTS.md).
 
 ## Sidebar state
 
