@@ -24,7 +24,15 @@ export async function Hero() {
   const releases = await getLatestReleases();
 
   return (
-    <Section variant="default" className="border-site-line border-b">
+    <Section
+      variant="default"
+      className="border-site-line relative isolate border-b"
+    >
+      {/* The site's one radial accent: a soft glow at the hero's top. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_120%_50%_at_50%_0%,color-mix(in_oklch,var(--site-accent)_var(--hero-glow),var(--site-bg))_0%,transparent_70%)] [--hero-glow:12%] sm:bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,color-mix(in_oklch,var(--site-accent)_var(--hero-glow),var(--site-bg))_0%,transparent_70%)] dark:[--hero-glow:20%]"
+      />
       <Container className="grid grid-cols-1 items-center gap-10 pt-12 pb-10 lg:grid-cols-2 lg:gap-12 lg:pt-16">
         <div>
           <h1 className="text-site-ink text-4xl font-semibold tracking-tight sm:text-5xl lg:text-4xl xl:text-[2.5rem]">
