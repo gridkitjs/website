@@ -87,11 +87,63 @@ it to render. Renaming or removing a component from that map is a breaking
 change for every doc page that uses it; grep `gridkit`'s `packages/*/docs/`
 before doing either.
 
-How to add an MDX-exposed component, the doc-content primitives and code
-fence meta are in the root
-[Styling and custom components](../../AGENTS.md#styling-and-custom-components)
-section; live examples are in
-[components/live-examples/AGENTS.md](../../components/live-examples/AGENTS.md).
+### New MDX-exposed components
+
+A new doc-content primitive like `<Kbd>` is registered in exactly one
+place — `mdxComponents` in `lib/docs/mdx.tsx`. Adding the component file
+without registering it there means `.mdx` content using it 404s silently
+into literal text. Live examples are the exception: they reach
+`mdxComponents` through `...exampleTags`, generated from their files (see
+[components/live-examples/AGENTS.md](../../components/live-examples/AGENTS.md)).
+
+`npm run build` first runs `scripts/export-mdx-tags.mjs` (`prebuild`),
+which reads that object's capitalised keys, plus the example tags from
+`lib/docs/example-sources.generated.ts`, and writes
+`public/mdx-tags.json`, served at `/mdx-tags.json`. `gridkit`'s docs check
+fetches it from the deployed site and fails on any tag the docs use that
+isn't listed. It is a build output, so it is gitignored; run the script by
+hand to see it locally.
+
+### Doc-content primitives
+
+The primitives in `components/docs/` give authors what they used to fake
+with headings. next-mdx-remote runs with `blockJS: true`, so every prop is
+a string — a flag is `dev="true"`, never `dev={true}`:
+
+- `<Callout type="note|tip|warning|breaking" title="…">` — a boxed aside;
+  children are the content. `type` defaults to `note` (so does an unknown
+  one); without `title` the heading is the type's label, from
+  `messages/en/docs.json` (`content.callout`) like other site chrome.
+- `<PackageInstall pkg="@gridkitjs/react @gridkitjs/theme-tailwind" dev="true" />`
+  — the install command with npm/pnpm/yarn/bun tabs and a copy button.
+  The choice is shared by every block and kept in
+  `localStorage["gk-pm"]` (`usePackageManager`); `dev` is optional.
+- `<Since v="0.12.0" pkg="react" />` — an inline "since version" badge;
+  `pkg` (the package without its scope) is optional.
+- `<LinkCards>` holding `<LinkCard href="/docs/…" title="…" description="…" />`
+  — a two-column grid of link cards, e.g. a page's next steps.
+  `description` is optional; `href` routes like a prose link.
+
+### Code fences
+
+Code fences take meta after the language, forwarded to `Pre` by
+`lib/docs/rehype-code-meta.ts` and read by `parseFenceMeta` in `mdx.tsx`:
+`title="App.tsx"` (a title bar), `{1,3-5}` (highlight lines),
+`showLineNumbers`, and `wrap` (lines start wrapped). In the code itself,
+Shiki's notation comments `// [!code highlight]`, `// [!code ++]`,
+`// [!code --]` and `// [!code focus]` mark single lines; they are
+stripped from the output and from what the copy button copies, which
+also leaves out removed diff lines. `CodeFrame` adds a wrap toggle beside
+the copy button whenever a line overflows. The line styles live in
+`globals.css` under `.code-block`.
+
+### Internal links inside MDX
+
+Internal links inside MDX must go through `next-intl`'s `Link` (see
+`DocLink` in `components/docs/`, behind both the `A` override and
+`LinkCard`) so they carry the current locale prefix. In-page `#anchor`
+and relative links get a plain `<a>` in the same tab; only `http(s)://`
+links open a new tab.
 
 ### `<Kbd>` convention
 
