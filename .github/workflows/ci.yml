@@ -40,3 +40,9 @@ jobs:
       # loading skeleton. Fails unless both routes are prerendered (`●`).
       - name: Check docs routes are prerendered
         run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
+
+      # `prebuild` regenerates the live examples' sources from
+      # components/live-examples. A committed copy that no longer matches means
+      # an example changed without the regeneration being committed.
+      - name: Check generated example sources are current
+        run: git diff --exit-code lib/docs/example-sources.generated.ts
