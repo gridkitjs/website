@@ -79,7 +79,8 @@ section.
   pages, the changelog index and the docs sidebar. A registry failure is
   logged and the page renders without the version rather than failing.
 - `main` takes released `@gridkitjs/*` versions only; the `development`
-  branch, behind next.gridkitjs.com, tracks the `dev` snapshots.
+  branch, behind next.gridkitjs.com, tracks the `dev` snapshots, which
+  `gridkit-snapshot.yml` installs (see [Channels](../../AGENTS.md#channels)).
   `scripts/check-release-deps.mjs` fails on a prerelease version (one with
   a `-` after `major.minor.patch`) in `package.json` or the lockfile, and
   CI runs it on pull requests into `main` only ("Check gridkit versions are

@@ -70,10 +70,12 @@ for local dev too.
 
 `npm run update-gridkit` moves all five `@gridkitjs/*` packages (`core`,
 `dom`, `react`, `theme-tailwind`, `export-xlsx`) to their `latest` releases.
-It is the only way they move: on `0.x` a caret range never crosses a minor,
-so `npm update` leaves them where they are. Production's docs are pinned
-separately, in `gridkit.json`, and move to the same release with it; add a
-new published package to the script when `gridkit` ships one.
+It is the only way to move them by hand: on `0.x` a caret range never
+crosses a minor, so `npm update` leaves them where they are. Production's
+docs are pinned separately, in `gridkit.json`, and move to the same release
+with it; add a new published package to the script when `gridkit` ships one.
+On `development`, a bot installs gridkit's `dev` snapshots instead (see
+[Channels](#channels)).
 
 ## Standards
 
@@ -85,9 +87,15 @@ npm run format:check && npm run lint && npx tsc --noEmit && npm run build
 
 The `ci` job in `.github/workflows/ci.yml` runs this same sequence on every
 pull request and every push to `main` and `development`; the `ci` check must
-pass before a merge. On pull requests into `main`, before the build,
-`node scripts/check-release-deps.mjs` fails on a prerelease `@gridkitjs/*`
-version in `package.json` or the lockfile. After the build it also runs
+pass before a merge. The sequence and the build's guards live in the
+`.github/actions/site-checks` composite action, which the snapshot workflow
+runs too. On `development`, and on pull requests into it, the build reads
+the next site's docs (`DOCS_MANIFEST_REF=docs-meta-next`, set by
+`scripts/use-manifest-ref.mjs`); until gridkit has published that branch, it
+warns and reads the pin in `gridkit.json`. On pull requests into `main`,
+before the build, `node scripts/check-release-deps.mjs` fails on a
+prerelease `@gridkitjs/*` version in `package.json` or the lockfile. After
+the build it also runs
 three guards:
 
 - `node scripts/check-prerendered-routes.mjs <build-log>` fails when the docs
@@ -164,6 +172,41 @@ subject: `feat/prev-next-nav`, `fix/kbd-registration`.
 A PR description describes the end state and why it's needed, not how the
 branch got there (what was tried, what was reverted, "addressed review
 feedback").
+
+### Channels
+
+| Branch        | Deploys to         | `@gridkitjs/*`    | Docs manifest                 | Takes                                                          |
+| ------------- | ------------------ | ----------------- | ----------------------------- | -------------------------------------------------------------- |
+| `main`        | gridkitjs.com      | Released versions | The pin in `gridkit.json`     | All site work, and gridkit's release PRs                       |
+| `development` | next.gridkitjs.com | `dev` snapshots   | `docs-meta-next` (Vercel env) | Live examples that need unreleased APIs, and the bots' commits |
+
+- **Branch off `main` and open the PR into `main`** for anything that works
+  with the released packages: pages, components, fixes, and examples of
+  released features. That is nearly everything.
+- **Branch off `development` and open the PR into it** only for a live
+  example that needs an API gridkit hasn't released yet. It ships to
+  production with the release that brings the API.
+- **Bots keep `development` current.** `sync-development.yml` merges `main`
+  into it after every push to `main`, so it always contains `main`. When
+  that merge conflicts, it opens (or comments on) a pull request
+  `main` → `development` titled `chore: sync development with main`, whose
+  body says how to resolve it on a branch; merge that fix with a merge
+  commit, not a squash. `gridkit-snapshot.yml` installs the exact `dev`
+  snapshot versions gridkit sends after each snapshot publish, runs the
+  site checks and commits `chore(deps): use gridkit snapshot <sha>`. Both
+  push as the release bot (a GitHub App), so CI and the Vercel deploy run.
+- **Never merge `development` into `main` by hand**, and never push to it
+  except through a pull request. It carries prerelease packages, which CI
+  refuses on pull requests into `main`. It reaches `main` only through the
+  release pull request opened when gridkit releases.
+- To test the snapshot workflow, run it from the Actions tab with a
+  payload of the event's shape, versions from
+  `npm view @gridkitjs/<pkg> dist-tags` (the `dev` tag):
+  `{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.0.0-dev-…", "@gridkitjs/dom": "…", "@gridkitjs/react": "…", "@gridkitjs/theme-tailwind": "…", "@gridkitjs/export-xlsx": "…"}, "manifestRef": "docs-meta-next"}`.
+  It skips when those versions are already installed.
+- next.gridkitjs.com is built with `SITE_CHANNEL=next`, which keeps it out
+  of search engines and shows a preview banner (see
+  [lib/seo/AGENTS.md](lib/seo/AGENTS.md#the-next-channel)).
 
 ## Where the rest lives
 
