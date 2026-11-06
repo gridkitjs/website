@@ -68,14 +68,16 @@ comes through the rate-limited GitHub API, and the per-file fallback makes
 more requests than GitHub's unauthenticated limit (60 req/hr) allows; set it
 for local dev too.
 
-`npm run update-gridkit` moves all five `@gridkitjs/*` packages (`core`,
-`dom`, `react`, `theme-tailwind`, `export-xlsx`) to their `latest` releases.
-It is the only way to move them by hand: on `0.x` a caret range never
-crosses a minor, so `npm update` leaves them where they are. Production's
-docs are pinned separately, in `gridkit.json`, and move to the same release
-with it; add a new published package to the script when `gridkit` ships one.
-On `development`, a bot installs gridkit's `dev` snapshots instead (see
-[Channels](#channels)).
+The five `@gridkitjs/*` packages (`core`, `dom`, `react`, `theme-tailwind`,
+`export-xlsx`) are never moved by hand. On `main` they change only through
+the release pull request a bot opens when gridkit releases, which also
+moves the docs pin in `gridkit.json`, so production's packages and docs
+change together; on `development`, a bot installs gridkit's `dev`
+snapshots (see [Channels](#channels)). On `0.x` a caret range never crosses
+a minor, so `npm update` leaves them where they are. When `gridkit` ships a
+new published package, add it to `package.json` by hand once: the release
+payload names every package, and the release workflow refuses one it
+doesn't depend on.
 
 ## Standards
 

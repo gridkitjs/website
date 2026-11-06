@@ -4,7 +4,8 @@ import { Container } from "@/components/ui/Container";
 import { CodeBlock } from "@/components/code/CodeBlock";
 
 // Both compile against the installed packages, given a `./tickets` module
-// exporting an array of rows; recheck them after `npm run update-gridkit`.
+// exporting an array of rows; recheck them when a gridkit release moves the
+// packages.
 const CORE_CODE = `
 import { createGridController } from "@gridkitjs/core";
 import { tickets } from "./tickets";

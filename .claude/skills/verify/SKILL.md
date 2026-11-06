@@ -63,7 +63,7 @@ published (it warns while it isn't, and CI then reads the pin). See
 | `next build`             | Read the first error; a fetch or rate-limit error usually means `GITHUB_TOKEN` is missing or expired.                                                                                        |
 | `ƒ` on a docs route      | See step 2.                                                                                                                                                                                  |
 | `check-manifest-tags`    | A doc page names a tag this site lacks, usually a live example not added yet: add it here first (the `live-example` skill), or pin a manifest that doesn't use it.                           |
-| `check-release-deps`     | Move the `@gridkitjs/*` packages to releases with `npm run update-gridkit`; snapshots belong on `development`.                                                                               |
+| `check-release-deps`     | A branch headed for `main` carries a `dev` snapshot: cut it from `main`, not `development`. Only the release pull request moves `main`'s `@gridkitjs/*` versions.                            |
 | `next build`, docs pages | A doc page that fails to compile is MDX from `gridkit`: fix it there, never with a local `.mdx` here (see [lib/docs/AGENTS.md](../../../lib/docs/AGENTS.md)).                                |
 
 `npm run build` and `npm run dev` both regenerate
