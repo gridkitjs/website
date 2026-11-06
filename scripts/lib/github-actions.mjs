@@ -1,6 +1,6 @@
 /**
- * Hands values from a script to the steps after it in a GitHub Actions job.
- * Outside Actions, the values are printed instead, so the scripts that use
+ * Hands values from a script to the steps after it in a GitHub Actions job,
+ * and Markdown to the run's summary page. Outside Actions, the values are printed instead, so the scripts that use
  * this run locally too.
  */
 import { appendFile } from "node:fs/promises";
@@ -25,5 +25,20 @@ export async function writeActionsFile(variable, values) {
     await appendFile(file, lines.join(""));
   } else {
     process.stdout.write(lines.join(""));
+  }
+}
+
+/**
+ * Appends Markdown to the job's summary, the page a workflow run shows. Prints
+ * it when `GITHUB_STEP_SUMMARY` is unset.
+ *
+ * @param {string} markdown
+ */
+export async function appendSummary(markdown) {
+  const file = process.env.GITHUB_STEP_SUMMARY;
+  if (file) {
+    await appendFile(file, `${markdown}\n`);
+  } else {
+    process.stdout.write(`${markdown}\n`);
   }
 }

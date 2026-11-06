@@ -24,10 +24,12 @@ section.
   | `DOCS_MANIFEST_REF`  | The next site, previews | A branch or any ref: `docs-meta-next` on next.gridkitjs.com, `docs-meta-<branch>` to preview a branch.   |
   | `gridkit.json`       | Production, by default  | `docsManifest`, a `docs-meta` commit SHA. Docs on gridkitjs.com change only when a PR changes this file. |
 
-  The release workflow updates `gridkit.json` in the PR it opens when
-  gridkit releases, so production's docs move with its `@gridkitjs/*`
-  versions. Edit it by hand only to move production's docs to another
-  `docs-meta` commit. The build logs the source it read
+  The release workflow (`gridkit-release.yml`) writes the release's
+  `manifestSha` into `gridkit.json` in the PR it opens when gridkit
+  releases, so production's docs move with its `@gridkitjs/*` versions
+  (see [How production moves](../../AGENTS.md#how-production-moves)).
+  Edit it by hand only to move production's docs to another `docs-meta`
+  commit. The build logs the source it read
   (`[docs] Reading docs-manifest.json at <ref>`), once per worker.
 
 - The fetch goes through Next's `fetch` cache, tagged `docs-content`. At a
@@ -78,9 +80,11 @@ section.
   auth), tagged `pkg-freshness` with a 1-hour fallback, for the changelog
   pages, the changelog index and the docs sidebar. A registry failure is
   logged and the page renders without the version rather than failing.
-- `main` takes released `@gridkitjs/*` versions only; the `development`
-  branch, behind next.gridkitjs.com, tracks the `dev` snapshots, which
-  `gridkit-snapshot.yml` installs (see [Channels](../../AGENTS.md#channels)).
+- `main` takes released `@gridkitjs/*` versions only, as caret ranges,
+  through the release pull request; the `development` branch, behind
+  next.gridkitjs.com, tracks the `dev` snapshots, which
+  `gridkit-snapshot.yml` installs as exact pins (see
+  [Channels](../../AGENTS.md#channels)).
   `scripts/check-release-deps.mjs` fails on a prerelease version (one with
   a `-` after `major.minor.patch`) in `package.json` or the lockfile, and
   CI runs it on pull requests into `main` only ("Check gridkit versions are

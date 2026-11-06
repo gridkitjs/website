@@ -10,8 +10,7 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "update-gridkit": "npm i @gridkitjs/core@latest @gridkitjs/dom@latest @gridkitjs/react@latest @gridkitjs/theme-tailwind@latest @gridkitjs/export-xlsx@latest"
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@gridkitjs/core": "^0.14.0",

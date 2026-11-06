@@ -3,6 +3,7 @@ name: Gridkit snapshot
 # gridkit sends `gridkit-snapshot` after publishing a `dev` snapshot of its
 # packages. This installs those exact versions on `development`, which
 # deploys to next.gridkitjs.com, so examples there can use unreleased APIs.
+# It skips while the release pull request `development` → `main` is open.
 # Run it by hand with the same JSON to test it or to redo a snapshot.
 on:
   repository_dispatch:
@@ -32,12 +33,14 @@ jobs:
     steps:
       # The App's token, not GITHUB_TOKEN: a push made with GITHUB_TOKEN
       # triggers no workflows, so CI and the deploy wouldn't follow it.
+      # Pull-requests read is for the open release pull request check.
       - uses: actions/create-github-app-token@v3
         id: app-token
         with:
           client-id: ${{ vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
           permission-contents: write
+          permission-pull-requests: read
 
       - uses: actions/checkout@v4
         with:
@@ -50,11 +53,15 @@ jobs:
           cache: npm
 
       # Through env, never interpolated into the script: the payload is
-      # untrusted input until the script has validated it.
+      # untrusted input until the script has validated it. While a release
+      # pull request is open, the script reports no change, so the snapshot
+      # is skipped and the release's versions stay on `development`.
       - name: Read the payload
         id: payload
         env:
           GRIDKIT_PAYLOAD: ${{ github.event_name == 'repository_dispatch' && toJSON(github.event.client_payload) || inputs.payload }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
         run: node scripts/gridkit-snapshot.mjs
 
       # Exact versions: a caret range on a snapshot would let the lockfile and

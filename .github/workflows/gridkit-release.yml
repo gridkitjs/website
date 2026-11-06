@@ -1,0 +1,204 @@
+name: Gridkit release
+
+# gridkit sends `gridkit-release` after publishing a release and its docs.
+# This ships both to production the only way production moves: it commits
+# the released versions (as caret ranges) and the docs-meta commit
+# (`gridkit.json`) to `development`, checks the site, and opens or updates
+# the pull request `development` → `main`, which merges itself with a merge
+# commit once CI passes. When a check fails, the pull request stays open and
+# gets a comment on what failed and what to do.
+#
+# Run it by hand with the same JSON to re-run a release, for one whose pull
+# request was fixed after a failure or was closed: the payload is in the pull
+# request's description.
+on:
+  repository_dispatch:
+    types: [gridkit-release]
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: >
+          The client_payload as JSON: {"sha": "<40-character gridkit commit>",
+          "versions": {"@gridkitjs/core": "0.15.0", …all five},
+          "manifestSha": "<40-character docs-meta commit>"}
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# One release at a time; a newer release queued behind an older one updates
+# the same pull request after it.
+concurrency:
+  group: gridkit-release
+  cancel-in-progress: false
+
+env:
+  # Through env, never interpolated into a script: the payload is untrusted
+  # input until scripts/lib/gridkit-payload.mjs has validated it.
+  GRIDKIT_PAYLOAD: ${{ github.event_name == 'repository_dispatch' && toJSON(github.event.client_payload) || inputs.payload }}
+
+jobs:
+  # Commits the release to `development`, or nothing when it is already there.
+  ship:
+    runs-on: ubuntu-latest
+    outputs:
+      head: ${{ steps.push.outputs.head }}
+    steps:
+      # The App's token, not GITHUB_TOKEN: a push made with GITHUB_TOKEN
+      # triggers no workflows, so CI and the deploy wouldn't follow it.
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - uses: actions/checkout@v4
+        with:
+          ref: development
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # Validates the payload and writes its manifestSha into gridkit.json.
+      - name: Read the payload
+        id: payload
+        run: node scripts/gridkit-release.mjs
+
+      # The exact released version, saved as a caret range as on `main`. A
+      # range in the spec instead would let npm pick a newer patch.
+      - name: Install the release
+        if: steps.payload.outputs.install == 'true'
+        env:
+          PACKAGES: ${{ steps.payload.outputs.packages }}
+        run: |
+          read -ra packages <<< "$PACKAGES"
+          npm install --save-prefix='^' --no-save-exact "${packages[@]}"
+
+      # The live examples' generated sources name the installed versions, for
+      # StackBlitz.
+      - name: Regenerate the example sources
+        if: steps.payload.outputs.install == 'true'
+        run: node scripts/gen-example-sources.mjs
+
+      - uses: ./.github/actions/bot-identity
+        if: steps.payload.outputs.changed == 'true'
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          app-slug: ${{ steps.app-token.outputs.app-slug }}
+
+      - name: Commit and push
+        id: push
+        env:
+          CHANGED: ${{ steps.payload.outputs.changed }}
+          SUBJECT: ${{ steps.payload.outputs.subject }}
+        run: |
+          if [ "$CHANGED" = true ]; then
+            git add package.json package-lock.json gridkit.json \
+              lib/docs/example-sources.generated.ts
+            git commit -m "$SUBJECT"
+            # The sync and snapshot workflows also push to `development`. If
+            # one got there first, replay this commit on top and try again.
+            pushed=false
+            for attempt in 1 2 3; do
+              if git push origin HEAD:development; then pushed=true; break; fi
+              echo "Push $attempt was rejected; rebasing on the new development."
+              git pull --rebase --autostash origin development
+            done
+            [ "$pushed" = true ] || exit 1
+          fi
+          echo "head=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  # The same checks as CI on a pull request into `main`, so the comment on a
+  # failure can name the check. CI still runs on the pull request itself.
+  check:
+    needs: ship
+    runs-on: ubuntu-latest
+    outputs:
+      failed-check: ${{ steps.failed.outputs.check }}
+    env:
+      # Production reads the pin in gridkit.json, so the release is checked
+      # against it, never against a branch.
+      DOCS_MANIFEST_REF: ""
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.ship.outputs.head }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - id: install
+        run: npm ci
+
+      - name: Check gridkit versions are releases
+        id: release-deps
+        run: node scripts/check-release-deps.mjs
+
+      - uses: ./.github/actions/site-checks
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check generated example sources are current
+        id: sources
+        run: git diff --exit-code lib/docs/example-sources.generated.ts
+
+      # The site-checks composite names its own failed check in a file.
+      - name: Name the failed check
+        id: failed
+        if: failure()
+        env:
+          INSTALL: ${{ steps.install.outcome }}
+          RELEASE_DEPS: ${{ steps.release-deps.outcome }}
+          SOURCES: ${{ steps.sources.outcome }}
+        run: |
+          if [ "$INSTALL" = failure ]; then check=install
+          elif [ "$RELEASE_DEPS" = failure ]; then check=release-deps
+          elif [ -s "$RUNNER_TEMP/failed-check" ]; then
+            check=$(cat "$RUNNER_TEMP/failed-check")
+          elif [ "$SOURCES" = failure ]; then check=sources
+          else check=unknown
+          fi
+          echo "check=$check" >> "$GITHUB_OUTPUT"
+
+  # Opens or updates the release pull request; turns on auto-merge when the
+  # checks passed, comments what failed when they didn't.
+  pull-request:
+    needs: [ship, check]
+    if: ${{ !cancelled() && needs.ship.result == 'success' && (needs.check.result == 'success' || needs.check.result == 'failure') }}
+    runs-on: ubuntu-latest
+    steps:
+      # The App's token, so CI runs on the pull request it opens; one opened
+      # with GITHUB_TOKEN starts no workflow, and `main`'s required check would
+      # never report. Contents write is needed to enable auto-merge.
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.ship.outputs.head }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Open or update the release pull request
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          CHECKS: ${{ needs.check.result == 'success' && 'passed' || 'failed' }}
+          FAILED_CHECK: ${{ needs.check.outputs.failed-check }}
+        run: >-
+          node scripts/gridkit-release-pr.mjs
+          --checks "$CHECKS" --failed-check "$FAILED_CHECK"

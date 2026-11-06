@@ -16,19 +16,19 @@ First look in `components/live-examples/` for an example of the same
 interaction (`ColumnChooserExample` is under `columns/`, for one). If it
 exists, skip to step 6 and hand over its tag.
 
-Then pick the branch by whether the example needs an API gridkit hasn't
-released (see [Channels](../../../AGENTS.md#channels)):
+Then pick the branch by whether `main` already installs the API (see
+[Channels](../../../AGENTS.md#channels)). Never move the `@gridkitjs/*`
+versions by hand on either branch: bots install them.
 
-- **Released API**: branch off `main` and open the PR into `main`. If the
-  feature is newer than the installed `@gridkitjs/*` versions in
-  `package.json` but released, run `npm run update-gridkit` first, or the
-  example won't compile.
-- **Unreleased API**: branch off `development` and open the PR into
-  `development`, which already has gridkit's latest `dev` snapshot
-  installed. Don't install a snapshot by hand or run `update-gridkit`
-  there; if the API isn't in the installed snapshot yet, wait for the next
-  snapshot commit on `development`. The example reaches gridkitjs.com with
-  the release that brings the API.
+- **In `main`'s installed packages**: branch off `main` and open the PR
+  into `main`.
+- **Anything newer**: branch off `development` and open the PR into
+  `development`, which has gridkit's latest `dev` snapshot installed, or
+  the release whose pull request into `main` is still open. If the API
+  isn't on `development` yet either, wait for the next snapshot commit
+  there. The example reaches gridkitjs.com with the release pull request
+  that brings the API; when that pull request is red because a doc page
+  names this example, landing the example on `development` is the fix.
 
 ## 2. Write the file
 
