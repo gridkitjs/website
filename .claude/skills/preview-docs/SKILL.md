@@ -5,8 +5,9 @@ description: Preview gridkit doc pages that aren't pushed yet, by rendering this
 
 # Preview unpublished docs
 
-The site normally reads `docs-manifest.json` from `gridkit`'s `docs-meta`
-branch. Setting `DOCS_MANIFEST_FILE` makes it read a file on disk instead.
+The site normally reads `docs-manifest.json` at the `docs-meta` commit
+pinned in `gridkit.json` (or at `DOCS_MANIFEST_REF`, when set). Setting
+`DOCS_MANIFEST_FILE` makes it read a file on disk instead.
 How the manifest works is in [lib/docs/AGENTS.md](../../../lib/docs/AGENTS.md#the-manifest).
 Local only: never set it on Vercel.
 
