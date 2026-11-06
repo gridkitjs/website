@@ -168,8 +168,9 @@ runs; add a new published package to the script when `gridkit` ships one.
   so the outermost cell borders sit under the frame's and none pokes through a
   corner; versions and counts are `font-mono tabular-nums`; a section label,
   when one earns its place, is a small uppercase header-cell style line, at most
-  one per three sections. No gradients, gradient-clipped text or radial
-  backgrounds.
+  one per three sections. The home hero carries the one radial accent glow
+  (`--site-accent` mixed into `--site-bg`, fading to transparent); nothing
+  else uses gradients, radial backgrounds or gradient-clipped text.
 - **Dark mode** is the `.dark` class on `<html>`. Every token above is
   redefined under `@variant dark` in `globals.css`, so a new token needs a
   dark value there too. An inline script in the locale layout's `<head>`
