@@ -1,0 +1,76 @@
+---
+name: live-example
+description: Add or change a live example, a real DataGrid demo that gridkit's doc pages embed as an MDX tag. Use when a doc page needs an example that doesn't exist yet, or when asked to add, fix or rename a live example.
+---
+
+# Add a live example
+
+The file contract (where it goes, what `meta` holds, which fixtures to use)
+is in [components/live-examples/AGENTS.md](../../../components/live-examples/AGENTS.md),
+and how the grid is styled in [.claude/rules/styling.md](../../rules/styling.md).
+Read both first; this is the procedure.
+
+## 1. Write the file
+
+First look in `components/live-examples/` for an example of the same
+interaction (`ColumnChooserExample` is under `columns/`, for one). If it
+exists, skip to step 5 and hand over its tag. If the feature is newer than
+the installed `@gridkitjs/*` versions in `package.json`, run
+`npm run update-gridkit` first, or the example won't compile.
+
+Pick the area (`grid`, `columns`, `rows`, `selection` or `data`) and a name
+ending in `Example`. Start from the smallest existing example,
+`components/live-examples/grid/DataGridBasicExample.example.tsx`, and copy
+it to `components/live-examples/<area>/<Name>.example.tsx`:
+
+- `"use client"` on the first line; the component exported as `<Name>`.
+- `meta` with literal values only: a new kebab-case `id`, a `title`, and a
+  one-sentence `description` saying what to try. Leave `minHeight` out until
+  step 3.
+- Rows from `../fixtures` (`deploymentRows`, `makeRows(n)` or
+  `mockLoadMore`), never `Math.random` or `Date`. Any controls (buttons,
+  toggles) live inside the component, which takes no props.
+
+## 2. Regenerate sources and the tag list
+
+```bash
+node scripts/gen-example-sources.mjs
+node scripts/export-mdx-tags.mjs
+```
+
+The first rewrites `lib/docs/example-sources.generated.ts`; it names the
+file and the problem if `meta` is incomplete, an `id` is taken, or an
+import isn't in `package.json`. The second writes `public/mdx-tags.json`
+(gitignored); check the new tag is listed in it.
+
+## 3. See it render
+
+No route shows an example on its own: it renders inside a doc page. In your
+local `gridkit` checkout, add `<Name />` on its own line to the page it
+belongs on (don't commit it there yet), then follow the `preview-docs`
+skill ([.claude/skills/preview-docs/SKILL.md](../preview-docs/SKILL.md))
+and open that page. Check:
+
+- It works in light and dark (the header's theme toggle), and Reset puts it
+  back to its first state.
+- The Code tab shows clean, paste-ready source, and "Open in StackBlitz"
+  starts.
+- The browser console has no hydration warning (usually a random or
+  time-based value, or browser-only code running during render).
+- Set `meta.minHeight` to the example's rendered height in px (measure the
+  preview area in dev tools), rerun step 2, and reload: nothing should jump
+  as it mounts.
+
+## 4. Check and commit
+
+Run the `verify` skill ([.claude/skills/verify/SKILL.md](../verify/SKILL.md)).
+Commit the example and `lib/docs/example-sources.generated.ts` together,
+for example `feat(examples): add a column pinning live example`. Nothing else
+registers it.
+
+## 5. Hand over the tag
+
+Tell the doc author the exact tag, `<Name />`, and that it is usable in
+`gridkit` only once this site is deployed: `gridkit`'s CI checks doc tags
+against the deployed `/mdx-tags.json`. Until then, the page there keeps a
+complete code sample.

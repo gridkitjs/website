@@ -45,8 +45,11 @@ next-env.d.ts
 .history
 *.tmp*
 
-# Claude Code (plans, local state) - never committed, same as the gridkit repo
-.claude/
+# Agent config: only the shared parts are committed.
+.claude/*
+!.claude/settings.json
+!.claude/rules/
+!.claude/skills/
 
 # generated at prebuild from lib/docs/mdx.tsx
 /public/mdx-tags.json
