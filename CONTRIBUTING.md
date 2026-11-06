@@ -17,8 +17,10 @@ The docs pages themselves are not in this repo: they are written in the
 
 ## Workflow
 
-Branch off `main`, one branch per change, and open a pull request. Branch
-names and commit messages are under
+Branch off `main`, one branch per change, and open a pull request into
+`main`. The one exception is a live example that needs an unreleased
+GridKit API: that branches off `development` and goes back into it (see
+[Channels](AGENTS.md#channels)). Branch names and commit messages are under
 [Branches and commits](AGENTS.md#branches-and-commits). The `ci` check runs
 the same checks on every pull request and must pass before a merge.
 

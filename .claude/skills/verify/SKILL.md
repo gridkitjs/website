@@ -44,7 +44,11 @@ After the build, run `node scripts/check-manifest-tags.mjs`: it fails when
 the docs manifest the build read uses a tag this site doesn't register. On a
 branch headed for `main`, also run `node scripts/check-release-deps.mjs`,
 which fails on a prerelease `@gridkitjs/*` version. CI runs both (the second
-on pull requests into `main` only); see
+on pull requests into `main` only). On a branch headed for `development`,
+CI builds against the next site's docs: set
+`DOCS_MANIFEST_REF=docs-meta-next` for the build and the tag check, once
+`node scripts/use-manifest-ref.mjs docs-meta-next` finds that branch
+published (it warns while it isn't, and CI then reads the pin). See
 [lib/docs/AGENTS.md](../../../lib/docs/AGENTS.md#the-manifest).
 
 ## 4. Reading a failure

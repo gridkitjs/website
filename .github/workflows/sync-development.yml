@@ -1,0 +1,106 @@
+name: Sync development
+
+# `development` (next.gridkitjs.com) must always contain `main`, so site work
+# merged to `main` shows on the next site too. This merges `main` into it
+# after every push; a conflict goes to a human as a pull request.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One sync at a time. A queued run that a newer push replaces loses nothing:
+# the newer run merges the newer `main`.
+concurrency:
+  group: sync-development
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      # The App's token, not GITHUB_TOKEN: a push made with GITHUB_TOKEN
+      # triggers no workflows, so CI wouldn't run on `development`. Workflows
+      # write is needed because the merge can carry changes to workflow files.
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-workflows: write
+
+      - uses: actions/checkout@v4
+        with:
+          ref: development
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: ./.github/actions/bot-identity
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          app-slug: ${{ steps.app-token.outputs.app-slug }}
+
+      - name: Merge main into development
+        id: merge
+        run: |
+          if git merge --no-edit -m "chore: sync development with main" origin/main; then
+            echo "conflict=false" >> "$GITHUB_OUTPUT"
+          else
+            git merge --abort
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The snapshot workflow also pushes to `development`. If it got there
+      # first, merge its commit and try again.
+      - name: Push development
+        if: steps.merge.outputs.conflict == 'false'
+        run: |
+          for attempt in 1 2 3; do
+            if git push origin HEAD:development; then exit 0; fi
+            echo "Push $attempt was rejected; merging the new development."
+            git pull --no-rebase --no-edit origin development
+          done
+          exit 1
+
+      # The pull request's head is `main` itself, so it updates as `main`
+      # moves and closes as merged once `development` contains `main`.
+      - name: Open or update the sync pull request
+        if: steps.merge.outputs.conflict == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          MAIN_SHA: ${{ github.sha }}
+        run: |
+          number=$(gh pr list --base development --head main --state open \
+            --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh pr comment "$number" \
+              --body "main moved to $MAIN_SHA, which still conflicts with development."
+            exit 0
+          fi
+          cat > "$RUNNER_TEMP/body.md" <<'EOF'
+          `main` no longer merges cleanly into `development`, so the sync
+          workflow stopped. Until this is resolved, `development` (and
+          next.gridkitjs.com) misses what landed on `main`.
+
+          Resolve it on a branch cut from `development`, not with GitHub's
+          conflict editor: that would commit `development` into `main`.
+
+          ```bash
+          git fetch origin
+          git checkout -b chore/sync-development origin/development
+          git merge origin/main
+          # resolve, commit, then open a PR into development
+          git push -u origin chore/sync-development
+          ```
+
+          Merge that pull request with a merge commit, not a squash, so
+          `development` keeps `main`'s commits. Then `development` contains
+          `main` and this pull request closes by itself.
+          EOF
+          gh pr create --base development --head main \
+            --title "chore: sync development with main" \
+            --body-file "$RUNNER_TEMP/body.md"

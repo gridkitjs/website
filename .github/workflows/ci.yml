@@ -27,35 +27,14 @@ jobs:
       - name: Check gridkit versions are releases
         if: github.base_ref == 'main'
         run: node scripts/check-release-deps.mjs
-      - run: npm run format:check
-      - run: npm run lint
-      - run: npx tsc --noEmit
 
-      # The build fetches the docs manifest from the public gridkitjs/gridkitjs
-      # repo through the GitHub API; the built-in token lifts the
-      # unauthenticated rate limit. The log is kept for the route check below,
-      # and `pipefail` keeps a failed build from being hidden by `tee`.
-      - name: Build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -o pipefail
-          npm run build 2>&1 | tee "$RUNNER_TEMP/build.log"
-
-      # A route that reads request headers renders on demand (`ƒ`): the build
-      # still succeeds, but every docs and changelog visit would then show the
-      # loading skeleton. Fails unless both routes are prerendered (`●`).
-      - name: Check docs routes are prerendered
-        run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
-
-      # The two repos couple by tag name only. A pinned docs manifest using a
-      # live example or component this site doesn't register would render a
-      # placeholder, so the PR that pins it fails until the example lands.
-      # Reads the public/mdx-tags.json that `prebuild` wrote.
-      - name: Check manifest tags are registered
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/check-manifest-tags.mjs
+      # `development` is next.gridkitjs.com, which renders the docs gridkit
+      # publishes to `docs-meta-next`; everything else renders the pin in
+      # gridkit.json, as production does.
+      - uses: ./.github/actions/site-checks
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          manifest-ref: ${{ (github.ref == 'refs/heads/development' || github.base_ref == 'development') && 'docs-meta-next' || '' }}
 
       # `prebuild` regenerates the live examples' sources from
       # components/live-examples. A committed copy that no longer matches means

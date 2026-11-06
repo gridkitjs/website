@@ -10,13 +10,27 @@ is in [components/live-examples/AGENTS.md](../../../components/live-examples/AGE
 and how the grid is styled in [.claude/rules/styling.md](../../rules/styling.md).
 Read both first; this is the procedure.
 
-## 1. Write the file
+## 1. Pick the base branch
 
 First look in `components/live-examples/` for an example of the same
 interaction (`ColumnChooserExample` is under `columns/`, for one). If it
-exists, skip to step 5 and hand over its tag. If the feature is newer than
-the installed `@gridkitjs/*` versions in `package.json`, run
-`npm run update-gridkit` first, or the example won't compile.
+exists, skip to step 6 and hand over its tag.
+
+Then pick the branch by whether the example needs an API gridkit hasn't
+released (see [Channels](../../../AGENTS.md#channels)):
+
+- **Released API**: branch off `main` and open the PR into `main`. If the
+  feature is newer than the installed `@gridkitjs/*` versions in
+  `package.json` but released, run `npm run update-gridkit` first, or the
+  example won't compile.
+- **Unreleased API**: branch off `development` and open the PR into
+  `development`, which already has gridkit's latest `dev` snapshot
+  installed. Don't install a snapshot by hand or run `update-gridkit`
+  there; if the API isn't in the installed snapshot yet, wait for the next
+  snapshot commit on `development`. The example reaches gridkitjs.com with
+  the release that brings the API.
+
+## 2. Write the file
 
 Pick the area (`grid`, `columns`, `rows`, `selection` or `data`) and a name
 ending in `Example`. Start from the smallest existing example,
@@ -26,12 +40,12 @@ it to `components/live-examples/<area>/<Name>.example.tsx`:
 - `"use client"` on the first line; the component exported as `<Name>`.
 - `meta` with literal values only: a new kebab-case `id`, a `title`, and a
   one-sentence `description` saying what to try. Leave `minHeight` out until
-  step 3.
+  step 4.
 - Rows from `../fixtures` (`deploymentRows`, `makeRows(n)` or
   `mockLoadMore`), never `Math.random` or `Date`. Any controls (buttons,
   toggles) live inside the component, which takes no props.
 
-## 2. Regenerate sources and the tag list
+## 3. Regenerate sources and the tag list
 
 ```bash
 node scripts/gen-example-sources.mjs
@@ -43,7 +57,7 @@ file and the problem if `meta` is incomplete, an `id` is taken, or an
 import isn't in `package.json`. The second writes `public/mdx-tags.json`
 (gitignored); check the new tag is listed in it.
 
-## 3. See it render
+## 4. See it render
 
 No route shows an example on its own: it renders inside a doc page. In your
 local `gridkit` checkout, add `<Name />` on its own line to the page it
@@ -58,19 +72,20 @@ and open that page. Check:
 - The browser console has no hydration warning (usually a random or
   time-based value, or browser-only code running during render).
 - Set `meta.minHeight` to the example's rendered height in px (measure the
-  preview area in dev tools), rerun step 2, and reload: nothing should jump
+  preview area in dev tools), rerun step 3, and reload: nothing should jump
   as it mounts.
 
-## 4. Check and commit
+## 5. Check and commit
 
 Run the `verify` skill ([.claude/skills/verify/SKILL.md](../verify/SKILL.md)).
 Commit the example and `lib/docs/example-sources.generated.ts` together,
 for example `feat(examples): add a column pinning live example`. Nothing else
 registers it.
 
-## 5. Hand over the tag
+## 6. Hand over the tag
 
 Tell the doc author the exact tag, `<Name />`, and that it is usable in
 `gridkit` only once this site is deployed: `gridkit`'s CI checks doc tags
-against the deployed `/mdx-tags.json`. Until then, the page there keeps a
-complete code sample.
+against the deployed `/mdx-tags.json` of next.gridkitjs.com, which gets an
+example merged into `development` directly and one merged into `main`
+through the sync. Until then, the page there keeps a complete code sample.

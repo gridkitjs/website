@@ -1,0 +1,99 @@
+name: Gridkit snapshot
+
+# gridkit sends `gridkit-snapshot` after publishing a `dev` snapshot of its
+# packages. This installs those exact versions on `development`, which
+# deploys to next.gridkitjs.com, so examples there can use unreleased APIs.
+# Run it by hand with the same JSON to test it or to redo a snapshot.
+on:
+  repository_dispatch:
+    types: [gridkit-snapshot]
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: >
+          The client_payload as JSON: {"sha": "<40-character gridkit commit>",
+          "versions": {"@gridkitjs/core": "0.0.0-dev-…", …all five},
+          "manifestRef": "docs-meta-next"}
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# One snapshot at a time. A queued run that a newer snapshot replaces loses
+# nothing: the newer versions supersede it.
+concurrency:
+  group: gridkit-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      # The App's token, not GITHUB_TOKEN: a push made with GITHUB_TOKEN
+      # triggers no workflows, so CI and the deploy wouldn't follow it.
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - uses: actions/checkout@v4
+        with:
+          ref: development
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # Through env, never interpolated into the script: the payload is
+      # untrusted input until the script has validated it.
+      - name: Read the payload
+        id: payload
+        env:
+          GRIDKIT_PAYLOAD: ${{ github.event_name == 'repository_dispatch' && toJSON(github.event.client_payload) || inputs.payload }}
+        run: node scripts/gridkit-snapshot.mjs
+
+      # Exact versions: a caret range on a snapshot would let the lockfile and
+      # package.json disagree about which snapshot is meant.
+      - name: Install the snapshot
+        if: steps.payload.outputs.changed == 'true'
+        env:
+          PACKAGES: ${{ steps.payload.outputs.packages }}
+        run: |
+          read -ra packages <<< "$PACKAGES"
+          npm install --save-exact "${packages[@]}"
+
+      - name: Check the site builds
+        if: steps.payload.outputs.changed == 'true'
+        uses: ./.github/actions/site-checks
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          manifest-ref: ${{ steps.payload.outputs.manifest-ref }}
+
+      - uses: ./.github/actions/bot-identity
+        if: steps.payload.outputs.changed == 'true'
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          app-slug: ${{ steps.app-token.outputs.app-slug }}
+
+      # The live examples' generated sources name the installed versions, for
+      # StackBlitz, so the build changed them too.
+      - name: Commit and push
+        if: steps.payload.outputs.changed == 'true'
+        env:
+          SHORT_SHA: ${{ steps.payload.outputs.short-sha }}
+        run: |
+          git add package.json package-lock.json lib/docs/example-sources.generated.ts
+          git commit -m "chore(deps): use gridkit snapshot $SHORT_SHA"
+          # The sync workflow also pushes to `development`. If it got there
+          # first, replay this commit on top and try again.
+          for attempt in 1 2 3; do
+            if git push origin HEAD:development; then exit 0; fi
+            echo "Push $attempt was rejected; rebasing on the new development."
+            git pull --rebase --autostash origin development
+          done
+          exit 1

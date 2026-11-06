@@ -15,6 +15,7 @@
     "githubProfileLabel": "Blagoja Blazhevski on GitHub"
   },
   "skipToContent": "Skip to content",
+  "channelBanner": "Preview of unreleased GridKit. The current release is on <link>gridkitjs.com</link>.",
   "liveExample": "Live example",
   "install": "Install",
   "lastUpdated": "Last updated {date}",

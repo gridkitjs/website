@@ -1,0 +1,26 @@
+name: Bot identity
+description: >
+  Makes the release bot (the GitHub App) the author of the job's git commits,
+  so they show as the App's bot user. Pushes use the token the repo was
+  checked out with.
+
+inputs:
+  token:
+    description: The App installation token, from actions/create-github-app-token.
+    required: true
+  app-slug:
+    description: The App's slug, from actions/create-github-app-token.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Commit as ${{ inputs.app-slug }}[bot]
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        APP_SLUG: ${{ inputs.app-slug }}
+      run: |
+        user_id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)
+        git config user.name "${APP_SLUG}[bot]"
+        git config user.email "${user_id}+${APP_SLUG}[bot]@users.noreply.github.com"

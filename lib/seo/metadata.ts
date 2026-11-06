@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { routing } from "@/i18n/routing";
+import { canonicalBaseUrl } from "./channel";
 import { ogImageSize } from "./og-image";
 import { siteConfig } from "./site-config";
 
@@ -19,7 +20,7 @@ interface BuildMetadataOptions {
 
 function localizedUrl(locale: string, path: string): string {
   const suffix = path ? `/${path}` : "";
-  return `${siteConfig.baseUrl}/${locale}${suffix}`;
+  return `${canonicalBaseUrl}/${locale}${suffix}`;
 }
 
 export function buildMetadata({

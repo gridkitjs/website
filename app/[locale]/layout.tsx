@@ -6,10 +6,12 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { ChannelBanner } from "@/components/layout/ChannelBanner";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { ThemeScript } from "@/components/layout/ThemeScript";
 import { JsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/json-ld";
+import { canonicalBaseUrl, isNextChannel } from "@/lib/seo/channel";
 import { siteConfig } from "@/lib/seo/site-config";
 import "../globals.css";
 
@@ -59,9 +61,9 @@ export async function generateMetadata({
       languages: Object.fromEntries([
         ...routing.locales.map((candidate) => [
           candidate,
-          `${siteConfig.baseUrl}/${candidate}`,
+          `${canonicalBaseUrl}/${candidate}`,
         ]),
-        ["x-default", `${siteConfig.baseUrl}/${routing.defaultLocale}`],
+        ["x-default", `${canonicalBaseUrl}/${routing.defaultLocale}`],
       ]),
     },
     openGraph: {
@@ -70,6 +72,8 @@ export async function generateMetadata({
     // No `icons`: favicon.ico, icon.svg and apple-icon.png in app/ are linked
     // by file convention, and only while no `icons` key is set.
     manifest: "/site.webmanifest",
+    // Pages inherit this; none sets `robots` of its own.
+    ...(isNextChannel && { robots: { index: false, follow: false } }),
   };
 }
 
@@ -109,6 +113,7 @@ export default async function LocaleLayout({
           >
             {t("skipToContent")}
           </a>
+          <ChannelBanner locale={locale} />
           <SiteHeader />
           {/* Focusable so the skip link moves focus, not just the scroll. */}
           <main id="main" tabIndex={-1} className="flex-1 outline-none">
