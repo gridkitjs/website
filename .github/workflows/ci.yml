@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npx tsc --noEmit
+
+      # The build fetches the docs manifest from the public gridkitjs/gridkitjs
+      # repo through the GitHub API; the built-in token lifts the
+      # unauthenticated rate limit. The log is kept for the route check below,
+      # and `pipefail` keeps a failed build from being hidden by `tee`.
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee "$RUNNER_TEMP/build.log"
+
+      # A route that reads request headers renders on demand (`ƒ`): the build
+      # still succeeds, but every docs and changelog visit would then show the
+      # loading skeleton. Fails unless both routes are prerendered (`●`).
+      - name: Check docs routes are prerendered
+        run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
+
+      # `prebuild` regenerates the live examples' sources from
+      # components/live-examples. A committed copy that no longer matches means
+      # an example changed without the regeneration being committed.
+      - name: Check generated example sources are current
+        run: git diff --exit-code lib/docs/example-sources.generated.ts
