@@ -24,6 +24,13 @@ GridKit API: that branches off `development` and goes back into it (see
 [Branches and commits](AGENTS.md#branches-and-commits). The `ci` check runs
 the same checks on every pull request and must pass before a merge.
 
+Don't change the `@gridkitjs/*` versions yourself. Production takes new
+GridKit packages, and the docs pinned in `gridkit.json`, through the
+release pull request a bot opens from `development` when GridKit releases;
+it merges itself once CI passes. When one is red, its comment says what
+failed; the fix goes into `development` (see
+[How production moves](AGENTS.md#how-production-moves)).
+
 ## Before you open a pull request
 
 - [ ] **Checks.** The local check sequence under

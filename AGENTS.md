@@ -90,11 +90,11 @@ npm run format:check && npm run lint && npx tsc --noEmit && npm run build
 The `ci` job in `.github/workflows/ci.yml` runs this same sequence on every
 pull request and every push to `main` and `development`; the `ci` check must
 pass before a merge. The sequence and the build's guards live in the
-`.github/actions/site-checks` composite action, which the snapshot workflow
-runs too. On `development`, and on pull requests into it, the build reads
-the next site's docs (`DOCS_MANIFEST_REF=docs-meta-next`, set by
-`scripts/use-manifest-ref.mjs`); until gridkit has published that branch, it
-warns and reads the pin in `gridkit.json`. On pull requests into `main`,
+`.github/actions/site-checks` composite action, which the snapshot and
+release workflows run too. On `development`, and on pull requests into it,
+the build reads the next site's docs (`DOCS_MANIFEST_REF=docs-meta-next`,
+set by `scripts/use-manifest-ref.mjs`); until gridkit has published that
+branch, it warns and reads the pin in `gridkit.json`. On pull requests into `main`,
 before the build, `node scripts/check-release-deps.mjs` fails on a
 prerelease `@gridkitjs/*` version in `package.json` or the lockfile. After
 the build it also runs
@@ -200,7 +200,7 @@ feedback").
 - **Never merge `development` into `main` by hand**, and never push to it
   except through a pull request. It carries prerelease packages, which CI
   refuses on pull requests into `main`. It reaches `main` only through the
-  release pull request opened when gridkit releases.
+  release pull request below.
 - To test the snapshot workflow, run it from the Actions tab with a
   payload of the event's shape, versions from
   `npm view @gridkitjs/<pkg> dist-tags` (the `dev` tag):
@@ -209,6 +209,47 @@ feedback").
 - next.gridkitjs.com is built with `SITE_CHANNEL=next`, which keeps it out
   of search engines and shows a preview banner (see
   [lib/seo/AGENTS.md](lib/seo/AGENTS.md#the-next-channel)).
+
+#### How production moves
+
+gridkitjs.com takes new `@gridkitjs/*` versions and new docs only through
+a release pull request; site work still merges to `main` directly, as
+above, and never waits for one.
+
+1. gridkit publishes a release and its docs, then sends `gridkit-release`
+   with every package's released version and the `docs-meta` commit
+   holding their docs (`manifestSha`).
+2. `gridkit-release.yml` ("Gridkit release") installs those versions on
+   `development` as caret ranges, replacing the snapshots' exact pins,
+   writes `manifestSha` into `gridkit.json`, and commits
+   `chore(deps): ship gridkit <versions>` as the release bot.
+3. It runs the site checks against the pin, as CI does on a pull request
+   into `main`, then opens the pull request `development` → `main` titled
+   `chore: release gridkit <core version>`, or updates the open one. Its
+   description links each version's GitHub Release and the manifest
+   commit, and holds the payload for a re-run.
+4. With the checks green it turns on auto-merge, so the pull request merges
+   itself with a **merge commit** once `ci` passes on it. Never squash it:
+   `main` and `development` must keep the same history. Every example
+   written on `development` ships with it.
+
+**When a release pull request is red** it stays open, and the workflow
+comments which check failed and what to do. Usually a doc page names a
+live example this site lacks (`check-manifest-tags`), or an example
+written against a snapshot no longer compiles against the release. Fix it
+on a branch off `development` with a pull request into `development`;
+merging that updates the release pull request and CI runs again.
+Auto-merge stays off after a failure, so then merge it with a merge
+commit, or re-run the workflow (below), which checks it again and turns
+auto-merge on.
+
+**To re-run a release**, after a fix, or for a closed release pull
+request, run "Gridkit release" from the Actions tab with the payload from
+the pull request's description:
+`{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.15.0", …all five}, "manifestSha": "<40-character docs-meta commit>"}`.
+Versions must be releases; it refuses a prerelease. What is already on
+`development` it leaves alone, and with nothing on `development` that
+`main` lacks it opens no pull request.
 
 ## Where the rest lives
 
