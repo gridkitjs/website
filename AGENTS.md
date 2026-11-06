@@ -17,24 +17,24 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 
 ## Structure
 
-| Path                                        | What belongs in it                                                                                                                                                                                                                                                                          |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app/[locale]/`                             | Routes: marketing home, `about` (the story behind GridKit, linked from the home page and the footer), `docs/[[...slug]]`, `changelog/[[...slug]]`, and `og/` (Open Graph images, see **Brand assets**). Locale-prefixed via `next-intl`. The layout's skip link targets `<main id="main">`. |
-| `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                                                                                                                                                                                      |
-| `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                                                                                                                                                                                 |
-| `app/api/search-index`                      | The docs search index as JSON (`lib/docs/search-index.ts`), prerendered and revalidated with the docs.                                                                                                                                                                                      |
-| `components/live-examples/`                 | `DataGrid` demos, one `<area>/<Name>.example.tsx` each, and their fixtures; registered via `lib/docs/examples.ts` (see [components/live-examples/AGENTS.md](components/live-examples/AGENTS.md)).                                                                                           |
-| `components/search/`                        | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).                                                                                                            |
-| `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`.                                                                                               |
-| `components/marketing/`                     | Homepage sections: `Hero` (with `HeroGrid`, the live grid), `FeatureMatrix`, `HeadlessSection`, `PackagesSection`, `StorySection`, `CtaSection`. Not used inside docs (see [components/marketing/AGENTS.md](components/marketing/AGENTS.md)).                                               |
-| `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                                                                                                                 |
-| `components/code/`                          | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override.                                                                                                                                                                    |
-| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`).                                                                                                |
-| `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                                                                                                                                                                                                |
-| `lib/packages/`                             | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                                                                                                                    |
-| `lib/marketing/`                            | Home page data: `features.ts`, the feature matrix (`FEATURE_GROUPS`).                                                                                                                                                                                                                       |
-| `lib/seo/`                                  | Metadata (`metadata.ts`), the Open Graph renderer (`og-image.tsx`), site constants.                                                                                                                                                                                                         |
-| `i18n/`                                     | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                                                                                                                                                                                 |
+| Path                                        | What belongs in it                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/[locale]/`                             | Routes: marketing home, `about` (the story behind GridKit, linked from the home page and the footer), `docs/[[...slug]]`, `changelog/[[...slug]]`, and `og/` (Open Graph images, see [lib/seo/AGENTS.md](lib/seo/AGENTS.md)). Locale-prefixed via `next-intl`. The layout's skip link targets `<main id="main">`. |
+| `app/[locale]/docs/`                        | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                                                                                                                                                                                                            |
+| `app/api/revalidate-docs`                   | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                                                                                                                                                                                                       |
+| `app/api/search-index`                      | The docs search index as JSON (`lib/docs/search-index.ts`), prerendered and revalidated with the docs.                                                                                                                                                                                                            |
+| `components/live-examples/`                 | `DataGrid` demos, one `<area>/<Name>.example.tsx` each, and their fixtures; registered via `lib/docs/examples.ts` (see [components/live-examples/AGENTS.md](components/live-examples/AGENTS.md)).                                                                                                                 |
+| `components/search/`                        | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).                                                                                                                                  |
+| `components/docs/`, `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`.                                                                                                                     |
+| `components/marketing/`                     | Homepage sections: `Hero` (with `HeroGrid`, the live grid), `FeatureMatrix`, `HeadlessSection`, `PackagesSection`, `StorySection`, `CtaSection`. Not used inside docs (see [components/marketing/AGENTS.md](components/marketing/AGENTS.md)).                                                                     |
+| `components/ui/`                            | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                                                                                                                                       |
+| `components/code/`                          | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override.                                                                                                                                                                                          |
+| `lib/docs/`                                 | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`).                                                                                                                      |
+| `lib/changelog/`                            | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`.                                                                                                                                                                                                                                      |
+| `lib/packages/`                             | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                                                                                                                                          |
+| `lib/marketing/`                            | Home page data: `features.ts`, the feature matrix (`FEATURE_GROUPS`).                                                                                                                                                                                                                                             |
+| `lib/seo/`                                  | Metadata (`metadata.ts`), the Open Graph renderer (`og-image.tsx`), site constants.                                                                                                                                                                                                                               |
+| `i18n/`                                     | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                                                                                                                                                                                                       |
 
 ## Relationship to the `gridkit` repo
 
@@ -190,38 +190,6 @@ runs; add a new published package to the script when `gridkit` ships one.
   `LinkCard`) so they carry the current locale prefix. In-page `#anchor`
   and relative links get a plain `<a>` in the same tab; only `http(s)://`
   links open a new tab.
-
-## Brand assets and social images
-
-- **The mark** is a four-by-four lattice with one blue cell, drawn twice:
-  `GridKitMark` in `components/ui/icons.tsx` (the header logo, inline, and
-  the Open Graph images) and `app/icon.svg` (the favicon). Keep the two in
-  step. `app/favicon.ico` and `app/apple-icon.png` cover browsers and iOS
-  home screens without SVG icons; `public/android-chrome-*.png` are the
-  web manifest's. All of `app/`'s icons are linked by file convention,
-  which Next skips once any `icons` key is set in metadata, so the layout
-  sets none.
-- **Open Graph images** are 1200×630 PNGs rendered by `renderOgImage` in
-  `lib/seo/og-image.tsx` (`next/og`, Geist, the dark theme's colours, so a
-  shared link looks the same whatever theme the reader uses): the mark, a
-  section label, the page title and its URL. Every page names its image
-  through `buildMetadata`'s `image` option, a locale-less route path:
-  - `app/[locale]/opengraph-image.tsx`, the site image (the hero's
-    headline), is the default.
-  - `app/[locale]/og/docs/[[...slug]]/route.tsx` and
-    `app/[locale]/og/changelog/[[...slug]]/route.tsx` render a docs or
-    changelog page's title, at `/<locale>/og/docs/<slug>` and
-    `/<locale>/og/changelog/<slug>`. They are route handlers because Next
-    can't put an `opengraph-image.tsx` under an optional catch-all.
-  - **Adding one for a new section**: copy a route handler under
-    `app/[locale]/og/<section>/`, keep `dynamic = "force-static"`,
-    `revalidate` and a `generateStaticParams` that lists every locale
-    (route handlers don't inherit the layout's params; without it the
-    route renders on demand), and pass `image: "og/<section>/<slug>"` from
-    the page's `generateMetadata`. Labels live under `og` in
-    `messages/<locale>/common.json`.
-  - Set the image explicitly, as `buildMetadata` does: a page's own
-    `openGraph` replaces its layout's, file-based image included.
 
 ## i18n
 
