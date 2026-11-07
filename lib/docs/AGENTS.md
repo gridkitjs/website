@@ -12,8 +12,9 @@ section.
 - `gridkit`'s `revalidate-docs` GitHub Action runs on every push to `main`
   touching `packages/*/docs/**`, `packages/*/CHANGELOG.md` or
   `packages/*/package.json`. It builds `docs-manifest.json` (every page's
-  frontmatter and body, every `_meta.json`, every changelog, and each file's
-  last commit date) and commits it to the orphan `docs-meta` branch.
+  frontmatter, every `_meta.json`, every page and changelog as its body or
+  the git blob SHA to fetch it by, and each file's last commit date) and
+  commits it to the orphan `docs-meta` branch.
 - `lib/docs/manifest.ts` fetches that file in **one request**, through the
   GitHub contents API (`lib/docs/github.ts`) with the raw media type. The
   first of these that is set picks where it reads (see `.env.example`):
@@ -40,6 +41,25 @@ section.
   docs tree, the changelog and the footer's "Docs synced" line all read
   it. `cacheComponents` is off, so this is the `fetch`-cache model, not
   `use cache`.
+- The manifest comes in two schemas, and `getDocsManifest()` returns both
+  in one shape, with every body in place, so the docs tree, the changelog
+  and the search index read `body` whichever it was:
+
+  | `schemaVersion` | Bodies                                                                                                                                                |
+  | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | `1`             | In the file: every page's MDX with its frontmatter stripped, and every whole `CHANGELOG.md`.                                                          |
+  | `2`, an index   | Left out, unless gridkit built it with `--inline-bodies`. Each page and changelog has its `blobSha`, and the loader fetches every missing body by it. |
+
+  For a schema 2 index the loader fetches the bodies in parallel through
+  `fetchBlob` (`lib/docs/github.ts`: GitHub's blobs API with the raw media
+  type), strips a page's frontmatter as gridkit's builder does, and keeps a
+  changelog whole. A blob SHA is the hash of its content, so each body is
+  cached without expiry: a cold build fetches about 65 blobs, and later
+  renders read them from the cache. They carry the `docs-content` tag too,
+  so the webhook below drops them with the manifest and they are fetched
+  again once. Any other `schemaVersion` is logged as an error and falls
+  back to the per-file path below.
+
 - While no manifest is published (a 404), `lib/docs/source.ts` and
   `lib/changelog/source.ts` fall back, with a logged warning, to the old
   per-file path: the repo tree for `DOCS_GITHUB_BRANCH`, then each file from
@@ -59,9 +79,12 @@ section.
   only changes with a deploy of a new `gridkit.json`.
 - `scripts/check-manifest-tags.mjs` holds the manifest to the
   [component map](#the-mdx-component-map). It reads the manifest the build
-  reads, by the same precedence (`scripts/lib/docs-manifest.mjs`, which
-  `check-feature-slugs.mjs` shares), collects every PascalCase tag in every
-  page body, ignoring fenced code, code spans and comments as `gridkit`'s
+  reads, by the same precedence and with a schema 2 index's page bodies
+  fetched the same way (`readDocsManifest` in
+  `scripts/lib/docs-manifest.mjs`; `check-feature-slugs.mjs` needs only
+  the pages' paths, so it reads the index as published, through
+  `readDocsIndex`), collects every PascalCase tag in every page body,
+  ignoring fenced code, code spans and comments as `gridkit`'s
   `scripts/check-mdx-tags.mjs` does, and fails with the page and tag of any
   tag missing from `public/mdx-tags.json`. CI runs it after the build
   ("Check manifest tags are registered"), so a release PR whose docs name a
@@ -70,7 +93,10 @@ section.
 - To preview gridkit docs before pushing them, build a manifest locally
   (`node scripts/build-docs-manifest.mjs <path>` in `gridkit`) and point
   `DOCS_MANIFEST_FILE` at it; this site then reads that file instead of
-  GitHub. Local only, never on Vercel.
+  GitHub. Local only, never on Vercel. The file must carry its bodies
+  (schema 1, or schema 2 built with `--inline-bodies`): a body it leaves
+  out is fetched from GitHub by blob SHA, and an unpushed file's blob
+  isn't there.
 
 ## Versions and dates
 
