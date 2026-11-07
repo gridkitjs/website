@@ -10,10 +10,10 @@ import { fetchBlob, fetchFileFromApi, isNotFound } from "./github";
  * commit date. gridkit's `scripts/build-docs-manifest.mjs` builds the file on
  * every push that touches docs, a changelog or a package version, and its
  * workflows commit it to an orphan manifest branch before calling the
- * revalidation webhook. Schema 1 carries every body; schema 2
- * (`DocsManifestIndex`) is an index that leaves them out, and the loader
- * fetches them by blob SHA. These types are the part of that script's
- * `DocsManifest` typedef this site reads.
+ * revalidation webhook. The file itself is an index
+ * (`DocsManifestIndex`) that leaves the bodies out, and the loader fetches
+ * them by blob SHA. These types are the part of that script's `DocsManifest`
+ * typedef this site reads.
  */
 export interface DocsManifest {
   /** Bumped when a field changes meaning or goes away. */
@@ -51,15 +51,11 @@ export interface ManifestMeta {
 }
 
 /**
- * A schema 2 manifest as published: the same shape as `DocsManifest`, but a
- * body is present only when gridkit built it with `--inline-bodies`, as a
- * local preview does. Otherwise each body is fetched by its git blob SHA.
+ * The manifest as published: the same shape as `DocsManifest`, but a body is
+ * present only when gridkit built it with `--inline-bodies`, as a local
+ * preview does. Otherwise each body is fetched by its git blob SHA.
  */
-interface DocsManifestIndex extends Omit<
-  DocsManifest,
-  "schemaVersion" | "packages" | "docs"
-> {
-  schemaVersion: 2;
+interface DocsManifestIndex extends Omit<DocsManifest, "packages" | "docs"> {
   packages: Record<string, IndexPackage>;
   docs: IndexDoc[];
 }
@@ -82,10 +78,8 @@ interface IndexDoc extends Omit<ManifestDoc, "body"> {
   body?: string;
 }
 
-/** A manifest of a schema this site reads, as it was parsed. */
-type PublishedManifest =
-  (DocsManifest & { schemaVersion: 1 }) | DocsManifestIndex;
-
+/** The `schemaVersion` of the index this site reads. */
+const SCHEMA_VERSION = 2;
 const MANIFEST_PATH = "docs-manifest.json";
 /** The frontmatter block at the top of an `.mdx` file, as gridkit's manifest builder matches it. */
 const FRONTMATTER = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
@@ -150,20 +144,14 @@ async function loadDocsManifest(): Promise<DocsManifest | null> {
     warnMissingManifestOnce();
     return null;
   }
-  const manifest = JSON.parse(raw) as PublishedManifest;
-  switch (manifest.schemaVersion) {
-    case 1:
-      return manifest;
-    case 2:
-      return hydrateIndex(manifest);
-    default: {
-      const { schemaVersion } = manifest as { schemaVersion: unknown };
-      console.error(
-        `[docs] ${MANIFEST_PATH} has schema version ${schemaVersion}, this site reads 1 and 2; falling back to per-file fetches`,
-      );
-      return null;
-    }
+  const index = JSON.parse(raw) as DocsManifestIndex;
+  if (index.schemaVersion !== SCHEMA_VERSION) {
+    console.error(
+      `[docs] ${MANIFEST_PATH} has schema version ${index.schemaVersion}, this site reads ${SCHEMA_VERSION}; falling back to per-file fetches`,
+    );
+    return null;
   }
+  return hydrateIndex(index);
 }
 
 /**
@@ -222,8 +210,8 @@ export async function getDocsSync(): Promise<DocsSync | null> {
  * The published docs manifest, or `null` when there is none yet (or it's a
  * schema this site can't read), in which case callers fall back to fetching
  * files one by one. Memoized per request so the docs tree, the changelog and
- * the footer parse it once; across requests the manifest and the bodies a
- * schema 2 index leaves out are cached by `fetchFileFromApi` and `fetchBlob`
- * under `DOCS_CACHE_TAG`, which the revalidation webhook busts.
+ * the footer parse it once; across requests the manifest and the bodies the
+ * index leaves out are cached by `fetchFileFromApi` and `fetchBlob` under
+ * `DOCS_CACHE_TAG`, which the revalidation webhook busts.
  */
 export const getDocsManifest = cache(loadDocsManifest);

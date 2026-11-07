@@ -31,9 +31,8 @@ const FRONTMATTER = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
  * @property {string} repoPath e.g. "packages/react/docs/columns/column-sorting.mdx".
  * @property {string} blobSha The git blob SHA of the `.mdx` file,
  *   frontmatter included.
- * @property {string} [body] The MDX with its frontmatter stripped. Schema 1
- *   always carries it; schema 2 only when gridkit built it with
- *   `--inline-bodies`.
+ * @property {string} [body] The MDX with its frontmatter stripped. Present
+ *   only when gridkit built the manifest with `--inline-bodies`.
  */
 
 /**
@@ -112,7 +111,7 @@ export async function refExists(ref) {
 
 /**
  * The manifest the build would render, as published, or `null` when none is
- * published at the ref. Throws on any other failure. A schema 2 index leaves
+ * published at the ref. Throws on any other failure. The index leaves
  * page bodies out; read it through `readDocsManifest` to have them.
  *
  * @returns {Promise<DocsIndex | null>}
@@ -152,7 +151,7 @@ async function fetchBlob(sha) {
 }
 
 /**
- * The manifest the build would render, with every page body a schema 2 index
+ * The manifest the build would render, with every page body the index
  * leaves out fetched by blob SHA and its frontmatter stripped, as
  * `lib/docs/manifest.ts` does; `null` when none is published at the ref.
  * Throws on any other failure.
