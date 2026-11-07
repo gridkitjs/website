@@ -1,4 +1,4 @@
 {
   "$comment": "The gridkit docs-meta commit whose docs-manifest.json this site renders. The release workflow updates it; see lib/docs/AGENTS.md.",
-  "docsManifest": "954bd8ee9aaec58a46f48eb0ca2eaad875632138"
+  "docsManifest": "ca0309374ad9fb01425a47a0a76b61cbcc1d7331"
 }
