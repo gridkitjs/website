@@ -23,6 +23,25 @@ const PIN = new URL("../../gridkit.json", import.meta.url);
 /** A git ref safe to pass to the GitHub API and to a workflow's env file. */
 export const MANIFEST_REF = /^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._/-]*$/;
 
+/** The frontmatter block at the top of an `.mdx` file, as gridkit's manifest builder matches it. */
+const FRONTMATTER = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/;
+
+/**
+ * @typedef {object} IndexDoc A page as the published manifest lists it.
+ * @property {string} repoPath e.g. "packages/react/docs/columns/column-sorting.mdx".
+ * @property {string} blobSha The git blob SHA of the `.mdx` file,
+ *   frontmatter included.
+ * @property {string} [body] The MDX with its frontmatter stripped. Schema 1
+ *   always carries it; schema 2 only when gridkit built it with
+ *   `--inline-bodies`.
+ */
+
+/**
+ * @typedef {object} DocsIndex The part of the published manifest these
+ *   scripts read.
+ * @property {IndexDoc[]} docs
+ */
+
 /**
  * @typedef {object} ManifestDoc
  * @property {string} repoPath e.g. "packages/react/docs/columns/column-sorting.mdx".
@@ -30,7 +49,8 @@ export const MANIFEST_REF = /^(?!.*\.\.)[A-Za-z0-9][A-Za-z0-9._/-]*$/;
  */
 
 /**
- * @typedef {object} DocsManifest The part of the manifest these scripts read.
+ * @typedef {object} DocsManifest The published manifest with every page
+ *   body in place.
  * @property {ManifestDoc[]} docs
  */
 
@@ -91,12 +111,13 @@ export async function refExists(ref) {
 }
 
 /**
- * The manifest the build would render, or `null` when none is published at
- * the ref. Throws on any other failure.
+ * The manifest the build would render, as published, or `null` when none is
+ * published at the ref. Throws on any other failure. A schema 2 index leaves
+ * page bodies out; read it through `readDocsManifest` to have them.
  *
- * @returns {Promise<DocsManifest | null>}
+ * @returns {Promise<DocsIndex | null>}
  */
-export async function readDocsManifest() {
+export async function readDocsIndex() {
   const source = await manifestSource();
   if ("file" in source) {
     return JSON.parse(await readFile(source.file, "utf8"));
@@ -112,4 +133,40 @@ export async function readDocsManifest() {
   throw new Error(
     `GitHub returned ${response.status} for the manifest at ${source.ref}`,
   );
+}
+
+/**
+ * The content of the git blob `sha` in the docs repo.
+ *
+ * @param {string} sha
+ * @returns {Promise<string>}
+ */
+async function fetchBlob(sha) {
+  const response = await githubApi(
+    `git/blobs/${sha}`,
+    "application/vnd.github.raw",
+  );
+  if (response.ok) return response.text();
+  await response.body?.cancel();
+  throw new Error(`GitHub returned ${response.status} for the blob ${sha}`);
+}
+
+/**
+ * The manifest the build would render, with every page body a schema 2 index
+ * leaves out fetched by blob SHA and its frontmatter stripped, as
+ * `lib/docs/manifest.ts` does; `null` when none is published at the ref.
+ * Throws on any other failure.
+ *
+ * @returns {Promise<DocsManifest | null>}
+ */
+export async function readDocsManifest() {
+  const index = await readDocsIndex();
+  if (index === null) return null;
+  const docs = await Promise.all(
+    index.docs.map(async ({ blobSha, body, ...doc }) => ({
+      ...doc,
+      body: body ?? (await fetchBlob(blobSha)).replace(FRONTMATTER, ""),
+    })),
+  );
+  return { ...index, docs };
 }
