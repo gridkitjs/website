@@ -13,10 +13,10 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@gridkitjs/core": "0.0.0-dev-20261107203826",
-    "@gridkitjs/dom": "0.0.0-dev-20261107203826",
-    "@gridkitjs/export-xlsx": "0.0.0-dev-20261107203826",
-    "@gridkitjs/react": "0.0.0-dev-20261107203826",
+    "@gridkitjs/core": "0.0.0-dev-20261107212842",
+    "@gridkitjs/dom": "0.0.0-dev-20261107212842",
+    "@gridkitjs/export-xlsx": "0.0.0-dev-20261107212842",
+    "@gridkitjs/react": "0.0.0-dev-20261107212842",
     "@gridkitjs/theme-tailwind": "0.11.0",
     "@shikijs/transformers": "^4.4.1",
     "@stackblitz/sdk": "^1.11.0",
