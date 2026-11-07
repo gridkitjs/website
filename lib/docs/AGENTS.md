@@ -41,18 +41,15 @@ section.
   docs tree, the changelog and the footer's "Docs synced" line all read
   it. `cacheComponents` is off, so this is the `fetch`-cache model, not
   `use cache`.
-- The manifest comes in two schemas, and `getDocsManifest()` returns both
-  in one shape, with every body in place, so the docs tree, the changelog
-  and the search index read `body` whichever it was:
+- The manifest is an index, `schemaVersion` 2: it leaves every page and
+  changelog body out, unless gridkit built it with `--inline-bodies`, and
+  gives each its `blobSha`. `getDocsManifest()` returns it with every body
+  in place, so the docs tree, the changelog and the search index read
+  `body` however it got there.
 
-  | `schemaVersion` | Bodies                                                                                                                                                |
-  | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | `1`             | In the file: every page's MDX with its frontmatter stripped, and every whole `CHANGELOG.md`.                                                          |
-  | `2`, an index   | Left out, unless gridkit built it with `--inline-bodies`. Each page and changelog has its `blobSha`, and the loader fetches every missing body by it. |
-
-  For a schema 2 index the loader fetches the bodies in parallel through
-  `fetchBlob` (`lib/docs/github.ts`: GitHub's blobs API with the raw media
-  type), strips a page's frontmatter as gridkit's builder does, and keeps a
+  The loader fetches the missing bodies in parallel through `fetchBlob`
+  (`lib/docs/github.ts`: GitHub's blobs API with the raw media type),
+  strips a page's frontmatter as gridkit's builder does, and keeps a
   changelog whole. A blob SHA is the hash of its content, so each body is
   cached without expiry: a cold build fetches about 65 blobs, and later
   renders read them from the cache. They carry the `docs-content` tag too,
@@ -79,7 +76,7 @@ section.
   only changes with a deploy of a new `gridkit.json`.
 - `scripts/check-manifest-tags.mjs` holds the manifest to the
   [component map](#the-mdx-component-map). It reads the manifest the build
-  reads, by the same precedence and with a schema 2 index's page bodies
+  reads, by the same precedence and with the index's page bodies
   fetched the same way (`readDocsManifest` in
   `scripts/lib/docs-manifest.mjs`; `check-feature-slugs.mjs` needs only
   the pages' paths, so it reads the index as published, through
@@ -94,9 +91,8 @@ section.
   (`node scripts/build-docs-manifest.mjs <path> --inline-bodies` in `gridkit`) and point
   `DOCS_MANIFEST_FILE` at it; this site then reads that file instead of
   GitHub. Local only, never on Vercel. The file must carry its bodies
-  (schema 1, or schema 2 built with `--inline-bodies`): a body it leaves
-  out is fetched from GitHub by blob SHA, and an unpushed file's blob
-  isn't there.
+  (built with `--inline-bodies`): a body it leaves out is fetched from
+  GitHub by blob SHA, and an unpushed file's blob isn't there.
 
 ## Versions and dates
 
