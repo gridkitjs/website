@@ -6,7 +6,8 @@ import "server-only";
  * update docs without a website redeploy. Every request here goes through
  * Next's fetch cache — see `DOCS_CACHE_TAG` for the on-demand revalidation
  * hook and `DOCS_CACHE_SECONDS` for the time-based fallback, which a file
- * read at a commit SHA goes without because its content can never change.
+ * read at a commit SHA or a blob read by its SHA goes without because its
+ * content can never change.
  */
 
 export const DOCS_CACHE_TAG = "docs-content";
@@ -146,6 +147,22 @@ export async function fetchFileFromApi(
     `${repoPath}@${ref}`,
     "application/vnd.github.raw+json",
     { ...options, immutable: isCommitSha(ref) },
+  );
+  return res.text();
+}
+
+/**
+ * The content of the git blob `sha` in the docs repo, through the blobs API
+ * with the raw media type. A blob's SHA is the hash of its content, so it's
+ * cached without expiry; it still carries `DOCS_CACHE_TAG`, like every other
+ * fetch here.
+ */
+export async function fetchBlob(sha: string): Promise<string> {
+  const res = await fetchFromGithub(
+    `https://api.github.com/repos/${OWNER}/${REPO}/git/blobs/${sha}`,
+    `blob ${sha}`,
+    "application/vnd.github.raw",
+    { immutable: true },
   );
   return res.text();
 }

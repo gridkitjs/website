@@ -16,7 +16,7 @@
  */
 import { readdir, readFile } from "node:fs/promises";
 import ts from "typescript";
-import { githubApi, readDocsManifest } from "./lib/docs-manifest.mjs";
+import { githubApi, readDocsIndex } from "./lib/docs-manifest.mjs";
 
 const BRANCH = process.env.DOCS_GITHUB_BRANCH ?? "main";
 const MESSAGES = new URL("../messages/", import.meta.url);
@@ -36,7 +36,7 @@ async function importTs(path) {
 
 /** The repo path of every docs page, from the manifest or the repo tree. */
 async function docsRepoPaths() {
-  const manifest = await readDocsManifest();
+  const manifest = await readDocsIndex();
   if (manifest) return manifest.docs.map((doc) => doc.repoPath);
   const tree = await githubApi(
     `git/trees/${BRANCH}?recursive=1`,
