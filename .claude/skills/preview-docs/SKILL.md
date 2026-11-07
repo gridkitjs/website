@@ -21,11 +21,14 @@ site resolves a relative one against its own folder.
 ```bash
 cd ../gridkit
 pnpm install
-node scripts/build-docs-manifest.mjs /tmp/docs-manifest.json
+node scripts/build-docs-manifest.mjs /tmp/docs-manifest.json --inline-bodies
 ```
 
 It prints the packages, pages and `_meta.json` files it found. Uncommitted
 edits are included; last-updated dates come from git, so they lag behind.
+`--inline-bodies` puts every page and changelog in the file; without it the
+site fetches each one from GitHub by blob SHA, and an unpushed edit isn't
+there.
 
 ## 2. Run the site against it
 

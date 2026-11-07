@@ -91,7 +91,7 @@ section.
   live example this site lacks fails until the example lands. Run it by
   hand after `npm run build` or `node scripts/export-mdx-tags.mjs`.
 - To preview gridkit docs before pushing them, build a manifest locally
-  (`node scripts/build-docs-manifest.mjs <path>` in `gridkit`) and point
+  (`node scripts/build-docs-manifest.mjs <path> --inline-bodies` in `gridkit`) and point
   `DOCS_MANIFEST_FILE` at it; this site then reads that file instead of
   GitHub. Local only, never on Vercel. The file must carry its bodies
   (schema 1, or schema 2 built with `--inline-bodies`): a body it leaves
