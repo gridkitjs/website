@@ -13,12 +13,12 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@gridkitjs/core": "0.15.0",
-    "@gridkitjs/dom": "0.3.3",
-    "@gridkitjs/export-xlsx": "0.1.3",
-    "@gridkitjs/react": "0.15.0",
-    "@gridkitjs/theme-css": "0.0.0-dev-20261108091259",
-    "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
+    "@gridkitjs/core": "^0.15.0",
+    "@gridkitjs/dom": "^0.3.3",
+    "@gridkitjs/export-xlsx": "^0.1.3",
+    "@gridkitjs/react": "^0.15.0",
+    "@gridkitjs/theme-css": "^0.1.0",
+    "@gridkitjs/theme-tailwind": "^0.12.0",
     "@shikijs/transformers": "^4.4.1",
     "@stackblitz/sdk": "^1.11.0",
     "@vercel/analytics": "^2.0.1",
