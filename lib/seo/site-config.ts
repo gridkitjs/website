@@ -10,6 +10,7 @@ export const siteConfig = {
     dom: "https://www.npmjs.com/package/@gridkitjs/dom",
     react: "https://www.npmjs.com/package/@gridkitjs/react",
     themeTailwind: "https://www.npmjs.com/package/@gridkitjs/theme-tailwind",
+    themeCss: "https://www.npmjs.com/package/@gridkitjs/theme-css",
     exportXlsx: "https://www.npmjs.com/package/@gridkitjs/export-xlsx",
   },
   author: {

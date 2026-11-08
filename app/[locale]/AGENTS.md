@@ -30,7 +30,8 @@ parallel, so the call in one doesn't cover another:
   touch headers.
 
 After a change under `app/[locale]/`, check the build output still marks
-`/[locale]/docs/[[...slug]]` and `/[locale]/changelog/[[...slug]]` with `●`:
+`/[locale]/docs/[[...slug]]`, `/[locale]/changelog/[[...slug]]` and
+`/[locale]/theme-builder` with `●`:
 
 ```bash
 npm run build

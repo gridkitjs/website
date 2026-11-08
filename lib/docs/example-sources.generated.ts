@@ -1014,7 +1014,7 @@ function ThemeSwatch({
       <p className="text-site-ink-muted mb-2 text-xs font-medium">{caption}</p>
       <div
         className={cn(
-          "border-line bg-surface text-fg rounded-site border p-2",
+          "border-gridkit-line bg-gridkit-surface text-gridkit-fg rounded-site border p-2",
           className,
         )}
       >

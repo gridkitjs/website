@@ -1,0 +1,97 @@
+{
+  "metaTitle": "Theme builder",
+  "description": "Build a GridKit theme: start from a preset, tune every token on a live grid in light and dark, and download one CSS file for Tailwind or plain CSS.",
+  "title": "Theme builder",
+  "intro": "Start from a preset and tune the grid's tokens on a live preview, in light and dark. What you download is one small CSS file of overrides, loaded after the theme's stylesheet.",
+  "preview": {
+    "heading": "Preview",
+    "mode": "Palette",
+    "light": "Light",
+    "dark": "Dark",
+    "gridLabel": {
+      "light": "Tickets, light palette",
+      "dark": "Tickets, dark palette"
+    },
+    "toolbarLabel": "Ticket tools"
+  },
+  "controls": {
+    "label": "Theme controls",
+    "presets": {
+      "heading": "Preset",
+      "replace": "Replace your changes with {preset}? They are kept only in this page's address."
+    },
+    "palette": {
+      "heading": "Palette from one accent",
+      "intro": "Pick an accent to get the accent, selection and hover colours for both palettes. Each keeps its default lightness, so text on it stays readable.",
+      "accent": "Accent",
+      "proposal": "Proposed colours",
+      "apply": "Apply these colours"
+    },
+    "tokens": {
+      "heading": "Tokens",
+      "tier": "Tokens to show",
+      "basic": "Basic",
+      "advanced": "Advanced",
+      "changed": "Changed",
+      "changedCount": "{count} changed",
+      "reset": "Reset {token}",
+      "resetGroup": "Reset {group}",
+      "resetButton": "Reset"
+    },
+    "contrast": {
+      "target": "Contrast",
+      "AA": "AA",
+      "AAA": "AAA",
+      "issue": "{side}: {text} on {background} is {ratio}:1, under {minimum}:1."
+    },
+    "fields": {
+      "light": "Light",
+      "dark": "Dark",
+      "adjust": "Adjust {token}, {side}",
+      "channel": {
+        "l": "Lightness",
+        "c": "Chroma",
+        "h": "Hue",
+        "alpha": "Opacity"
+      },
+      "unit": "Unit",
+      "pageValue": "The page's",
+      "shadow": {
+        "x": "X (px)",
+        "y": "Y (px)",
+        "blur": "Blur (px)",
+        "spread": "Spread (px)"
+      }
+    }
+  },
+  "output": {
+    "heading": "Theme file",
+    "intro": "The tokens you changed, as one stylesheet that works on top of either theme package. The preview above is this file, applied to the page.",
+    "download": "Download {file}",
+    "contrast": {
+      "pass": "Every contrast check passes at {level}, in both palettes.",
+      "fail": "{count, plural, one {# contrast check falls} other {# contrast checks fall}} short of {level}:"
+    },
+    "import": {
+      "open": "Import",
+      "label": "Theme file to import",
+      "hint": "Paste a theme file, such as one downloaded here or a preset. Only the tokens it sets on :root are read.",
+      "invalid": "This isn't a stylesheet the builder can read. Check that every block and comment it opens is closed.",
+      "submit": "Load theme",
+      "cancel": "Cancel",
+      "replace": "Replace your changes with this theme file? They are kept only in this page's address.",
+      "loaded": "Theme loaded.",
+      "ignored": "Theme loaded. Left out {count, plural, one {# declaration} other {# declarations}} that set no token or can't be applied: {names}."
+    },
+    "steps": {
+      "heading": "Use it",
+      "install": "Install {pkg}.",
+      "import": "Save {file} beside your CSS entry, and import it after the theme's stylesheet."
+    },
+    "flavour": "Your project's styles",
+    "flavours": {
+      "tailwind": "Tailwind",
+      "css": "Plain CSS"
+    }
+  }
+}

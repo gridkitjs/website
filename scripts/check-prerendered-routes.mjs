@@ -1,11 +1,12 @@
 /**
- * Fails when `next build` did not prerender the docs or changelog routes.
+ * Fails when `next build` did not prerender the docs, changelog or theme
+ * builder routes.
  *
- * Both routes must be static (`●` in the build's route table). A layout or
- * page that reads request headers, such as one that skips `setRequestLocale`,
+ * Each must be static (`●` in the build's route table). A layout or page
+ * that reads request headers, such as one that skips `setRequestLocale`,
  * turns a route dynamic (`ƒ`): the build still succeeds, but every visit then
- * renders on demand behind the loading skeleton. See
- * `app/[locale]/AGENTS.md`.
+ * renders on demand, the docs and changelog behind their loading skeleton.
+ * See `app/[locale]/AGENTS.md`.
  *
  * A route is read from the table as a top-level line carrying the route's
  * pattern, followed by one line per prerendered path. A dynamic route has the
@@ -19,6 +20,7 @@ import { readFile } from "node:fs/promises";
 const REQUIRED_ROUTES = [
   "/[locale]/docs/[[...slug]]",
   "/[locale]/changelog/[[...slug]]",
+  "/[locale]/theme-builder",
 ];
 
 const STATIC = "●";

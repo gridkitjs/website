@@ -18,6 +18,7 @@ export async function SiteFooter() {
     { name: "@gridkitjs/dom", href: siteConfig.npm.dom },
     { name: "@gridkitjs/react", href: siteConfig.npm.react },
     { name: "@gridkitjs/theme-tailwind", href: siteConfig.npm.themeTailwind },
+    { name: "@gridkitjs/theme-css", href: siteConfig.npm.themeCss },
     { name: "@gridkitjs/export-xlsx", href: siteConfig.npm.exportXlsx },
   ];
 
@@ -46,6 +47,12 @@ export async function SiteFooter() {
               className="text-site-ink-inverted text-sm font-medium transition-opacity hover:opacity-70"
             >
               {t("about")}
+            </Link>
+            <Link
+              href="/theme-builder"
+              className="text-site-ink-inverted text-sm font-medium transition-opacity hover:opacity-70"
+            >
+              {t("themeBuilder")}
             </Link>
           </div>
         </div>

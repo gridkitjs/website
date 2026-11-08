@@ -19,7 +19,7 @@ on:
       payload:
         description: >
           The client_payload as JSON: {"sha": "<40-character gridkit commit>",
-          "versions": {"@gridkitjs/core": "0.15.0", …all five},
+          "versions": {"@gridkitjs/core": "0.15.0", …one per package},
           "manifestSha": "<40-character docs-meta commit>"}
         required: true
         type: string

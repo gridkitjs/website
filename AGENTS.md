@@ -19,25 +19,27 @@ headless data-grid toolkit. Next.js 16 App Router, React 19, Tailwind CSS 4,
 
 A linked folder has rules of its own in its `AGENTS.md`.
 
-| Path                                                                     | What belongs in it                                                                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`app/[locale]/`](app/[locale]/AGENTS.md)                                | Routes: marketing home, `about` (the story behind GridKit, linked from the home page and the footer), `docs/[[...slug]]`, `changelog/[[...slug]]`, and `og/` (Open Graph images, see [lib/seo/AGENTS.md](lib/seo/AGENTS.md)). Locale-prefixed via `next-intl`. The layout's skip link targets `<main id="main">`. |
-| `app/[locale]/docs/`                                                     | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                                                                                                                                                                                                            |
-| `app/api/revalidate-docs`                                                | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                                                                                                                                                                                                       |
-| `app/api/search-index`                                                   | The docs search index as JSON (`lib/docs/search-index.ts`), prerendered and revalidated with the docs.                                                                                                                                                                                                            |
-| [`components/live-examples/`](components/live-examples/AGENTS.md)        | `DataGrid` demos, one `<area>/<Name>.example.tsx` each, and their fixtures; registered via `lib/docs/examples.ts`.                                                                                                                                                                                                |
-| [`components/search/`](components/search/AGENTS.md)                      | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).                                                                                                                                  |
-| [`components/docs/`](components/docs/AGENTS.md), `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`.                                                                                                                     |
-| [`components/marketing/`](components/marketing/AGENTS.md)                | Homepage sections: `Hero` (with `HeroGrid`, the live grid), `FeatureMatrix`, `HeadlessSection`, `PackagesSection`, `StorySection`, `CtaSection`. Not used inside docs.                                                                                                                                            |
-| `components/ui/`                                                         | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                                                                                                                                       |
-| `components/code/`                                                       | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override.                                                                                                                                                                                          |
-| [`lib/docs/`](lib/docs/AGENTS.md)                                        | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`, `remark-unregistered-tags.ts`).                                                                                       |
-| `lib/changelog/`                                                         | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`; covered by `lib/docs/AGENTS.md`.                                                                                                                                                                                                     |
-| `lib/packages/`                                                          | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                                                                                                                                          |
-| `lib/marketing/`                                                         | Home page data: `features.ts`, the feature matrix (`FEATURE_GROUPS`).                                                                                                                                                                                                                                             |
-| [`lib/seo/`](lib/seo/AGENTS.md)                                          | Metadata (`metadata.ts`), the Open Graph renderer (`og-image.tsx`), site constants.                                                                                                                                                                                                                               |
-| `gridkit.json`                                                           | `docsManifest`: the `gridkit` `docs-meta` commit whose docs manifest production renders. The release workflow updates it; see [lib/docs/AGENTS.md](lib/docs/AGENTS.md#the-manifest).                                                                                                                              |
-| `i18n/`                                                                  | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                                                                                                                                                                                                       |
+| Path                                                                     | What belongs in it                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`app/[locale]/`](app/[locale]/AGENTS.md)                                | Routes: marketing home, `about` (the story behind GridKit, linked from the home page and the footer), `docs/[[...slug]]`, `changelog/[[...slug]]`, `theme-builder` (see [components/theme-builder/AGENTS.md](components/theme-builder/AGENTS.md)), and `og/` (Open Graph images, see [lib/seo/AGENTS.md](lib/seo/AGENTS.md)). Locale-prefixed via `next-intl`. The layout's skip link targets `<main id="main">`. |
+| `app/[locale]/docs/`                                                     | Docs layout; `error.tsx` retries a page that fails to fetch or compile, `loading.tsx` is its skeleton.                                                                                                                                                                                                                                                                                                            |
+| `app/api/revalidate-docs`                                                | Webhook the `gridkit` repo calls after publishing a docs manifest, to bust the fetch cache.                                                                                                                                                                                                                                                                                                                       |
+| `app/api/search-index`                                                   | The docs search index as JSON (`lib/docs/search-index.ts`), prerendered and revalidated with the docs.                                                                                                                                                                                                                                                                                                            |
+| [`components/live-examples/`](components/live-examples/AGENTS.md)        | `DataGrid` demos, one `<area>/<Name>.example.tsx` each, and their fixtures; registered via `lib/docs/examples.ts`.                                                                                                                                                                                                                                                                                                |
+| [`components/search/`](components/search/AGENTS.md)                      | Docs search: `SearchDialog` (the Ctrl/Cmd+K palette, mounted once in the header), `SearchTrigger` (header and docs bar), `useSearchIndex` (MiniSearch over `/api/search-index`).                                                                                                                                                                                                                                  |
+| [`components/docs/`](components/docs/AGENTS.md), `components/changelog/` | Docs/changelog page chrome: sidebar (`DocsSidebar`, `SidebarGroup`), mobile drawer (`DocsMobileNav`), table of contents (`OnThisPage`, current heading from `useActiveHeading`), `BackToTop`.                                                                                                                                                                                                                     |
+| [`components/marketing/`](components/marketing/AGENTS.md)                | Homepage sections: `Hero` (with `HeroGrid`, the live grid), `FeatureMatrix`, `HeadlessSection`, `PackagesSection`, `StorySection`, `CtaSection`. Not used inside docs.                                                                                                                                                                                                                                            |
+| [`components/theme-builder/`](components/theme-builder/AGENTS.md)        | The theme builder: the preview, the controls generated from the theme package's token manifest, and the theme file it outputs.                                                                                                                                                                                                                                                                                    |
+| `components/ui/`                                                         | Generic building blocks (Button, Badge, Kbd, Section, Prose, `cn`). No knowledge of docs/marketing content.                                                                                                                                                                                                                                                                                                       |
+| `components/code/`                                                       | `CodeBlock` (Shiki highlighting), `CodeFrame` (title bar, wrap toggle) and `CopyButton`, used by the MDX `pre` override; `PlainCodeBlock`, unhighlighted, for code that changes in the browser.                                                                                                                                                                                                                   |
+| [`lib/docs/`](lib/docs/AGENTS.md)                                        | GitHub-fetch client (`github.ts`), manifest reader (`manifest.ts`), tree builder (`source.ts`, `nav.ts`), search index (`search-index.ts`), MDX renderer (`mdx.tsx`, `rehype-code-meta.ts`, `remark-unregistered-tags.ts`).                                                                                                                                                                                       |
+| `lib/changelog/`                                                         | Same shape as `lib/docs/`, for `CHANGELOG.md` files instead of `docs/*.mdx`; covered by `lib/docs/AGENTS.md`.                                                                                                                                                                                                                                                                                                     |
+| `lib/packages/`                                                          | Package release info from the npm registry (`npm.ts`): latest version and release dates.                                                                                                                                                                                                                                                                                                                          |
+| `lib/marketing/`                                                         | Home page data: `features.ts`, the feature matrix (`FEATURE_GROUPS`).                                                                                                                                                                                                                                                                                                                                             |
+| `lib/theme-builder/`                                                     | The theme builder's logic, without React: the token manifest, the theme model, theme files, the URL hash, colour and contrast. Covered by [components/theme-builder/AGENTS.md](components/theme-builder/AGENTS.md#libtheme-builder).                                                                                                                                                                              |
+| [`lib/seo/`](lib/seo/AGENTS.md)                                          | Metadata (`metadata.ts`), the Open Graph renderer (`og-image.tsx`), site constants.                                                                                                                                                                                                                                                                                                                               |
+| `gridkit.json`                                                           | `docsManifest`: the `gridkit` `docs-meta` commit whose docs manifest production renders. The release workflow updates it; see [lib/docs/AGENTS.md](lib/docs/AGENTS.md#the-manifest).                                                                                                                                                                                                                              |
+| `i18n/`                                                                  | `next-intl` routing/navigation config. `messages/en/` holds UI copy — **not** docs content.                                                                                                                                                                                                                                                                                                                       |
 
 ## Relationship to the `gridkit` repo
 
@@ -68,11 +70,11 @@ comes through the rate-limited GitHub API, and the per-file fallback makes
 more requests than GitHub's unauthenticated limit (60 req/hr) allows; set it
 for local dev too.
 
-The five `@gridkitjs/*` packages (`core`, `dom`, `react`, `theme-tailwind`,
-`export-xlsx`) are never moved by hand. On `main` they change only through
-the release pull request a bot opens when gridkit releases, which also
-moves the docs pin in `gridkit.json`, so production's packages and docs
-change together; on `development`, a bot installs gridkit's `dev`
+The `@gridkitjs/*` packages (`core`, `dom`, `react`, `theme-tailwind`,
+`theme-css`, `export-xlsx`) are never moved by hand. On `main` they change
+only through the release pull request a bot opens when gridkit releases,
+which also moves the docs pin in `gridkit.json`, so production's packages
+and docs change together; on `development`, a bot installs gridkit's `dev`
 snapshots (see [Channels](#channels)). On `0.x` a caret range never crosses
 a minor, so `npm update` leaves them where they are. When `gridkit` ships a
 new published package, add it to `package.json` by hand once: the release
@@ -84,7 +86,7 @@ doesn't depend on.
 CI-equivalent local check, in order:
 
 ```bash
-npm run format:check && npm run lint && npx tsc --noEmit && npm run build
+npm run format:check && npm run lint && npx tsc --noEmit && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "lib/**/*.test.ts" && npm run build
 ```
 
 The `ci` job in `.github/workflows/ci.yml` runs this same sequence on every
@@ -100,8 +102,9 @@ prerelease `@gridkitjs/*` version in `package.json` or the lockfile. After
 the build it also runs
 three guards:
 
-- `node scripts/check-prerendered-routes.mjs <build-log>` fails when the docs
-  or changelog route is `ƒ` instead of `●` in the build's route table (see
+- `node scripts/check-prerendered-routes.mjs <build-log>` fails when the
+  docs, changelog or theme builder route is `ƒ` instead of `●` in the
+  build's route table (see
   [app/[locale]/AGENTS.md](app/[locale]/AGENTS.md#keep-the-routes-prerendered)).
 - `node scripts/check-manifest-tags.mjs` fails when a page of the docs
   manifest the build read uses a tag missing from `public/mdx-tags.json`
@@ -116,6 +119,11 @@ Vercel still builds the previews and production on its own.
   reaching for `any` or a non-null assertion.
 - **ESLint** — `eslint-config-next`'s core-web-vitals + typescript configs.
   Fix the code rather than adding disable comments.
+- **Tests** — unit tests sit beside their module as `*.test.ts` and run on
+  Node's own test runner, with no dependencies; so far only
+  `lib/theme-builder/` has them. Node strips the types itself, so a tested
+  module imports only relative paths, ending in `.ts`
+  (`allowImportingTsExtensions` in `tsconfig.json`), never the `@/` alias.
 - **Prettier** — double quotes, semicolons, 2-space indent, trailing commas,
   80 columns, `prettier-plugin-tailwindcss` (class names get reordered
   automatically — don't hand-order them, don't fight the formatter).
@@ -206,7 +214,7 @@ feedback").
 - To test the snapshot workflow, run it from the Actions tab with a
   payload of the event's shape, versions from
   `npm view @gridkitjs/<pkg> dist-tags` (the `dev` tag):
-  `{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.0.0-dev-…", "@gridkitjs/dom": "…", "@gridkitjs/react": "…", "@gridkitjs/theme-tailwind": "…", "@gridkitjs/export-xlsx": "…"}, "manifestRef": "docs-meta-next"}`.
+  `{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.0.0-dev-…", "@gridkitjs/dom": "…", "@gridkitjs/react": "…", "@gridkitjs/theme-tailwind": "…", "@gridkitjs/theme-css": "…", "@gridkitjs/export-xlsx": "…"}, "manifestRef": "docs-meta-next"}`.
   It skips when those versions are already installed.
 - next.gridkitjs.com is built with `SITE_CHANNEL=next`, which keeps it out
   of search engines and shows a preview banner (see
@@ -248,7 +256,7 @@ auto-merge on.
 **To re-run a release**, after a fix, or for a closed release pull
 request, run "Gridkit release" from the Actions tab with the payload from
 the pull request's description:
-`{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.15.0", …all five}, "manifestSha": "<40-character docs-meta commit>"}`.
+`{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.15.0", …one per package}, "manifestSha": "<40-character docs-meta commit>"}`.
 Versions must be releases; it refuses a prerelease. What is already on
 `development` it leaves alone, and with nothing on `development` that
 `main` lacks it opens no pull request.
@@ -268,18 +276,19 @@ in `.claude/rules/`. Claude Code loads each one by path; with another tool,
 open the one the work touches. Skills in `.claude/skills/` are step-by-step
 procedures for repeated tasks; with another tool, follow the `SKILL.md`.
 
-| File                                                                     | What it covers                                                                                        |
-| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| [lib/docs/AGENTS.md](lib/docs/AGENTS.md)                                 | The docs pipeline: manifest, caching, versions, search index, MDX component map; `lib/changelog/` too |
-| [components/docs/AGENTS.md](components/docs/AGENTS.md)                   | Docs and changelog chrome: sidebar state                                                              |
-| [components/search/AGENTS.md](components/search/AGENTS.md)               | Docs search: loading the index, ranking, shortcuts                                                    |
-| [components/live-examples/AGENTS.md](components/live-examples/AGENTS.md) | Live examples: the file contract, generated sources, registry, frame                                  |
-| [components/marketing/AGENTS.md](components/marketing/AGENTS.md)         | Home page sections: the hero glow, `HeroGrid` height, `FeatureMatrix` slugs                           |
-| [app/[locale]/AGENTS.md](app/[locale]/AGENTS.md)                         | Routes: keeping them prerendered (`setRequestLocale`, client `loading.tsx`)                           |
-| [lib/seo/AGENTS.md](lib/seo/AGENTS.md)                                   | Metadata, Open Graph images, and the brand mark (`components/ui/icons.tsx`, `app/icon.svg`)           |
-| [.claude/rules/styling.md](.claude/rules/styling.md)                     | Styling: tokens, identity, dark mode, the grid's theme, `cn()`, component shape                       |
-| [.claude/rules/i18n.md](.claude/rules/i18n.md)                           | UI copy in `messages/`, and what stays untranslated                                                   |
-| [CONTRIBUTING.md](CONTRIBUTING.md)                                       | Setup, the workflow and the PR checklist, on one screen                                               |
-| [.claude/skills/live-example/](.claude/skills/live-example/SKILL.md)     | Skill: add a live example, check it renders, hand over its tag                                        |
-| [.claude/skills/preview-docs/](.claude/skills/preview-docs/SKILL.md)     | Skill: render unpublished `gridkit` docs from a local manifest                                        |
-| [.claude/skills/verify/](.claude/skills/verify/SKILL.md)                 | Skill: run the local check sequence in order and read a failure                                       |
+| File                                                                     | What it covers                                                                                            |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| [lib/docs/AGENTS.md](lib/docs/AGENTS.md)                                 | The docs pipeline: manifest, caching, versions, search index, MDX component map; `lib/changelog/` too     |
+| [components/docs/AGENTS.md](components/docs/AGENTS.md)                   | Docs and changelog chrome: sidebar state                                                                  |
+| [components/search/AGENTS.md](components/search/AGENTS.md)               | Docs search: loading the index, ranking, shortcuts                                                        |
+| [components/live-examples/AGENTS.md](components/live-examples/AGENTS.md) | Live examples: the file contract, generated sources, registry, frame                                      |
+| [components/marketing/AGENTS.md](components/marketing/AGENTS.md)         | Home page sections: the hero glow, `HeroGrid` height, `FeatureMatrix` slugs                               |
+| [components/theme-builder/AGENTS.md](components/theme-builder/AGENTS.md) | The theme builder: controls from the manifest, why the preview renders the download, `lib/theme-builder/` |
+| [app/[locale]/AGENTS.md](app/[locale]/AGENTS.md)                         | Routes: keeping them prerendered (`setRequestLocale`, client `loading.tsx`)                               |
+| [lib/seo/AGENTS.md](lib/seo/AGENTS.md)                                   | Metadata, Open Graph images, and the brand mark (`components/ui/icons.tsx`, `app/icon.svg`)               |
+| [.claude/rules/styling.md](.claude/rules/styling.md)                     | Styling: tokens, identity, dark mode, the grid's theme, `cn()`, component shape                           |
+| [.claude/rules/i18n.md](.claude/rules/i18n.md)                           | UI copy in `messages/`, and what stays untranslated                                                       |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                                       | Setup, the workflow and the PR checklist, on one screen                                                   |
+| [.claude/skills/live-example/](.claude/skills/live-example/SKILL.md)     | Skill: add a live example, check it renders, hand over its tag                                            |
+| [.claude/skills/preview-docs/](.claude/skills/preview-docs/SKILL.md)     | Skill: render unpublished `gridkit` docs from a local manifest                                            |
+| [.claude/skills/verify/](.claude/skills/verify/SKILL.md)                 | Skill: run the local check sequence in order and read a failure                                           |
