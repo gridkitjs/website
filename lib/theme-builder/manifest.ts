@@ -13,6 +13,11 @@
 /** Every token's name starts with it. */
 export const TOKEN_PREFIX = "--gridkit-";
 
+/** A token's name without its prefix, as the builder labels it. */
+export function tokenLabel(name: string): string {
+  return name.startsWith(TOKEN_PREFIX) ? name.slice(TOKEN_PREFIX.length) : name;
+}
+
 export interface ColorPair {
   readonly light: string;
   readonly dark: string;

@@ -5,8 +5,10 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/components/ui/cn";
 import { COLOR_SIDES, type ColorSide } from "@/lib/theme-builder/manifest";
 import { PreviewGrid } from "./PreviewGrid";
+import { SegmentedControl } from "./SegmentedControl";
 
-const PALETTE_CLASSES = {
+/** The grid's classes that pin it, and its menus, to one palette. */
+export const PALETTE_CLASSES = {
   light: "gridkit-light",
   dark: "gridkit-dark",
 } as const satisfies Record<ColorSide, string>;
@@ -24,7 +26,7 @@ export function ThemePreview() {
   const [shown, setShown] = useState<ColorSide>("light");
 
   return (
-    <section aria-labelledby="theme-preview" className="@container">
+    <section aria-labelledby="theme-preview" className="@container min-w-0">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h2
           id="theme-preview"
@@ -32,30 +34,13 @@ export function ThemePreview() {
         >
           {t("heading")}
         </h2>
-        <div
-          role="group"
-          aria-label={t("mode")}
-          className="border-site-line rounded-site inline-flex overflow-hidden border text-xs @4xl:hidden"
-        >
-          {COLOR_SIDES.map((side) => (
-            <button
-              key={side}
-              type="button"
-              aria-pressed={shown === side}
-              onClick={() => {
-                setShown(side);
-              }}
-              className={cn(
-                "px-3 py-1.5 transition-colors",
-                shown === side
-                  ? "bg-site-accent text-site-accent-ink"
-                  : "text-site-ink hover:bg-site-surface",
-              )}
-            >
-              {t(side)}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          label={t("mode")}
+          options={COLOR_SIDES.map((side) => ({ value: side, label: t(side) }))}
+          value={shown}
+          onChange={setShown}
+          className="@4xl:hidden"
+        />
       </div>
       <div className="grid gap-4 @4xl:grid-cols-2">
         {COLOR_SIDES.map((side) => (

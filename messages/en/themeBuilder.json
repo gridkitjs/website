@@ -13,5 +13,55 @@
       "dark": "Tickets, dark palette"
     },
     "toolbarLabel": "Ticket tools"
+  },
+  "controls": {
+    "label": "Theme controls",
+    "presets": {
+      "heading": "Preset",
+      "replace": "Replace your changes with {preset}? They are kept only in this page's address."
+    },
+    "palette": {
+      "heading": "Palette from one accent",
+      "intro": "Pick an accent to get the accent, selection and hover colours for both palettes. Each keeps its default lightness, so text on it stays readable.",
+      "accent": "Accent",
+      "proposal": "Proposed colours",
+      "apply": "Apply these colours"
+    },
+    "tokens": {
+      "heading": "Tokens",
+      "tier": "Tokens to show",
+      "basic": "Basic",
+      "advanced": "Advanced",
+      "changed": "Changed",
+      "changedCount": "{count} changed",
+      "reset": "Reset {token}",
+      "resetGroup": "Reset {group}",
+      "resetButton": "Reset"
+    },
+    "contrast": {
+      "target": "Contrast",
+      "AA": "AA",
+      "AAA": "AAA",
+      "issue": "{side}: {text} on {background} is {ratio}:1, under {minimum}:1."
+    },
+    "fields": {
+      "light": "Light",
+      "dark": "Dark",
+      "adjust": "Adjust {token}, {side}",
+      "channel": {
+        "l": "Lightness",
+        "c": "Chroma",
+        "h": "Hue",
+        "alpha": "Opacity"
+      },
+      "unit": "Unit",
+      "pageValue": "The page's",
+      "shadow": {
+        "x": "X (px)",
+        "y": "Y (px)",
+        "blur": "Blur (px)",
+        "spread": "Spread (px)"
+      }
+    }
   }
 }
