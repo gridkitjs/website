@@ -100,7 +100,7 @@ export function ColumnChooserExample() {
     localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -241,7 +241,7 @@ export function ColumnFilteringExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -297,7 +297,7 @@ export function ColumnReorderingExample() {
     localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -381,7 +381,7 @@ export function ColumnResizingExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -444,7 +444,7 @@ export function ColumnSortingExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -498,7 +498,7 @@ export function ColumnTemplatesExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -589,7 +589,7 @@ export function FilterMenuExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -665,7 +665,7 @@ export function ClipboardExample() {
     localFiles: ["fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -756,7 +756,7 @@ export function ExportExample() {
     dependencies: {
       "@gridkitjs/export-xlsx": "0.1.3",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -858,7 +858,7 @@ export function StatePersistenceExample() {
     localFiles: ["fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -970,7 +970,7 @@ export function ContextMenuExample() {
     localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1093,7 +1093,7 @@ export function DarkModeExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       clsx: "^2.1.1",
       react: "19.2.4",
       "react-dom": "19.2.4",
@@ -1131,7 +1131,7 @@ export function DataGridBasicExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1220,7 +1220,7 @@ export function DataGridResizeReorderExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1326,7 +1326,7 @@ export function EventsShowcaseExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1435,7 +1435,7 @@ export function ToolbarExample() {
     dependencies: {
       "@gridkitjs/export-xlsx": "0.1.3",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1526,7 +1526,7 @@ export function AggregatesExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1598,7 +1598,7 @@ export function InfiniteScrollExample() {
     localFiles: ["fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1655,7 +1655,7 @@ export function PaginationExample() {
     localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1722,7 +1722,7 @@ export function RowGroupingExample() {
     localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1809,7 +1809,7 @@ export function RowVirtualizationExample() {
     localFiles: ["fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1875,7 +1875,7 @@ export function CellSelectionExample() {
     localFiles: ["fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1929,7 +1929,7 @@ export function ColumnSelectionExample() {
     localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -1984,7 +1984,7 @@ export function CombinedSelectionExample() {
     dependencies: {
       "@gridkitjs/core": "0.15.0",
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
@@ -2077,7 +2077,7 @@ export function RowSelectionExample() {
     localFiles: ["EventLog.tsx", "fixtures.ts"],
     dependencies: {
       "@gridkitjs/react": "0.15.0",
-      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108090704",
+      "@gridkitjs/theme-tailwind": "0.0.0-dev-20261108091259",
       react: "19.2.4",
       "react-dom": "19.2.4",
     },
