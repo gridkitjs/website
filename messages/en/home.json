@@ -82,6 +82,7 @@
       "core": "Framework-agnostic grid logic: state, view, actions and export, tested without a DOM.",
       "dom": "Browser behaviours any renderer reuses: gestures, focus, observers and overlays.",
       "theme-tailwind": "The grid stylesheet: palette tokens, dark mode and the styles for every part.",
+      "theme-css": "The grid stylesheet in plain CSS, for apps without Tailwind: palette tokens, dark mode and every part's styles.",
       "export-xlsx": "An Excel writer for the export menu, with typed cells and grouped outlines."
     }
   },

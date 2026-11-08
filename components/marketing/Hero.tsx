@@ -61,7 +61,7 @@ export async function Hero() {
 
       <Container className="pb-12 lg:pb-16">
         <div className="border-site-line rounded-site overflow-hidden border">
-          <dl className="-mr-px -mb-px grid grid-cols-2 text-sm sm:grid-cols-4 lg:grid-cols-7">
+          <dl className="-mr-px -mb-px grid grid-cols-2 text-sm sm:grid-cols-4 lg:grid-cols-8">
             {PACKAGES.map(({ slug }) => {
               const release = releases[slug];
               return (

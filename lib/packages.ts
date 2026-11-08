@@ -38,6 +38,12 @@ export const PACKAGES: PackageInfo[] = [
       "GridKit's Tailwind CSS stylesheet: palette tokens, dark mode and the styles for every part of the data grid.",
   },
   {
+    slug: "theme-css",
+    title: "Theme CSS",
+    description:
+      "GridKit's plain CSS stylesheet for apps without Tailwind: palette tokens, dark mode and the styles for every part of the data grid.",
+  },
+  {
     slug: "export-xlsx",
     title: "Export XLSX",
     description:
