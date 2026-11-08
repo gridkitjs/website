@@ -3,7 +3,6 @@
 import { useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/components/ui/cn";
-import { WarningIcon } from "@/components/ui/icons";
 import { formatOklch, parseOklch, type Oklch } from "@/lib/theme-builder/color";
 import type { ColorReader, ContrastIssue } from "@/lib/theme-builder/contrast";
 import {
@@ -16,6 +15,7 @@ import {
 } from "@/lib/theme-builder/manifest";
 import { resolvedColor } from "@/lib/theme-builder/resolve";
 import { colorValue, type Theme } from "@/lib/theme-builder/theme";
+import { ContrastIssues } from "./ContrastIssues";
 import { OklchSliders } from "./fields/OklchSliders";
 import { cssValue, TextField } from "./fields/TextField";
 import { PALETTE_CLASSES } from "./ThemePreview";
@@ -145,23 +145,7 @@ export function ColorControl({
         </div>
       )}
       {issues.length > 0 && (
-        <ul className="mt-2 space-y-1">
-          {issues.map(({ side, text, background, ratio }) => (
-            <li
-              key={`${side} ${text} ${background}`}
-              className="text-site-warning flex gap-1.5 text-xs"
-            >
-              <WarningIcon className="mt-px size-3.5 shrink-0" />
-              {t("contrast.issue", {
-                side: t(`fields.${side}`),
-                text: tokenLabel(text),
-                background: tokenLabel(background),
-                ratio: ratio.toFixed(2),
-                minimum,
-              })}
-            </li>
-          ))}
-        </ul>
+        <ContrastIssues issues={issues} minimum={minimum} className="mt-2" />
       )}
     </div>
   );

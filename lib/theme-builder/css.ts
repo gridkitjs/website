@@ -16,6 +16,9 @@ interface CssBlock {
   blocks: CssBlock[];
 }
 
+/** The name the builder downloads the theme file under. */
+export const THEME_FILE_NAME = "gridkit-theme.css";
+
 export interface ThemeFileOptions {
   /** The version of `@gridkitjs/theme-tailwind` whose tokens it sets. */
   version: string;

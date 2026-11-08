@@ -9,6 +9,7 @@ import {
 import { themeToCss } from "@/lib/theme-builder/css";
 import type { ThemeBuilderData } from "@/lib/theme-builder/package";
 import { ControlPanel } from "./ControlPanel";
+import { OutputPanel } from "./OutputPanel";
 import { ThemePreview } from "./ThemePreview";
 import { useColorReader } from "./useColorReader";
 import { useTheme } from "./useTheme";
@@ -27,7 +28,8 @@ interface ThemeBuilderProps {
  * tokens from `:root`, so the file sets them there, for the whole page.
  *
  * On wide screens the controls are a column of their own beside the
- * preview, scrolling on their own so the preview stays in view.
+ * preview and the theme file under it, scrolling on their own so the
+ * preview stays in view.
  */
 export function ThemeBuilder({ data, pageUrl }: ThemeBuilderProps) {
   const { tokens, presets, version } = data;
@@ -56,6 +58,16 @@ export function ThemeBuilder({ data, pageUrl }: ThemeBuilderProps) {
         level={level}
         onLevelChange={setLevel}
         className="lg:sticky lg:top-20 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-m-2 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:overscroll-contain lg:p-2"
+      />
+      <OutputPanel
+        tokens={tokens}
+        presets={presets}
+        theme={theme}
+        onThemeChange={setTheme}
+        css={css}
+        issues={issues}
+        level={level}
+        className="lg:col-start-1 lg:row-start-2"
       />
     </div>
   );

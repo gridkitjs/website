@@ -63,5 +63,35 @@
         "spread": "Spread (px)"
       }
     }
+  },
+  "output": {
+    "heading": "Theme file",
+    "intro": "The tokens you changed, as one stylesheet that works on top of either theme package. The preview above is this file, applied to the page.",
+    "download": "Download {file}",
+    "contrast": {
+      "pass": "Every contrast check passes at {level}, in both palettes.",
+      "fail": "{count, plural, one {# contrast check falls} other {# contrast checks fall}} short of {level}:"
+    },
+    "import": {
+      "open": "Import",
+      "label": "Theme file to import",
+      "hint": "Paste a theme file, such as one downloaded here or a preset. Only the tokens it sets on :root are read.",
+      "invalid": "This isn't a stylesheet the builder can read. Check that every block and comment it opens is closed.",
+      "submit": "Load theme",
+      "cancel": "Cancel",
+      "replace": "Replace your changes with this theme file? They are kept only in this page's address.",
+      "loaded": "Theme loaded.",
+      "ignored": "Theme loaded. Left out {count, plural, one {# declaration} other {# declarations}} that set no token or can't be applied: {names}."
+    },
+    "steps": {
+      "heading": "Use it",
+      "install": "Install {pkg}.",
+      "import": "Save {file} beside your CSS entry, and import it after the theme's stylesheet."
+    },
+    "flavour": "Your project's styles",
+    "flavours": {
+      "tailwind": "Tailwind",
+      "css": "Plain CSS"
+    }
   }
 }

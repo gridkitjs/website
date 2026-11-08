@@ -1,13 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/components/ui/cn";
-import { parseThemeCss } from "@/lib/theme-builder/css";
-import { themeToHash } from "@/lib/theme-builder/hash";
 import type { Token } from "@/lib/theme-builder/manifest";
 import type { Preset } from "@/lib/theme-builder/package";
 import type { Theme } from "@/lib/theme-builder/theme";
+import { confirmReplace, usePresets } from "./usePresets";
 
 interface PresetPickerProps {
   presets: readonly Preset[];
@@ -18,8 +16,7 @@ interface PresetPickerProps {
 
 /**
  * The theme package's presets, in its order. The one the theme matches is
- * pressed; while it matches none, it holds changes kept nowhere but the
- * address bar, so picking a preset asks first.
+ * pressed; while it matches none, picking a preset asks first.
  */
 export function PresetPicker({
   presets,
@@ -28,20 +25,7 @@ export function PresetPicker({
   onThemeChange,
 }: PresetPickerProps) {
   const t = useTranslations("themeBuilder.controls.presets");
-  const choices = useMemo(
-    () =>
-      presets.map((preset) => {
-        const presetTheme = parseThemeCss(preset.css, tokens).theme;
-        return {
-          preset,
-          theme: presetTheme,
-          hash: themeToHash(presetTheme, tokens),
-        };
-      }),
-    [presets, tokens],
-  );
-  const hash = themeToHash(theme, tokens);
-  const current = choices.find((choice) => choice.hash === hash);
+  const { choices, current } = usePresets(presets, tokens, theme);
 
   return (
     <section aria-labelledby="theme-presets">
@@ -59,12 +43,13 @@ export function PresetPicker({
               aria-pressed={choice === current}
               onClick={() => {
                 if (
-                  current === undefined &&
-                  !window.confirm(t("replace", { preset: choice.preset.label }))
+                  confirmReplace(
+                    current,
+                    t("replace", { preset: choice.preset.label }),
+                  )
                 ) {
-                  return;
+                  onThemeChange(choice.theme);
                 }
-                onThemeChange(choice.theme);
               }}
               className={cn(
                 "w-full px-3 py-2 text-left transition-colors",
