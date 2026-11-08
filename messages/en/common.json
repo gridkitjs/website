@@ -2,11 +2,13 @@
   "nav": {
     "changelog": "Changelog",
     "docs": "Docs",
+    "themeBuilder": "Theme builder",
     "github": "GridKit on GitHub"
   },
   "footer": {
     "tagline": "A headless data-grid toolkit for TypeScript.",
     "about": "About GridKit",
+    "themeBuilder": "Theme builder",
     "githubHeading": "Repository",
     "packagesHeading": "Packages",
     "copyright": "© {year} GridKit.",
@@ -42,6 +44,8 @@
     "docsSection": "{section} docs",
     "docsIndexTitle": "Guides, API reference and live examples",
     "changelog": "Changelog",
-    "changelogIndexTitle": "Release notes for every package"
+    "changelogIndexTitle": "Release notes for every package",
+    "themeBuilder": "Theme builder",
+    "themeBuilderTitle": "Tune the grid to your design, and download it as one CSS file"
   }
 }
