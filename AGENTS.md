@@ -100,8 +100,9 @@ prerelease `@gridkitjs/*` version in `package.json` or the lockfile. After
 the build it also runs
 three guards:
 
-- `node scripts/check-prerendered-routes.mjs <build-log>` fails when the docs
-  or changelog route is `ƒ` instead of `●` in the build's route table (see
+- `node scripts/check-prerendered-routes.mjs <build-log>` fails when the
+  docs, changelog or theme builder route is `ƒ` instead of `●` in the
+  build's route table (see
   [app/[locale]/AGENTS.md](app/[locale]/AGENTS.md#keep-the-routes-prerendered)).
 - `node scripts/check-manifest-tags.mjs` fails when a page of the docs
   manifest the build read uses a tag missing from `public/mdx-tags.json`

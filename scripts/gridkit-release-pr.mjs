@@ -78,7 +78,8 @@ const FAILURES = {
     fix: `Read the first error in the run. A doc page that fails to compile is fixed in gridkit, whose next docs publish sends a new release. Anything else, such as a live example that no longer compiles, fix ${ON_DEVELOPMENT}`,
   },
   routes: {
-    failed: "The docs or changelog route is no longer prerendered (`ƒ`).",
+    failed:
+      "The docs, changelog or theme builder route is no longer prerendered (`ƒ`).",
     fix: `See "Keep the routes prerendered" in \`app/[locale]/AGENTS.md\`, and fix it ${ON_DEVELOPMENT}`,
   },
   tags: {

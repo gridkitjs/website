@@ -28,10 +28,11 @@ updated `package-lock.json`.
 
 ## 2. Read the route table
 
-When the build passes, check its route table: `/[locale]/docs/[[...slug]]`
-and `/[locale]/changelog/[[...slug]]` must be marked `●` (prerendered). A
-`ƒ` there means a layout or page reads request headers, so every visit
-renders on demand behind the loading skeleton. The build still succeeds, so
+When the build passes, check its route table: `/[locale]/docs/[[...slug]]`,
+`/[locale]/changelog/[[...slug]]` and `/[locale]/theme-builder` must be
+marked `●` (prerendered). A `ƒ` there means a layout or page reads request
+headers, so every visit renders on demand, the docs and changelog behind the
+loading skeleton. The build still succeeds, so
 this is the step most often missed. CI fails on it through
 `scripts/check-prerendered-routes.mjs`, which reads a saved build log; to run
 it here, build with `npm run build 2>&1 | tee <log outside the repo>` and pass
@@ -62,7 +63,7 @@ published (it warns while it isn't, and CI then reads the pin). See
 | `gen-example-sources`    | It names the example file and what is wrong; see [components/live-examples/AGENTS.md](../../../components/live-examples/AGENTS.md).                                                          |
 | `check-feature-slugs`    | A feature-matrix link points at a doc page that doesn't exist, or a label is missing; see [components/marketing/AGENTS.md](../../../components/marketing/AGENTS.md).                         |
 | `next build`             | Read the first error; a fetch or rate-limit error usually means `GITHUB_TOKEN` is missing or expired.                                                                                        |
-| `ƒ` on a docs route      | See step 2.                                                                                                                                                                                  |
+| `ƒ` on a route           | See step 2.                                                                                                                                                                                  |
 | `check-manifest-tags`    | A doc page names a tag this site lacks, usually a live example not added yet: add it here first (the `live-example` skill), or pin a manifest that doesn't use it.                           |
 | `check-release-deps`     | A branch headed for `main` carries a `dev` snapshot: cut it from `main`, not `development`. Only the release pull request moves `main`'s `@gridkitjs/*` versions.                            |
 | `next build`, docs pages | A doc page that fails to compile is MDX from `gridkit`: fix it there, never with a local `.mdx` here (see [lib/docs/AGENTS.md](../../../lib/docs/AGENTS.md)).                                |

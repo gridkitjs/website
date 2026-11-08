@@ -60,9 +60,10 @@ runs:
         npm run build 2>&1 | tee "$RUNNER_TEMP/build.log"
 
     # A route that reads request headers renders on demand (`ƒ`): the build
-    # still succeeds, but every docs and changelog visit would then show the
-    # loading skeleton. Fails unless both routes are prerendered (`●`).
-    - name: Check docs routes are prerendered
+    # still succeeds, but every visit would then render it, the docs and
+    # changelog behind the loading skeleton. Fails unless the docs, changelog
+    # and theme builder routes are prerendered (`●`).
+    - name: Check routes are prerendered
       id: routes
       shell: bash
       run: node scripts/check-prerendered-routes.mjs "$RUNNER_TEMP/build.log"
