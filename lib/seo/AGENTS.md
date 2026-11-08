@@ -52,12 +52,16 @@ through `buildMetadata`'s `image` option, a locale-less route path:
   changelog page's title, at `/<locale>/og/docs/<slug>` and
   `/<locale>/og/changelog/<slug>`. They are route handlers because Next
   can't put an `opengraph-image.tsx` under an optional catch-all.
+- `app/[locale]/og/theme-builder/route.tsx` renders the theme builder's,
+  at `/<locale>/og/theme-builder`. Its page changes only with a deploy,
+  so it has no `revalidate`.
 - **Adding one for a new section**: copy a route handler under
-  `app/[locale]/og/<section>/`, keep `dynamic = "force-static"`,
-  `revalidate` and a `generateStaticParams` that lists every locale
-  (route handlers don't inherit the layout's params; without it the
-  route renders on demand), and pass `image: "og/<section>/<slug>"` from
-  the page's `generateMetadata`. Labels live under `og` in
+  `app/[locale]/og/<section>/`, keep `dynamic = "force-static"`, a
+  `revalidate` matching the page's if its content is fetched, and a
+  `generateStaticParams` that lists every locale (route handlers don't
+  inherit the layout's params; without it the route renders on demand),
+  and pass `image: "og/<section>/<slug>"` from the page's
+  `generateMetadata`. Labels live under `og` in
   `messages/<locale>/common.json`.
 - Set the image explicitly, as `buildMetadata` does: a page's own
   `openGraph` replaces its layout's, file-based image included.

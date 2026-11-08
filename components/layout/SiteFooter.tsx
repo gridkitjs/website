@@ -47,6 +47,12 @@ export async function SiteFooter() {
             >
               {t("about")}
             </Link>
+            <Link
+              href="/theme-builder"
+              className="text-site-ink-inverted text-sm font-medium transition-opacity hover:opacity-70"
+            >
+              {t("themeBuilder")}
+            </Link>
           </div>
         </div>
         <div>

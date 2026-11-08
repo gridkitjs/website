@@ -32,6 +32,7 @@ export async function generateMetadata({
     description: t("description"),
     path: "theme-builder",
     locale,
+    image: "og/theme-builder",
   });
 }
 
