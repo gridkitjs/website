@@ -70,11 +70,11 @@ comes through the rate-limited GitHub API, and the per-file fallback makes
 more requests than GitHub's unauthenticated limit (60 req/hr) allows; set it
 for local dev too.
 
-The five `@gridkitjs/*` packages (`core`, `dom`, `react`, `theme-tailwind`,
-`export-xlsx`) are never moved by hand. On `main` they change only through
-the release pull request a bot opens when gridkit releases, which also
-moves the docs pin in `gridkit.json`, so production's packages and docs
-change together; on `development`, a bot installs gridkit's `dev`
+The `@gridkitjs/*` packages (`core`, `dom`, `react`, `theme-tailwind`,
+`theme-css`, `export-xlsx`) are never moved by hand. On `main` they change
+only through the release pull request a bot opens when gridkit releases,
+which also moves the docs pin in `gridkit.json`, so production's packages
+and docs change together; on `development`, a bot installs gridkit's `dev`
 snapshots (see [Channels](#channels)). On `0.x` a caret range never crosses
 a minor, so `npm update` leaves them where they are. When `gridkit` ships a
 new published package, add it to `package.json` by hand once: the release
@@ -214,7 +214,7 @@ feedback").
 - To test the snapshot workflow, run it from the Actions tab with a
   payload of the event's shape, versions from
   `npm view @gridkitjs/<pkg> dist-tags` (the `dev` tag):
-  `{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.0.0-dev-…", "@gridkitjs/dom": "…", "@gridkitjs/react": "…", "@gridkitjs/theme-tailwind": "…", "@gridkitjs/export-xlsx": "…"}, "manifestRef": "docs-meta-next"}`.
+  `{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.0.0-dev-…", "@gridkitjs/dom": "…", "@gridkitjs/react": "…", "@gridkitjs/theme-tailwind": "…", "@gridkitjs/theme-css": "…", "@gridkitjs/export-xlsx": "…"}, "manifestRef": "docs-meta-next"}`.
   It skips when those versions are already installed.
 - next.gridkitjs.com is built with `SITE_CHANNEL=next`, which keeps it out
   of search engines and shows a preview banner (see
@@ -256,7 +256,7 @@ auto-merge on.
 **To re-run a release**, after a fix, or for a closed release pull
 request, run "Gridkit release" from the Actions tab with the payload from
 the pull request's description:
-`{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.15.0", …all five}, "manifestSha": "<40-character docs-meta commit>"}`.
+`{"sha": "<40-character gridkit commit>", "versions": {"@gridkitjs/core": "0.15.0", …one per package}, "manifestSha": "<40-character docs-meta commit>"}`.
 Versions must be releases; it refuses a prerelease. What is already on
 `development` it leaves alone, and with nothing on `development` that
 `main` lacks it opens no pull request.
