@@ -69,6 +69,10 @@ const FAILURES = {
     failed: "`npx tsc --noEmit` fails with the released packages.",
     fix: `It is usually a live example written against a snapshot API that changed before the release. Fix it ${ON_DEVELOPMENT}`,
   },
+  test: {
+    failed: "The theme builder's unit tests fail with the released packages.",
+    fix: `It is usually the theme package's token manifest or presets changing shape, such as a new \`schemaVersion\` or a value the builder refuses. Update \`lib/theme-builder/\` ${ON_DEVELOPMENT}`,
+  },
   build: {
     failed: "`npm run build` fails with the released packages and docs.",
     fix: `Read the first error in the run. A doc page that fails to compile is fixed in gridkit, whose next docs publish sends a new release. Anything else, such as a live example that no longer compiles, fix ${ON_DEVELOPMENT}`,

@@ -15,7 +15,7 @@ finding a failure there. What each one enforces is under
 From the repo root, in this order. Each step stops the chain on failure:
 
 ```bash
-npm run format:check && npm run lint && npx tsc --noEmit && npm run build
+npm run format:check && npm run lint && npx tsc --noEmit && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "lib/**/*.test.ts" && npm run build
 ```
 
 `npm run build` needs `GITHUB_TOKEN` in `.env` (see
@@ -58,6 +58,7 @@ published (it warns while it isn't, and CI then reads the pin). See
 | `format:check`           | Run `npx prettier --write <file>` on the files it names, then review the diff. Line endings must be LF.                                                                                      |
 | `lint`                   | Fix the code; don't add a disable comment.                                                                                                                                                   |
 | `tsc`                    | Fix the type rather than reaching for `any` or `!`. An error in `lib/docs/example-sources.generated.ts` means it is stale: run `node scripts/gen-example-sources.mjs` and commit the result. |
+| `node --test`            | It names the test that failed. In `lib/theme-builder/`, it is usually the installed theme package's `tokens.json` or presets changing shape: fix the builder's model there.                  |
 | `gen-example-sources`    | It names the example file and what is wrong; see [components/live-examples/AGENTS.md](../../../components/live-examples/AGENTS.md).                                                          |
 | `check-feature-slugs`    | A feature-matrix link points at a doc page that doesn't exist, or a label is missing; see [components/marketing/AGENTS.md](../../../components/marketing/AGENTS.md).                         |
 | `next build`             | Read the first error; a fetch or rate-limit error usually means `GITHUB_TOKEN` is missing or expired.                                                                                        |

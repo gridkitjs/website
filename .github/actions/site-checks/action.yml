@@ -1,10 +1,10 @@
 name: Site checks
 description: >
-  Format, lint, types, the build, and the guards that read the build:
-  prerendered docs routes and registered manifest tags. Expects the repo
-  checked out and its dependencies installed. On a failure, it writes the
-  failed check's name (format, lint, types, build, routes or tags) to
-  $RUNNER_TEMP/failed-check.
+  Format, lint, types, the unit tests, the build, and the guards that read
+  the build: prerendered docs routes and registered manifest tags. Expects
+  the repo checked out and its dependencies installed. On a failure, it
+  writes the failed check's name (format, lint, types, test, build, routes
+  or tags) to $RUNNER_TEMP/failed-check.
 
 inputs:
   github-token:
@@ -42,6 +42,11 @@ runs:
     - id: types
       shell: bash
       run: npx tsc --noEmit
+    # Node strips the tests' types itself. The repo's package.json sets no
+    # `type`, so without the flag Node warns that it detected ESM.
+    - id: test
+      shell: bash
+      run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "lib/**/*.test.ts"
 
     # The log is kept for the route check below, and `pipefail` keeps a failed
     # build from being hidden by `tee`.
@@ -84,6 +89,7 @@ runs:
           format=${{ steps.format.outcome }}
           lint=${{ steps.lint.outcome }}
           types=${{ steps.types.outcome }}
+          test=${{ steps.test.outcome }}
           build=${{ steps.build.outcome }}
           routes=${{ steps.routes.outcome }}
           tags=${{ steps.tags.outcome }}

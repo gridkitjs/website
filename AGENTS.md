@@ -84,7 +84,7 @@ doesn't depend on.
 CI-equivalent local check, in order:
 
 ```bash
-npm run format:check && npm run lint && npx tsc --noEmit && npm run build
+npm run format:check && npm run lint && npx tsc --noEmit && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "lib/**/*.test.ts" && npm run build
 ```
 
 The `ci` job in `.github/workflows/ci.yml` runs this same sequence on every
@@ -116,6 +116,11 @@ Vercel still builds the previews and production on its own.
   reaching for `any` or a non-null assertion.
 - **ESLint** — `eslint-config-next`'s core-web-vitals + typescript configs.
   Fix the code rather than adding disable comments.
+- **Tests** — unit tests sit beside their module as `*.test.ts` and run on
+  Node's own test runner, with no dependencies; so far only
+  `lib/theme-builder/` has them. Node strips the types itself, so a tested
+  module imports only relative paths, ending in `.ts`
+  (`allowImportingTsExtensions` in `tsconfig.json`), never the `@/` alias.
 - **Prettier** — double quotes, semicolons, 2-space indent, trailing commas,
   80 columns, `prettier-plugin-tailwindcss` (class names get reordered
   automatically — don't hand-order them, don't fight the formatter).
